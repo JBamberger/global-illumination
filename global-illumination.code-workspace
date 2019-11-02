@@ -1,0 +1,42 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cmake.configureOnOpen": true,
+		"files.associations": {
+			"thread": "cpp",
+			"qtimer": "cpp",
+			"qwidget": "cpp",
+			"chrono": "cpp",
+			"qcloseevent": "cpp",
+			"qpainter": "cpp",
+			"qpushbutton": "cpp",
+			"qtoolbar": "cpp",
+			"qmainwindow": "cpp",
+			"qlabel": "cpp",
+			"qimage": "cpp",
+			"qfiledialog": "cpp",
+			"qfile": "cpp",
+			"qapplication": "cpp"
+		}
+	},
+	"launch": {
+		"configurations": [
+			{
+				"name": "Launch Raytracer",
+				"type": "cppvsdbg",
+				"request": "launch",
+				"program": "${workspaceFolder}/build/global-illu.exe",
+				"args": [],
+				"stopAtEntry": false,
+				"cwd": "${workspaceFolder}",
+				"environment": [],
+				"externalConsole": false
+			}
+		],
+		"compounds": []
+	}
+}
