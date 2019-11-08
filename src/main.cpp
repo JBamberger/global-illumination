@@ -14,23 +14,40 @@ int main(int argc, char** argv) {
 
     RayTracer raytracer(camera, light);
 
+    Material red{{1, 0, 0}};
+    Material green{{0, 1, 0}};
+    Material blue{{0, 0, 1}};
+
     // Set up scene
     Octree scene({-20, -20, -20}, {20, 20, 20});
-    // TODO Add objects to the scene
-    // scene.push_back(...);
 
     // sphere at center
     auto sphere = std::make_unique<ImplicitSphere>();
     sphere->radius = 1;
+    sphere->material = green;
     scene.push_back(sphere.get());
 
     // triangle upper right corner
+    auto t3 = std::make_unique<Triangle>();
+    t3->A = {1, 2.5, 0.5};
+    t3->B = {1, 2.5, 2.5};
+    t3->C = {1, 0.5, 2.5};
+    t3->material = red;
+    scene.push_back(t3.get());
 
-    auto ur_triangle = std::make_unique<Triangle>();
-    ur_triangle->A = {0, 2, 0};
-    ur_triangle->B = {0, 2, 2};
-    ur_triangle->C = {0, 0, 2};
-    scene.push_back(ur_triangle.get());
+    auto t1 = std::make_unique<Triangle>();
+    t1->A = {-1, 1.5, -0.5};
+    t1->B = {-1, 1.5, 1.5};
+    t1->C = {-1, -0.5, 1.5};
+    t1->material = blue;
+    scene.push_back(t1.get());
+
+    auto t2 = std::make_unique<Triangle>();
+    t2->A = {0, 2, 0};
+    t2->B = {0, 2, 2};
+    t2->C = {0, 0, 2};
+    t2->material = green;
+    scene.push_back(t2.get());
 
     raytracer.setScene(&scene);
 

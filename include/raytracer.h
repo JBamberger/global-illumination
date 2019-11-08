@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <memory>
 //#include <future>
+#include <limits>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -28,20 +29,29 @@ class RayTracer {
         // The structure of the for loop should remain for incremental rendering.
         for (int y = 0; y < h && _running; ++y) {
             for (int x = 0; x < w && _running; ++x) {
-                glm::dvec3 intersect, normal;
                 Ray ray = _camera.getRay(x, y, w, h);
-
-                _image->setPixel(x, y, {0, 0, 0});
-                std::vector<Entity*> entities = _scene->intersect(ray);
-                for (Entity* entity : entities) {
-                    if (entity->intersect(ray, intersect, normal)) {
-                        _image->setPixel(x, y, {0, 1, 0});
-                    }
-                }
-
-                // TODO Implement this
+                _image->setPixel(x, y, compute_pixel(ray, x, y));
             }
         }
+    }
+
+    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) {
+        glm::dvec3 intersect, normal;
+
+        double min = std::numeric_limits<double>::infinity();
+        glm::dvec3 color{0, 0, 0};
+
+        std::vector<Entity*> entities = _scene->intersect(ray);
+        for (Entity* entity : entities) {
+            if (entity->intersect(ray, intersect, normal)) {
+                double dist = glm::distance(ray.origin, intersect);
+                if (dist < min) {
+                    min = dist;
+                    color = entity->material.color;
+                }
+            }
+        }
+        return color;
     }
 
     bool running() const { return _running; }
