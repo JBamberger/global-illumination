@@ -17,21 +17,13 @@ class RayTracer {
     RayTracer() = delete;
 
     RayTracer(const Camera& camera, glm::dvec3 light)
-        : _camera(camera), _light(light), _image(std::make_shared<Image>(0, 0)){};
+        : _camera(camera), _light(light), _image(std::make_shared<Image>(0, 0)) {}
 
     void setScene(const Octree* scene) { _scene = scene; }
 
     void run(int w, int h) {
         // TODO Implement this
         _image = std::make_shared<Image>(w, h);
-
-        std::cout << "corner ray directions" << std::endl;
-        std::cout << glm::to_string(_camera.getRay(0, 0, w, h).dir) << "\n";
-        std::cout << glm::to_string(_camera.getRay(0, h - 1, w, h).dir) << "\n";
-        std::cout << glm::to_string(_camera.getRay(w - 1, 0, w, h).dir) << "\n";
-        std::cout << glm::to_string(_camera.getRay(w - 1, h - 1, w, h).dir) << "\n";
-        std::cout << "center ray direction" << std::endl;
-        std::cout << glm::to_string(_camera.getRay(w / 2 - 1, h / 2 - 1, w, h).dir) << "\n";
 
         // The structure of the for loop should remain for incremental rendering.
         for (int y = 0; y < h && _running; ++y) {
