@@ -3,10 +3,10 @@
 #include <chrono>
 #include <thread>
 
+#include <QCloseEvent>
 #include <QPainter>
 #include <QTimer>
 #include <QWidget>
-#include <QCloseEvent>
 
 #include "image.h"
 #include "raytracer.h"
@@ -22,9 +22,7 @@ class Viewer : public QWidget {
         restart_raytrace();
     }
 
-    ~Viewer() {
-        stop_raytrace();
-    }
+    ~Viewer() { stop_raytrace(); }
 
     void stop_raytrace() {
         if (_raytracer.running()) {

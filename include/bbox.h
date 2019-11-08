@@ -29,6 +29,7 @@ struct BoundingBox {
     /// Check if a point lies within the bounding box.
     bool contains(glm::dvec3 point) const {
         // TODO Implement this
-        return false;
+        return min.x <= point.x && point.x <= max.x && min.y <= point.y && point.y <= max.y &&
+               min.z <= point.z && point.z <= max.z;
     }
 };

@@ -2,5 +2,6 @@ build/
 .idea
 cmake-build-*/
 .vscode/
+.vs/
 *.code-workspace
 

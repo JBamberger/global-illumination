@@ -47,9 +47,7 @@ class Gui : public QMainWindow {
         this->resize(width, height);
     }
 
-    ~Gui() {
-        _viewer->stop_raytrace();
-    }
+    ~Gui() { _viewer->stop_raytrace(); }
 
   private:
     QLabel* _durationText;
