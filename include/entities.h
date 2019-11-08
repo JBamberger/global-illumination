@@ -30,6 +30,14 @@ struct ImplicitSphere final : Entity {
     double radius;
 };
 
+struct Triangle final : Entity {
+    bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
+    BoundingBox boundingBox() const override;
+    glm::dvec3 A = {0, 0, 0};
+    glm::dvec3 B = {0, 0, 0};
+    glm::dvec3 C = {0, 0, 0};
+};
+
 // TODO Implement implicit sphere
 // TODO Implement implicit triangle
 
