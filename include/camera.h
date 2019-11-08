@@ -17,26 +17,27 @@ struct Camera {
     const double focalDist = 0.04;   // focal distance
 
     inline Ray getRay(double x, double y, double x_size, double y_size) {
-        glm::dvec3 origin;
-        glm::dvec3 direction;
+        // TODO: right and scale should be cached for better performance
 
-        double scale = sensorDiag / glm::sqrt(x_size * x_size + y_size * y_size);
+        // the side direction can be computed from the up and forward vector since it is
+        // perpendicular to both of them
+        const auto right = glm::normalize(glm::cross(up, forward));
 
-        double w = scale * x_size;
-        double h = scale * y_size;
+        // scale is the factor by which the sensor is stretched to match the display size
+        const auto scale = sensorDiag / glm::sqrt(x_size * x_size + y_size * y_size);
 
-        double px = x * scale - (w / 2);
-        double py = y * scale - (h / 2);
+        // computes the relative location of the pixel in the sensor, i.e. the middle pixel of the
+        // screen is in the middle of the sensor
+        const auto px = scale * (x + 0.5 - x_size / 2);
+        const auto py = scale * (y + 0.5 - y_size / 2);
 
-        glm::dvec3 right = glm::normalize(glm::cross(up, forward));
-        glm::dvec3 fwd = forward * focalDist;
-        glm::dvec3 u = up * py;
-        glm::dvec3 r = right * px;
-        origin = pos;
-        direction = fwd  // move to image plain
-                    + u  // move up
-                    + r; // move right
+        // finally compute the direction of the ray which goes through the given pixel.
+        // this requires that forward, up and right are normalized
+        glm::dvec3 direction = forward * focalDist + up * py + right * px;
 
-        return {origin, direction};
+        // let rays originate in the camera center
+        // TODO: It might be better to originate in the sensor to avoid objects between sensor and
+        // eye?
+        return {pos, direction};
     }
 };

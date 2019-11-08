@@ -22,14 +22,17 @@ struct BoundingBox {
 
     /// Check if another bounding box intersects the current bounding box.
     bool intersect(const BoundingBox& other) const {
-        // TODO Implement this
-        return false;
+        // Check if the intervals in each dimension overlap (slab intersection)
+        return (min.x <= other.max.x && other.min.x <= max.x) && // test x dimension
+               (min.y <= other.max.y && other.min.y <= max.y) && // test y dimension
+               (min.z <= other.max.z && other.min.z <= max.z);   // test z dimension
     }
 
     /// Check if a point lies within the bounding box.
     bool contains(glm::dvec3 point) const {
-        // TODO Implement this
-        return min.x <= point.x && point.x <= max.x && min.y <= point.y && point.y <= max.y &&
-               min.z <= point.z && point.z <= max.z;
+        // basically the same as the bbox test but min and max are the same values
+        return (min.x <= point.x && point.x <= max.x) && // test x dimension
+               (min.y <= point.y && point.y <= max.y) && // test y dimension
+               (min.z <= point.z && point.z <= max.z);   // test z dimension
     }
 };

@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QWidget>
+#include <utility>
 
 #include "image.h"
 #include "raytracer.h"
@@ -14,11 +15,11 @@
 class Viewer : public QWidget {
   public:
     Viewer(RayTracer raytracer, QLabel* durationText, QWidget* parent)
-        : QWidget(parent), _durationText(durationText), _raytracer(raytracer) {
+        : QWidget(parent), _durationText(durationText), _raytracer(std::move(raytracer)) {
         _timer = new QTimer(this);
         _timer->setInterval(32);
         _timer->start();
-        connect(_timer, &QTimer::timeout, [&]() { this->repaint(); });
+        connect(_timer, &QTimer::timeout, [this]() { this->repaint(); });
         restart_raytrace();
     }
 
@@ -50,11 +51,12 @@ class Viewer : public QWidget {
         _thread = std::thread([&]() {
             _durationText->setText("Running...");
             using namespace std::chrono;
-            high_resolution_clock::time_point t1 = high_resolution_clock::now();
+            const auto t1 = high_resolution_clock::now();
             this->_raytracer.run(this->width(), this->height());
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(t2 - t1).count();
-            _durationText->setText(QString::number(duration / (double)1000) + " seconds");
+            const auto t2 = high_resolution_clock::now();
+            const auto duration = duration_cast<milliseconds>(t2 - t1).count();
+            _durationText->setText(QString::number(duration / static_cast<double>(1000)) +
+                                   " seconds");
         });
     }
 
