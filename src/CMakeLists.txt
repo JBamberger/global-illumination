@@ -17,7 +17,11 @@ set(HEADERS
 
 
 
-add_library(global_illu_lib entities.cpp)
+add_library(global_illu_lib
+	implicit_sphere.cpp
+	triangle.cpp
+	quad.cpp
+)
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/3rd_party"

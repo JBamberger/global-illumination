@@ -19,6 +19,8 @@ struct Camera {
     inline Ray getRay(double x, double y, double x_size, double y_size) {
         // TODO: right and scale should be cached for better performance
 
+        y = y_size - y; // invert the y axis to match the world coordinate system
+
         // the side direction can be computed from the up and forward vector since it is
         // perpendicular to both of them
         const auto right = glm::normalize(glm::cross(up, forward));

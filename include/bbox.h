@@ -35,4 +35,8 @@ struct BoundingBox {
                (min.y <= point.y && point.y <= max.y) && // test y dimension
                (min.z <= point.z && point.z <= max.z);   // test z dimension
     }
+
+    static BoundingBox unite(const BoundingBox& b1, const BoundingBox& b2) {
+        return BoundingBox{glm::min(b1.min, b2.min), glm::max(b1.max, b2.max)};
+    }
 };

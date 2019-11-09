@@ -38,6 +38,16 @@ struct Triangle final : Entity {
     glm::dvec3 C = {0, 0, 0};
 };
 
+struct Quad final : Entity {
+    bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
+    BoundingBox boundingBox() const override;
+    Quad() = delete;
+    Quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D);
+
+    Triangle T1;
+    Triangle T2;
+};
+
 // TODO Implement implicit sphere
 // TODO Implement implicit triangle
 
