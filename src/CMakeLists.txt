@@ -1,4 +1,4 @@
-find_package(Qt5Widgets)
+find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Threads)
 
 set(SOURCES main.cpp)
@@ -15,11 +15,19 @@ set(HEADERS
 	include/material.h
 )
 
+
+
 add_library(global_illu_lib entities.cpp)
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/3rd_party"
 )
+
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(global_illu_lib PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
 
 add_executable(global_illu ${SOURCES})
 target_include_directories(global_illu PRIVATE

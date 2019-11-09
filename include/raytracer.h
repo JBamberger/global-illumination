@@ -27,6 +27,8 @@ class RayTracer {
         _image = std::make_shared<Image>(w, h);
 
         // The structure of the for loop should remain for incremental rendering.
+        // termination criterion: add  && _running
+        // #pragma omp parallel for
         for (int y = 0; y < h && _running; ++y) {
             for (int x = 0; x < w && _running; ++x) {
                 Ray ray = _camera.getRay(x, y, w, h);
