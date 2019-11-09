@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 #include <ostream>
 
+constexpr static auto eps = 1e-5;
+
 struct ray_spec {
     const bool success;
     const glm::dvec3 direction;          // ray direction
@@ -27,22 +29,46 @@ struct TriangleIntersectionTest : public testing::TestWithParam<ray_spec> {
 };
 
 TEST_P(TriangleIntersectionTest, testSuccess) {
-    auto params = GetParam();
-    Ray ray{{10, 0, 0}, params.direction};
-    bool success = triangle.intersect(ray, intersect, normal);
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
+    const auto success = triangle.intersect(ray, intersect, normal);
     EXPECT_EQ(success, params.success);
 }
 
+TEST_P(TriangleIntersectionTest, testIntersect) {
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
+    triangle.intersect(ray, intersect, normal);
+
+    if (params.success) {
+        EXPECT_NEAR(intersect.x, params.expected_intersect.x, eps);
+        EXPECT_NEAR(intersect.y, params.expected_intersect.y, eps);
+        EXPECT_NEAR(intersect.z, params.expected_intersect.z, eps);
+    }
+}
+
+TEST_P(TriangleIntersectionTest, testNormal) {
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
+    triangle.intersect(ray, intersect, normal);
+
+    if (params.success) {
+        EXPECT_NEAR(normal.x, params.expected_normal.x, eps);
+        EXPECT_NEAR(normal.y, params.expected_normal.y, eps);
+        EXPECT_NEAR(normal.z, params.expected_normal.z, eps);
+    }
+}
+
 // clang-format off
-INSTANTIATE_TEST_CASE_P(Default, TriangleIntersectionTest, testing::Values(
-    ray_spec{1, glm::dvec3{-10,  0.1,  0.1}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // inside triangle
+INSTANTIATE_TEST_SUITE_P(Default, TriangleIntersectionTest, testing::Values(
+    ray_spec{1, glm::dvec3{-10,  0.1,  0.1}, glm::dvec3{0,0.1,0.1}, glm::dvec3{1,0,0}}, // inside triangle
     ray_spec{0, glm::dvec3{-1,   0,    0  }, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // exact hit test bottom left corner
     ray_spec{0, glm::dvec3{-10, -0.1,  0.1}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // outside test left
     ray_spec{0, glm::dvec3{-10,  0.1, -0.1}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // outside test bottom
     ray_spec{0, glm::dvec3{-10,  0.7,  0.7}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // outside test right
     ray_spec{0, glm::dvec3{-10, -0.1, -0.1}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // outside test bottom left
     ray_spec{0, glm::dvec3{-10,  1.5, -0.1}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}, // outside test bottom right
-    ray_spec{0, glm::dvec3{-10, -0.1,  1.5}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}})  // outside test top right
+    ray_spec{0, glm::dvec3{-10, -0.1,  1.5}, glm::dvec3{0,0,0}, glm::dvec3{0,0,0}}) // outside test top right
 );
 // clang-format on
 
@@ -55,19 +81,18 @@ struct ImplicitSphereIntersectionTest : public testing::TestWithParam<ray_spec> 
 };
 
 TEST_P(ImplicitSphereIntersectionTest, testSuccess) {
-    auto params = GetParam();
-    Ray ray{{10, 0, 0}, params.direction};
-    bool success = sphere.intersect(ray, intersect, normal);
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
+    const auto success = sphere.intersect(ray, intersect, normal);
 
     EXPECT_EQ(success, params.success);
 }
 
 TEST_P(ImplicitSphereIntersectionTest, testIntersect) {
-    auto params = GetParam();
-    Ray ray{{10, 0, 0}, params.direction};
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
     sphere.intersect(ray, intersect, normal);
 
-    const double eps = 1e-5;
     if (params.success) {
         EXPECT_NEAR(intersect.x, params.expected_intersect.x, eps);
         EXPECT_NEAR(intersect.y, params.expected_intersect.y, eps);
@@ -76,11 +101,10 @@ TEST_P(ImplicitSphereIntersectionTest, testIntersect) {
 }
 
 TEST_P(ImplicitSphereIntersectionTest, testNormal) {
-    auto params = GetParam();
-    Ray ray{{10, 0, 0}, params.direction};
+    const auto params = GetParam();
+    const Ray ray{{10, 0, 0}, params.direction};
     sphere.intersect(ray, intersect, normal);
 
-    const double eps = 1e-5;
     if (params.success) {
         EXPECT_NEAR(normal.x, params.expected_normal.x, eps);
         EXPECT_NEAR(normal.y, params.expected_normal.y, eps);
@@ -89,7 +113,7 @@ TEST_P(ImplicitSphereIntersectionTest, testNormal) {
 }
 
 // clang-format off
-INSTANTIATE_TEST_CASE_P(Default, ImplicitSphereIntersectionTest, testing::Values( 
+INSTANTIATE_TEST_SUITE_P(Default, ImplicitSphereIntersectionTest, testing::Values( 
     ray_spec{1, glm::dvec3{-1,             0,             0           }, glm::dvec3{1,             0,             0           }, glm::dvec3{1,            0,             0            }}, // center
                                                                                                                                                                                       
     ray_spec{0, glm::dvec3{-1,             1,             0           }, glm::dvec3{0,             0,             0           }, glm::dvec3{0,            0,             0            }}, // right  far outside
