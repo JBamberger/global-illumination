@@ -79,8 +79,21 @@ class RayTracer {
             }
 
             if (!blocked) {
+                // ambient:
+                // L_a = k_a * I_a
                 // diffuse:
                 // L_d = k_d * I * glm::max(0.0, glm::dot(n, l))
+                // specular:
+                // h = glm::normalize(v + l)
+                // L_s = k_s * I * glm::pow(glm::max(0.0, glm::dot(n,h)), p)
+                // mirror: (trace another ray in reflection direction)
+                // r = 2n(dot(n,v)) - v
+                // L_m = Ray(P, r).color
+                // glazed:
+                // L = L_a + L_d + L_m
+                //
+                // For many light sources:
+                // L = L_a + sum(L_d(i) + L_s(i))
 
                 // apply diffuse shading
                 color = min_ent->material.color * glm::max(0.0, glm::dot(normal, l));
