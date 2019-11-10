@@ -32,6 +32,7 @@ class RayTracer {
         for (int y = 0; y < h && _running; ++y) {
             for (int x = 0; x < w && _running; ++x) {
                 Ray ray = _camera.getRay(x, y, w, h);
+
                 _image->setPixel(x, y, compute_pixel(ray, x, y));
             }
         }
@@ -46,14 +47,23 @@ class RayTracer {
         std::vector<Entity*> entities = _scene->intersect(ray);
         for (Entity* entity : entities) {
             if (entity->intersect(ray, intersect, normal)) {
-                double dist = glm::distance(ray.origin, intersect);
+                const auto dist = glm::distance(ray.origin, intersect);
                 if (dist < min) {
                     min = dist;
-                    color = entity->material.color;
+                    color = compute_shade(ray, entity->material, intersect, normal);
                 }
             }
         }
         return color;
+    }
+
+    glm::dvec3
+    compute_shade(const Ray& ray, const Material& mat, const glm::dvec3& i, const glm::dvec3& n) {
+        // glm::dvec3 v = -glm::normalize(ray.dir);
+        const auto l = glm::normalize(_light - i);
+        const auto N = glm::normalize(n);
+
+        return mat.color * glm::max(0.0, glm::dot(N, l));
     }
 
     bool running() const { return _running; }
