@@ -2,12 +2,19 @@
 
 bool ExplicitEntity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const {
     // TODO: check intersection direction
+    glm::dvec3 i, n;
+    double min = std::numeric_limits<double>::infinity();
     for (const auto& t : faces) {
-        if (t.intersect(ray, intersect, normal)) {
-            return true;
+        if (t.intersect(ray, i, n)) {
+            const auto d = glm::distance(i, ray.origin);
+            if (d < min) {
+                min = d;
+                intersect = i;
+                normal = n;
+            }
         }
     }
-    return false;
+    return min != std::numeric_limits<double>::infinity();
 }
 
 BoundingBox ExplicitEntity::boundingBox() const {

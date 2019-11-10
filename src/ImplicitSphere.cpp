@@ -29,25 +29,32 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
     // q = 0 -> one solution
     // q > 0 -> two solutions
     const auto q = b * b - 4 * a * c;
-    double x1, x2; // possible solutions
+    double solution; // possible solutions
     if (q < 0) {
         return false;
     }
     if (q == 0) {
-        x1 = x2 = -0.5 * b / a;
+        solution = -0.5 * b / a;
     } else {
         const auto root = glm::sqrt(q);
-        x1 = -0.5 * (b - root) / a;
-        x2 = -0.5 * (b + root) / a;
+        const auto x1 = -0.5 * (b - root) / a;
+        const auto x2 = -0.5 * (b + root) / a;
 
-        // We want the point closer to the origin of the ray. Because the direction vector points in
-        // positive direction, a smaller value results in a closer point.
-        if (x1 > x2)
-            std::swap(x1, x2);
+        if (x1 <= 0) {
+            if (x2 <= 0) {
+                return false;
+            }
+            solution = x2;
+        } else {
+            solution = x1;
+            if (x2 > 0 && x2 < x1) {
+                solution = x2;
+            }
+        }
     }
 
     // TODO: select correct solution
-    intersect = ray.origin + x1 * ray.dir;
+    intersect = ray.origin + solution * ray.dir;
     normal = glm::normalize(intersect - pos);
     return true;
 }

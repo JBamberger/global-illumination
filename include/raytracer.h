@@ -62,8 +62,14 @@ class RayTracer {
         // glm::dvec3 v = -glm::normalize(ray.dir);
         const auto l = glm::normalize(_light - i);
         const auto N = glm::normalize(n);
+        const auto v1 = glm::max(0.0, glm::dot(N, l));
+        const auto v2 = glm::max(0.0, glm::dot(-N, l));
 
-        return mat.color * glm::max(0.0, glm::dot(N, l));
+        if (1 || v1 >= v2) {
+            return mat.color * v1;
+        } else {
+            return (glm::dvec3{1, 1, 1} - mat.color) * v2;
+        }
     }
 
     bool running() const { return _running; }
