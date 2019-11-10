@@ -26,6 +26,8 @@ struct Entity {
 };
 
 struct ImplicitSphere final : Entity {
+    ImplicitSphere() : ImplicitSphere({0, 0, 0}, 1) {}
+    ImplicitSphere(glm::dvec3 center, double radius);
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
     double radius = 0;
@@ -59,6 +61,11 @@ struct Quad final : ExplicitEntity {
 struct Cube final : ExplicitEntity {
     Cube() = delete;
     Cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner);
+};
+
+struct ExplicitSphere final : ExplicitEntity {
+    explicit ExplicitSphere() : ExplicitSphere({0, 0, 0}, 1, 3){};
+    explicit ExplicitSphere(glm::dvec3 center, double radius, int subDivisions);
 };
 
 // TODO Implement implicit sphere

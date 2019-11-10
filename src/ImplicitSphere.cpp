@@ -1,6 +1,10 @@
 
 #include "entities.h"
 
+ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius) : radius(radius) {
+    pos = center;
+}
+
 bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const {
     // O = ray.origin
     // D = ray.dir

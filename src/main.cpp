@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
     Octree scene({-20, -20, -20}, {20, 20, 20});
 
     // sphere at center
-    auto sphere = std::make_unique<ImplicitSphere>();
-    sphere->radius = 1;
+    auto sphere = std::make_unique<ExplicitSphere>(glm::dvec3{0, 0, 0}, 1, 0);
+    // sphere->radius = 1;
     sphere->material = green;
     scene.push_back(sphere.get());
 
