@@ -1,5 +1,11 @@
 #include "entities.h"
 
+Triangle::Triangle() : Entity() {}
+
+Triangle::Triangle(const Material& material) : Entity(material) {}
+
+Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c) {}
+
 bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const {
     glm::dvec3 N = glm::cross(B - A, C - A);
 

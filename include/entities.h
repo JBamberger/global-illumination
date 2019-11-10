@@ -5,6 +5,7 @@
 #include "bbox.h"
 #include "material.h"
 #include "ray.h"
+#include <vector>
 
 /// A base class for all entities in the scene.
 struct Entity {
@@ -27,25 +28,37 @@ struct Entity {
 struct ImplicitSphere final : Entity {
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
-    double radius;
+    double radius = 0;
 };
 
 struct Triangle final : Entity {
+    Triangle();
+    Triangle(const Material& material);
+    Triangle(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C);
+
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
+
     glm::dvec3 A = {0, 0, 0};
     glm::dvec3 B = {0, 0, 0};
     glm::dvec3 C = {0, 0, 0};
 };
 
-struct Quad final : Entity {
+struct ExplicitEntity : Entity {
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
+
+    std::vector<Triangle> faces;
+};
+
+struct Quad final : ExplicitEntity {
     Quad() = delete;
     Quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D);
+};
 
-    Triangle T1;
-    Triangle T2;
+struct Cube final : ExplicitEntity {
+    Cube() = delete;
+    Cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner);
 };
 
 // TODO Implement implicit sphere
