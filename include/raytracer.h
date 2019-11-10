@@ -18,72 +18,61 @@ class RayTracer {
     RayTracer() = delete;
 
     RayTracer(const Camera& camera, glm::dvec3 light)
-        : _camera(camera), _light(light), _image(std::make_shared<Image>(0, 0)) {}
+        : camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0)) {}
 
-    void setScene(const Octree* scene) { _scene = scene; }
+    void setScene(const Octree* scene) { scene_ = scene; }
 
     void run(int w, int h) {
-        // TODO Implement this
-        _image = std::make_shared<Image>(w, h);
+        image_ = std::make_shared<Image>(w, h);
 
         // The structure of the for loop should remain for incremental rendering.
         // termination criterion: add  && _running
         // #pragma omp parallel for
-        for (int y = 0; y < h && _running; ++y) {
-            for (int x = 0; x < w && _running; ++x) {
-                Ray ray = _camera.getRay(x, y, w, h);
+        for (auto y = 0; y < h && running_; ++y) {
+            for (auto x = 0; x < w && running_; ++x) {
+                const auto ray = camera_.getRay(x, y, w, h);
 
-                _image->setPixel(x, y, compute_pixel(ray, x, y));
+                image_->setPixel(x, y, compute_pixel(ray, x, y));
             }
         }
     }
 
-    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) {
+    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) const {
         glm::dvec3 intersect, normal;
 
-        double min = std::numeric_limits<double>::infinity();
+        auto min = std::numeric_limits<double>::infinity();
         glm::dvec3 color{0, 0, 0};
 
-        std::vector<Entity*> entities = _scene->intersect(ray);
-        for (Entity* entity : entities) {
+        auto entities = scene_->intersect(ray);
+        for (auto entity : entities) {
             if (entity->intersect(ray, intersect, normal)) {
                 const auto dist = glm::distance(ray.origin, intersect);
                 if (dist < min) {
                     min = dist;
-                    color = compute_shade(ray, entity->material, intersect, normal);
+                    // compute light and normal vector at the intersection point
+                    const auto l = glm::normalize(light_ - intersect);
+                    const auto n = glm::normalize(normal);
+
+                    // apply diffuse shading
+                    color = entity->material.color * glm::max(0.0, glm::dot(n, l));
                 }
             }
         }
         return color;
     }
 
-    glm::dvec3
-    compute_shade(const Ray& ray, const Material& mat, const glm::dvec3& i, const glm::dvec3& n) {
-        // glm::dvec3 v = -glm::normalize(ray.dir);
-        const auto l = glm::normalize(_light - i);
-        const auto N = glm::normalize(n);
-        const auto v1 = glm::max(0.0, glm::dot(N, l));
-        const auto v2 = glm::max(0.0, glm::dot(-N, l));
+    bool running() const { return running_; }
 
-        if (1 || v1 >= v2) {
-            return mat.color * v1;
-        } else {
-            return (glm::dvec3{1, 1, 1} - mat.color) * v2;
-        }
-    }
+    void stop() { running_ = false; }
 
-    bool running() const { return _running; }
+    void start() { running_ = true; }
 
-    void stop() { _running = false; }
-
-    void start() { _running = true; }
-
-    std::shared_ptr<Image> getImage() const { return _image; }
+    std::shared_ptr<Image> getImage() const { return image_; }
 
   private:
-    bool _running = false;
-    const Octree* _scene;
-    Camera _camera;
-    glm::dvec3 _light;
-    std::shared_ptr<Image> _image;
+    bool running_ = false;
+    const Octree* scene_;
+    Camera camera_;
+    glm::dvec3 light_;
+    std::shared_ptr<Image> image_;
 };
