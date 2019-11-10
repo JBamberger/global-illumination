@@ -78,6 +78,15 @@ class RayTracer {
                 }
             }
 
+#define USE_AMBIENT
+#define USE_DIFFUSE
+#define USE_SPECULAR
+#define USE_MIRROR
+
+#ifdef USE_AMBIENT
+            color = min_ent->material.color * min_ent->material.ambient;
+#endif
+
             if (!blocked) {
                 // ambient:
                 // L_a = k_a * I_a
@@ -95,9 +104,33 @@ class RayTracer {
                 // For many light sources:
                 // L = L_a + sum(L_d(i) + L_s(i))
 
+                // eye direction
+                const auto v = glm::normalize(-ray.dir);
+
+#ifdef USE_DIFFUSE
+                const auto diffuse = glm::max(0.0, glm::dot(normal, l));
+                color += min_ent->material.color * min_ent->material.diffuse * diffuse;
+#endif
+#ifdef USE_SPECULAR
+                // center between view and light
+                const auto h = glm::normalize(v + l);
+                const auto specular = glm::pow(glm::max(0.0, glm::dot(normal, h)),
+                                               min_ent->material.specular_exponent);
+                color += min_ent->material.specular * specular;
+#endif
+#ifdef USE_MIRROR
+                if (min_ent->material.glazed > 0) {
+                    // reflection direction
+                    const auto r = 2. * normal * glm::dot(normal, v) - v;
+                    const auto mirror_ray = Ray{intersect, r};
+                    const auto mirror = glm::dvec3{0., 0., 0.}; // TODO trace(mirror_ray);
+                    color += min_ent->material.glazed * mirror;
+                }
+#endif
+
                 // apply diffuse shading
-                color = min_ent->material.color * glm::max(0.0, glm::dot(normal, l));
             }
+            color = glm::clamp(color, 0., 1.);
         }
 
         return color;

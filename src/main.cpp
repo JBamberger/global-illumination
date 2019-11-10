@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
     // explicit sphere
     auto esphere = std::make_unique<ExplicitSphere>(glm::dvec3{0, -2, 2}, 0.5, 0);
     esphere->material = Material{{0.3, 0.3, 1}};
+    esphere->material.ambient = 0.3;
     scene.push_back(esphere.get());
 
     // explicit cube
@@ -35,6 +36,7 @@ int main(int argc, char** argv) {
     auto sphere = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 0}, 1);
     // sphere->radius = 1;
     sphere->material = green;
+    sphere->material.specular_exponent = 64;
     scene.push_back(sphere.get());
 
     // triangle upper right corner
