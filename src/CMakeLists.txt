@@ -22,6 +22,7 @@ add_library(global_illu_lib
 	ImplicitSphere.cpp
 	Triangle.cpp
 	Quad.cpp
+	Cube.cpp
 	ExplicitSphere.cpp
 )
 target_include_directories(global_illu_lib PUBLIC

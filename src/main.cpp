@@ -21,11 +21,17 @@ int main(int argc, char** argv) {
     // Set up scene
     Octree scene({-20, -20, -20}, {20, 20, 20});
 
-    // sphere at center
-    auto esphere = std::make_unique<ExplicitSphere>(glm::dvec3{0, -2, 0}, 1, 2);
-    esphere->material = Material{{0.3, 0.3, 1}};
-    scene.push_back(esphere.get());
+    // explicit sphere
+    // auto esphere = std::make_unique<ExplicitSphere>(glm::dvec3{0, -2, 0}, 1, 2);
+    // esphere->material = Material{{0.3, 0.3, 1}};
+    // scene.push_back(esphere.get());
 
+    // explicit cube
+    auto cube = std::make_unique<Cube>(glm::dvec3{0, -2, 0}, glm::dvec3{-0.7, -2.7, -0.5});
+    cube->material = red;
+    scene.push_back(cube.get());
+
+    // sphere at center
     auto sphere = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 0}, 1);
     // sphere->radius = 1;
     sphere->material = green;
