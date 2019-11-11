@@ -1,15 +1,16 @@
-
 #include "entities.h"
 
-ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius) : radius(radius) {
-    pos = center;
+ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius)
+    : center(center), radius(radius)
+{
 }
 
-bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const {
+bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+{
     // O = ray.origin
     // D = ray.dir
     // R = this->radius
-    // C = this->pos
+    // C = this->center
     //
     // (P - C)^2 - R^2 = 0 = (O + Dt - C)^2 - R^2
     // O^2 + 2ODt - 2CDt - 2CO + (Dt)^2 + C^2 - R^2 = 0
@@ -20,7 +21,7 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
     // q = b^2 - 4ac
     // q = (2D(O-C))^2 - 4 * D^2 ((O-C)^2 - R^2)
 
-    const auto L = ray.origin - pos;
+    const auto L = ray.origin - center;
     const auto a = glm::dot(ray.dir, ray.dir);
     const auto b = 2. * glm::dot(ray.dir, L);
     const auto c = glm::dot(L, L) - (radius * radius);
@@ -55,8 +56,8 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
 
     // TODO: select correct solution
     intersect = ray.origin + solution * ray.dir;
-    normal = glm::normalize(intersect - pos);
+    normal = glm::normalize(intersect - center);
     return true;
 }
 
-BoundingBox ImplicitSphere::boundingBox() const { return {pos - radius, pos + radius}; }
+BoundingBox ImplicitSphere::boundingBox() const { return {center - radius, center + radius}; }

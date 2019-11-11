@@ -21,7 +21,6 @@ struct Entity {
     /// Returns an axis-aligned bounding box of the entity.
     virtual BoundingBox boundingBox() const = 0;
 
-    glm::dvec3 pos = {0, 0, 0};
     Material material;
 };
 
@@ -30,6 +29,8 @@ struct ImplicitSphere final : Entity {
     ImplicitSphere(glm::dvec3 center, double radius);
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
+
+    glm::dvec3 center = {0, 0, 0};
     double radius = 0;
 };
 

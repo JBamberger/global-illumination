@@ -2,8 +2,9 @@
 #include <iostream>
 
 // projects a point to the given sphere
-inline glm::dvec3 projectToSphere(const ImplicitSphere& s, glm::dvec3 P) {
-    const auto r = Ray{s.pos, P - s.pos};
+inline glm::dvec3 projectToSphere(const ImplicitSphere& s, glm::dvec3 P)
+{
+    const auto r = Ray{s.center, P - s.center};
     glm::dvec3 i, n;
     const auto success = s.intersect(r, i, n);
 
@@ -12,11 +13,13 @@ inline glm::dvec3 projectToSphere(const ImplicitSphere& s, glm::dvec3 P) {
 }
 
 /// computes the middle point between two points and projects it to the sphere
-inline glm::dvec3 findCenter(const ImplicitSphere& s, glm::dvec3 p1, glm::dvec3 p2) {
+inline glm::dvec3 findCenter(const ImplicitSphere& s, glm::dvec3 p1, glm::dvec3 p2)
+{
     return projectToSphere(s, (p1 + p2) * 0.5);
 }
 
-ExplicitSphere::ExplicitSphere(glm::dvec3 center, double radius, int divisions) {
+ExplicitSphere::ExplicitSphere(glm::dvec3 center, double radius, int divisions)
+{
     // Algorithm:
     // start with tetrahedron
     // for division
