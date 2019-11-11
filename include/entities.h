@@ -5,6 +5,7 @@
 #include "bbox.h"
 #include "material.h"
 #include "ray.h"
+#include <utility>
 #include <vector>
 
 /// A base class for all entities in the scene.
@@ -49,31 +50,18 @@ struct Triangle final : Entity {
     glm::dvec3 C = {0, 0, 0};
 };
 
-struct ExplicitEntity : Entity {
+struct ExplicitEntity final : Entity {
+    explicit inline ExplicitEntity(std::vector<Triangle> faces) : faces(std::move(faces)) {}
+
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
 
+    static ExplicitEntity
+    make_sphere(glm::dvec3 center = {0, 0, 0}, double radius = 1, int subDivisions = 2);
+
+    static ExplicitEntity make_quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D);
+
+    static ExplicitEntity make_cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner);
+
     std::vector<Triangle> faces;
 };
-
-struct Quad final : ExplicitEntity {
-    Quad() = delete;
-    Quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D);
-};
-
-struct Cube final : ExplicitEntity {
-    Cube() = delete;
-    Cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner);
-};
-
-struct ExplicitSphere final : ExplicitEntity {
-    explicit ExplicitSphere() : ExplicitSphere({0, 0, 0}, 1, 3) {}
-    explicit ExplicitSphere(glm::dvec3 center, double radius, int subDivisions);
-};
-
-// TODO Implement implicit sphere
-// TODO Implement implicit triangle
-
-// TODO Implement explicit sphere (triangles)
-// TODO Implement explicit quad (triangles)
-// TODO Implement explicit cube (triangles)

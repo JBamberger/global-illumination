@@ -21,9 +21,6 @@ add_library(global_illu_lib
 	ExplicitEntity.cpp
 	ImplicitSphere.cpp
 	Triangle.cpp
-	Quad.cpp
-	Cube.cpp
-	ExplicitSphere.cpp
 )
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"

@@ -6,7 +6,8 @@
 #include "entities.h"
 #include "gui.h"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     QApplication app(argc, argv);
 
     Camera camera(glm::dvec3{10, 0, 0});
@@ -22,13 +23,15 @@ int main(int argc, char** argv) {
     Octree scene({-20, -20, -20}, {20, 20, 20});
 
     // explicit sphere
-    auto esphere = std::make_unique<ExplicitSphere>(glm::dvec3{0, -2, 2}, 0.5, 0);
+    auto esphere =
+        std::make_unique<ExplicitEntity>(ExplicitEntity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 0));
     esphere->material = Material{{0.3, 0.3, 1}};
     esphere->material.ambient = 0.3;
     scene.push_back(esphere.get());
 
     // explicit cube
-    auto cube = std::make_unique<Cube>(glm::dvec3{0, -2, 0}, glm::dvec3{-0.7, -2.7, -0.5});
+    auto cube = std::make_unique<ExplicitEntity>(
+        ExplicitEntity::make_cube(glm::dvec3{0, -2, 0}, glm::dvec3{-0.7, -2.7, -0.5}));
     cube->material = red;
     scene.push_back(cube.get());
 
@@ -61,8 +64,9 @@ int main(int argc, char** argv) {
     t2->material = green;
     scene.push_back(t2.get());
 
-    auto quad = std::make_unique<Quad>(glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1},
-                                       glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1});
+    auto quad = std::make_unique<ExplicitEntity>(
+        ExplicitEntity::make_quad(glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1},
+                                  glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1}));
     quad->material = Material(glm::dvec3{0.5, 0.5, 0.5});
     scene.push_back(quad.get());
 
