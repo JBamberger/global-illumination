@@ -86,7 +86,7 @@ ExplicitEntity ExplicitEntity::make_cube(glm::dvec3 center, glm::dvec3 bottomRig
     return ExplicitEntity(std::move(faces));
 }
 
-// projects a point to the given sphere
+/// projects a point to the given sphere
 inline glm::dvec3 projectToSphere(const ImplicitSphere& s, glm::dvec3 P)
 {
     const auto r = Ray{s.center, P - s.center};
@@ -103,71 +103,20 @@ inline glm::dvec3 findCenter(const ImplicitSphere& s, glm::dvec3 p1, glm::dvec3 
     return projectToSphere(s, (p1 + p2) * 0.5);
 }
 
-ExplicitEntity ExplicitEntity::make_sphere(glm::dvec3 center, double radius, int subDivisions)
+/// Subdivision algorithm which splits each triangle side in the middle and projects the new points
+/// to the given sphere. If equilateral the resulting triangles will be equilateral too.
+inline std::vector<Triangle>
+perform_subdivision(std::vector<Triangle> ts, const ImplicitSphere& ref, const int sub_divisions)
 {
     // Algorithm:
-    // start with tetrahedron
-    // for division
+    // for subDivisions do
     //     split every triangle side in half
     //     move the split points to the sphere
     //     form four triangles from them
-    // end for
+    // end
 
-    const auto ref = ImplicitSphere{center, radius};
-    const auto size = 0;
-    std::vector<Triangle> ts;
-    ts.reserve(size);
     std::vector<Triangle> ts2;
-    ts2.reserve(size);
-
-    // build tetrahedron
-    // const auto P1 = projectToSphere(ref, center + glm::dvec3{1, 1, 1});
-    // const auto P2 = projectToSphere(ref, center + glm::dvec3{-1, -1, 1});
-    // const auto P3 = projectToSphere(ref, center + glm::dvec3{-1, 1, -1});
-    // const auto P4 = projectToSphere(ref, center + glm::dvec3{1, -1, -1});
-    // ts.emplace_back(P1, P3, P2);
-    // ts.emplace_back(P1, P4, P3);
-    // ts.emplace_back(P1, P2, P4);
-    // ts.emplace_back(P2, P3, P4);
-    //
-    const auto t = (1.0 + glm::sqrt(5.0)) / 2.0;
-
-    const auto P0 = projectToSphere(ref, center + glm::dvec3{-1, t, 0});
-    const auto P1 = projectToSphere(ref, center + glm::dvec3{1, t, 0});
-    const auto P2 = projectToSphere(ref, center + glm::dvec3{-1, -t, 0});
-    const auto P3 = projectToSphere(ref, center + glm::dvec3{1, -t, 0});
-    const auto P4 = projectToSphere(ref, center + glm::dvec3{0, -1, t});
-    const auto P5 = projectToSphere(ref, center + glm::dvec3{0, 1, t});
-    const auto P6 = projectToSphere(ref, center + glm::dvec3{0, -1, -t});
-    const auto P7 = projectToSphere(ref, center + glm::dvec3{0, 1, -t});
-    const auto P8 = projectToSphere(ref, center + glm::dvec3{t, 0, -1});
-    const auto P9 = projectToSphere(ref, center + glm::dvec3{t, 0, 1});
-    const auto P10 = projectToSphere(ref, center + glm::dvec3{-t, 0, -1});
-    const auto P11 = projectToSphere(ref, center + glm::dvec3{-t, 0, 1});
-
-    ts.emplace_back(P0, P11, P5);
-    ts.emplace_back(P0, P5, P1);
-    ts.emplace_back(P0, P1, P7);
-    ts.emplace_back(P0, P7, P10);
-    ts.emplace_back(P0, P10, P11);
-    ts.emplace_back(P1, P5, P9);
-    ts.emplace_back(P5, P11, P4);
-    ts.emplace_back(P11, P10, P2);
-    ts.emplace_back(P10, P7, P6);
-    ts.emplace_back(P7, P1, P8);
-    ts.emplace_back(P3, P9, P4);
-    ts.emplace_back(P3, P4, P2);
-    ts.emplace_back(P3, P2, P6);
-    ts.emplace_back(P3, P6, P8);
-    ts.emplace_back(P3, P8, P9);
-    ts.emplace_back(P4, P9, P5);
-    ts.emplace_back(P2, P4, P11);
-    ts.emplace_back(P6, P2, P10);
-    ts.emplace_back(P8, P6, P7);
-    ts.emplace_back(P9, P8, P1);
-
-    // split triangles
-    for (auto d = 0; d < subDivisions; d++) {
+    for (auto d = 0; d < sub_divisions; d++) {
         ts2.clear();
         for (const auto& t : ts) {
             const auto X = findCenter(ref, t.A, t.B);
@@ -200,21 +149,94 @@ ExplicitEntity ExplicitEntity::make_sphere(glm::dvec3 center, double radius, int
         }
         std::swap(ts, ts2);
     }
-    std::vector<Triangle> faces;
-    faces.reserve(ts.size());
-    faces.insert(std::end(faces), std::begin(ts), std::end(ts));
-#if 0
-    // to obj file
-    int vertex = 1;
-    for (Triangle face : faces) {
-        std::cout << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
-        std::cout << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
-        std::cout << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
+    return ts;
+}
 
-        std::cout << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
-        vertex += 3;
-    }
-#endif
+inline std::vector<Triangle> get_tetrahedron(const ImplicitSphere& ref)
+{
+    std::vector<Triangle> faces;
+    faces.reserve(4);
+
+    const auto a = projectToSphere(ref, ref.center + glm::dvec3{1, 1, 1});
+    const auto b = projectToSphere(ref, ref.center + glm::dvec3{-1, -1, 1});
+    const auto c = projectToSphere(ref, ref.center + glm::dvec3{-1, 1, -1});
+    const auto d = projectToSphere(ref, ref.center + glm::dvec3{1, -1, -1});
+
+    faces.emplace_back(a, c, b);
+    faces.emplace_back(a, d, c);
+    faces.emplace_back(a, b, d);
+    faces.emplace_back(b, c, d);
+
+    return faces;
+}
+
+inline std::vector<Triangle> get_icosahedron(const ImplicitSphere& ref)
+{
+    std::vector<Triangle> faces;
+    faces.reserve(20);
+
+    const auto t = (1.0 + glm::sqrt(5.0)) / 2.0;
+
+    const auto a = projectToSphere(ref, ref.center + glm::dvec3{-1, t, 0});
+    const auto b = projectToSphere(ref, ref.center + glm::dvec3{1, t, 0});
+    const auto c = projectToSphere(ref, ref.center + glm::dvec3{-1, -t, 0});
+    const auto d = projectToSphere(ref, ref.center + glm::dvec3{1, -t, 0});
+    const auto e = projectToSphere(ref, ref.center + glm::dvec3{0, -1, t});
+    const auto f = projectToSphere(ref, ref.center + glm::dvec3{0, 1, t});
+    const auto g = projectToSphere(ref, ref.center + glm::dvec3{0, -1, -t});
+    const auto h = projectToSphere(ref, ref.center + glm::dvec3{0, 1, -t});
+    const auto i = projectToSphere(ref, ref.center + glm::dvec3{t, 0, -1});
+    const auto j = projectToSphere(ref, ref.center + glm::dvec3{t, 0, 1});
+    const auto k = projectToSphere(ref, ref.center + glm::dvec3{-t, 0, -1});
+    const auto l = projectToSphere(ref, ref.center + glm::dvec3{-t, 0, 1});
+
+    faces.emplace_back(a, l, f);
+    faces.emplace_back(a, f, b);
+    faces.emplace_back(a, b, h);
+    faces.emplace_back(a, h, k);
+    faces.emplace_back(a, k, l);
+    faces.emplace_back(b, f, j);
+    faces.emplace_back(f, l, e);
+    faces.emplace_back(l, k, c);
+    faces.emplace_back(k, h, g);
+    faces.emplace_back(h, b, i);
+    faces.emplace_back(d, j, e);
+    faces.emplace_back(d, e, c);
+    faces.emplace_back(d, c, g);
+    faces.emplace_back(d, g, i);
+    faces.emplace_back(d, i, j);
+    faces.emplace_back(e, j, f);
+    faces.emplace_back(c, e, l);
+    faces.emplace_back(g, c, k);
+    faces.emplace_back(i, g, h);
+    faces.emplace_back(j, i, b);
+
+    return faces;
+}
+
+ExplicitEntity ExplicitEntity::make_sphere(const glm::dvec3 center,
+                                           const double radius,
+                                           const int sub_divisions,
+                                           const bool use_tetrahedron)
+{
+    const auto ref = ImplicitSphere{center, radius};
+    const auto initial_shape = use_tetrahedron ? get_tetrahedron(ref) : get_icosahedron(ref);
+
+    auto faces = perform_subdivision(initial_shape, ref, sub_divisions);
 
     return ExplicitEntity(std::move(faces));
+}
+
+std::ostream& ExplicitEntity::write_obj(std::ostream& os)
+{
+    auto vertex = 1;
+    for (const auto face : faces) {
+        os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
+        os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
+        os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
+
+        os << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
+        vertex += 3;
+    }
+    return os;
 }
