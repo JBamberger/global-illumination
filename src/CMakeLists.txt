@@ -1,7 +1,9 @@
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Threads)
 
-set(SOURCES main.cpp)
+set(SOURCES
+	main.cpp
+)
 set(HEADERS
 	include/gui.h
 	include/image.h
@@ -13,12 +15,13 @@ set(HEADERS
 	include/octree.h
 	include/bbox.h
 	include/material.h
+	include/explicit_entity.h
 )
 
 
 
 add_library(global_illu_lib
-	ExplicitEntity.cpp
+	explicit_entity.cpp
 	ImplicitSphere.cpp
 	Triangle.cpp
 )
@@ -33,7 +36,9 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 
-add_executable(global_illu ${SOURCES})
+add_executable(global_illu
+	main.cpp
+)
 target_include_directories(global_illu PRIVATE
 	"${CMAKE_SOURCE_DIR}/include"
 )
@@ -43,8 +48,8 @@ target_link_libraries(global_illu PRIVATE
 	${CMAKE_THREAD_LIBS_INIT}
 )
 
-option(CLANG_FORMAT_TARGET "automatic clang format" OFF)
-if(CLANG_FORMAT_TARGET)
-    include(ClangFormat)
-    add_clang_format(TARGET global_illu STYLE "LLVM" FILES ${SOURCES} ${HEADERS})
-endif(CLANG_FORMAT_TARGET)
+# option(CLANG_FORMAT_TARGET "automatic clang format" OFF)
+# if(CLANG_FORMAT_TARGET)
+#     include(ClangFormat)
+#     add_clang_format(TARGET global_illu STYLE "LLVM" FILES ${SOURCES} ${HEADERS})
+# endif(CLANG_FORMAT_TARGET)
