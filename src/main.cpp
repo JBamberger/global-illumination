@@ -30,8 +30,8 @@ int main(int argc, char** argv)
     scene.push_back(esphere.get());
 
     // explicit cube
-    auto cube = std::make_unique<explicit_entity>(
-        explicit_entity::make_cube(glm::dvec3{0, -2, 0}, glm::dvec3{-0.7, -2.7, -0.5}));
+    auto cube =
+        std::make_unique<explicit_entity>(explicit_entity::make_cube(glm::dvec3{0, -2, 0}, 0.5));
     cube->material = red;
     scene.push_back(cube.get());
 

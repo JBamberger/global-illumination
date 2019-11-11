@@ -4,7 +4,7 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
 {
     // TODO: check intersection direction
     glm::dvec3 i, n;
-    double min = std::numeric_limits<double>::infinity();
+    auto min = std::numeric_limits<double>::infinity();
     for (const auto& t : faces) {
         if (t.intersect(ray, i, n)) {
             const auto d = glm::distance(i, ray.origin);
@@ -20,12 +20,11 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
 
 BoundingBox explicit_entity::boundingBox() const
 {
-    if (faces.empty()) {
-        return BoundingBox{{0, 0, 0}, {0, 0, 0}};
-    }
+    assert(!faces.empty());
+
     const auto b1 = faces[0].boundingBox();
-    glm::dvec3 min = b1.min;
-    glm::dvec3 max = b1.max;
+    auto min = b1.min;
+    auto max = b1.max;
 
     for (const auto& t : faces) {
         min = glm::min(min, t.A);
@@ -39,50 +38,49 @@ BoundingBox explicit_entity::boundingBox() const
     return BoundingBox{min, max};
 }
 
-explicit_entity explicit_entity::make_quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D)
+explicit_entity explicit_entity::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
 {
     std::vector<Triangle> faces;
     faces.reserve(2);
-    faces.emplace_back(A, B, C);
-    faces.emplace_back(C, D, A);
+    faces.emplace_back(a, b, c);
+    faces.emplace_back(c, d, a);
     return explicit_entity(std::move(faces));
 }
 
-explicit_entity explicit_entity::make_cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner)
+explicit_entity explicit_entity::make_cube(glm::dvec3 center, const double side_length)
 {
-    glm::dvec3 O = center;
-    glm::dvec3 A = bottomRightFrontCorner;
-    glm::dvec3 OA = A - O;
-    // compute the remaining corner points
-    glm::dvec3 B = O + glm::dvec3{OA.x, OA.y, -OA.z};
-    glm::dvec3 C = O + glm::dvec3{OA.x, -OA.y, -OA.z};
-    glm::dvec3 D = O + glm::dvec3{OA.x, -OA.y, OA.z};
+    const double l = side_length / 2;
 
-    glm::dvec3 E = O + glm::dvec3{-OA.x, OA.y, OA.z};
-    glm::dvec3 F = O + glm::dvec3{-OA.x, OA.y, -OA.z};
-    glm::dvec3 G = O + glm::dvec3{-OA.x, -OA.y, -OA.z};
-    glm::dvec3 H = O + glm::dvec3{-OA.x, -OA.y, OA.z};
+    const auto a = center + glm::dvec3{l, l, -l};
+    const auto b = center + glm::dvec3{l, l, l};
+    const auto c = center + glm::dvec3{l, -l, l};
+    const auto d = center + glm::dvec3{l, -l, -l};
+    const auto e = center + glm::dvec3{-l, l, -l};
+    const auto f = center + glm::dvec3{-l, l, l};
+    const auto g = center + glm::dvec3{-l, -l, l};
+    const auto h = center + glm::dvec3{-l, -l, -l};
 
     std::vector<Triangle> faces;
     faces.reserve(12);
     // front
-    faces.emplace_back(A, B, C);
-    faces.emplace_back(A, C, D);
+    faces.emplace_back(a, b, c);
+    faces.emplace_back(a, c, d);
     // right
-    faces.emplace_back(E, F, B);
-    faces.emplace_back(E, B, A);
+    faces.emplace_back(e, b, a);
+    faces.emplace_back(e, f, b);
     // back
-    faces.emplace_back(H, G, F);
-    faces.emplace_back(H, F, E);
+    faces.emplace_back(h, f, e);
+    faces.emplace_back(h, g, f);
     // left
-    faces.emplace_back(D, C, G);
-    faces.emplace_back(D, G, H);
+    faces.emplace_back(d, g, h);
+    faces.emplace_back(d, c, g);
     // top
-    faces.emplace_back(B, F, G);
-    faces.emplace_back(B, G, C);
+    faces.emplace_back(b, f, g);
+    faces.emplace_back(b, g, c);
     // bottom
-    faces.emplace_back(A, H, E);
-    faces.emplace_back(A, D, H);
+    faces.emplace_back(a, h, e);
+    faces.emplace_back(a, d, h);
+
     return explicit_entity(std::move(faces));
 }
 
@@ -119,33 +117,31 @@ perform_subdivision(std::vector<Triangle> ts, const ImplicitSphere& ref, const i
     for (auto d = 0; d < sub_divisions; d++) {
         ts2.clear();
         for (const auto& t : ts) {
-            const auto X = project_to_sphere(ref, find_line_center(t.A, t.B));
-            const auto Y = project_to_sphere(ref, find_line_center(t.B, t.C));
-            const auto Z = project_to_sphere(ref, find_line_center(t.C, t.A));
+            const auto x = project_to_sphere(ref, find_line_center(t.A, t.B));
+            const auto y = project_to_sphere(ref, find_line_center(t.B, t.C));
+            const auto z = project_to_sphere(ref, find_line_center(t.C, t.A));
 
-#if 1
-            ts2.emplace_back(t.A, X, Z);
-            ts2.emplace_back(X, t.B, Y);
-            ts2.emplace_back(Y, t.C, Z);
-            ts2.emplace_back(X, Y, Z);
-#else
-            const auto t1 = Triangle(t.A, X, Z);
-            const auto t2 = Triangle(X, t.B, Y);
-            const auto t3 = Triangle(Y, t.C, Z);
-            const auto t4 = Triangle(X, Y, Z);
+            ts2.emplace_back(t.A, x, z);
+            ts2.emplace_back(x, t.B, y);
+            ts2.emplace_back(y, t.C, z);
+            ts2.emplace_back(x, y, z);
 
-            assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t2.normal())));
-            assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t3.normal())));
-            assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t4.normal())));
-            assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t3.normal())));
-            assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t4.normal())));
-            assert(0 >= glm::dot(glm::normalize(t3.normal()), glm::normalize(t4.normal())));
+            // const auto t1 = Triangle(t.A, x, z);
+            // const auto t2 = Triangle(x, t.B, y);
+            // const auto t3 = Triangle(y, t.C, z);
+            // const auto t4 = Triangle(x, y, z);
 
-            ts2.push_back(t1);
-            ts2.push_back(t2);
-            ts2.push_back(t3);
-            ts2.push_back(t4);
-#endif
+            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t2.normal())));
+            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t3.normal())));
+            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t4.normal())));
+            // assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t3.normal())));
+            // assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t4.normal())));
+            // assert(0 >= glm::dot(glm::normalize(t3.normal()), glm::normalize(t4.normal())));
+
+            // ts2.push_back(t1);
+            // ts2.push_back(t2);
+            // ts2.push_back(t3);
+            // ts2.push_back(t4);
         }
         std::swap(ts, ts2);
     }
@@ -232,7 +228,7 @@ explicit_entity explicit_entity::make_sphere(const glm::dvec3 center,
 std::ostream& explicit_entity::write_obj(std::ostream& os)
 {
     auto vertex = 1;
-    for (const auto face : faces) {
+    for (const auto& face : faces) {
         os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
         os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
         os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";

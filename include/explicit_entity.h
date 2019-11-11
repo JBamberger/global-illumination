@@ -15,10 +15,10 @@ struct explicit_entity final : Entity {
                                        bool use_tetrahedron = false);
 
     /// Creates an explicit quad from the four points.
-    static explicit_entity make_quad(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C, glm::dvec3 D);
+    static explicit_entity make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d);
 
-    /// Creates an explicit cube entity.
-    static explicit_entity make_cube(glm::dvec3 center, glm::dvec3 bottomRightFrontCorner);
+    /// Creates an explicit axis-aligned cube.
+    static explicit_entity make_cube(glm::dvec3 center, double side_length);
 
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& write_obj(std::ostream& os);
