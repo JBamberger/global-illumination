@@ -18,11 +18,14 @@ class RayTracer {
     RayTracer() = delete;
 
     RayTracer(const Camera& camera, glm::dvec3 light)
-        : camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0)) {}
+        : camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0))
+    {
+    }
 
     void setScene(const Octree* scene) { scene_ = scene; }
 
-    void run(int w, int h) {
+    void run(int w, int h)
+    {
         image_ = std::make_shared<Image>(w, h);
 
         // The structure of the for loop should remain for incremental rendering.
@@ -37,12 +40,13 @@ class RayTracer {
         }
     }
 
-    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) const {
+    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) const
+    {
         glm::dvec3 i, n; // working variables
 
         auto min = std::numeric_limits<double>::infinity();
         glm::dvec3 intersect, normal; // values at minimum
-        Entity* min_ent = nullptr;
+        entity* min_ent = nullptr;
 
         // find closest intersecting entity
         auto entities = scene_->intersect(ray);

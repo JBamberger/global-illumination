@@ -15,7 +15,8 @@
 class Viewer : public QWidget {
   public:
     Viewer(RayTracer raytracer, QLabel* durationText, QWidget* parent)
-        : QWidget(parent), _durationText(durationText), _raytracer(std::move(raytracer)) {
+        : QWidget(parent), _durationText(durationText), _raytracer(std::move(raytracer))
+    {
         _timer = new QTimer(this);
         _timer->setInterval(32);
         _timer->start();
@@ -25,14 +26,16 @@ class Viewer : public QWidget {
 
     ~Viewer() { stop_raytrace(); }
 
-    void stop_raytrace() {
+    void stop_raytrace()
+    {
         if (_raytracer.running()) {
             _raytracer.stop();
             _thread.join();
         }
     }
 
-    void paintEvent(QPaintEvent*) {
+    void paintEvent(QPaintEvent*)
+    {
         QPainter painter(this);
         painter.drawImage(QPoint(0, 0), getImage());
     }
@@ -42,7 +45,8 @@ class Viewer : public QWidget {
     QImage getImage() const { return _raytracer.getImage()->_image; }
 
   private:
-    void restart_raytrace() {
+    void restart_raytrace()
+    {
         if (_raytracer.running()) {
             _raytracer.stop();
             _thread.join();

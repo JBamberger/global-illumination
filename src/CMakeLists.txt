@@ -15,6 +15,9 @@ set(HEADERS
 	include/octree.h
 	include/bbox.h
 	include/material.h
+	include/entity.h
+	include/implicit_sphere.h
+	include/triangle.h
 	include/explicit_entity.h
 )
 
@@ -22,8 +25,8 @@ set(HEADERS
 
 add_library(global_illu_lib
 	explicit_entity.cpp
-	ImplicitSphere.cpp
-	Triangle.cpp
+	implicit_sphere.cpp
+	triangle.cpp
 )
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"

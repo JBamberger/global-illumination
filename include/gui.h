@@ -16,7 +16,8 @@ class Gui : public QMainWindow {
   public:
     Gui() = delete;
 
-    Gui(int width, int height, RayTracer raytracer, QWindow* parent = nullptr) {
+    Gui(int width, int height, RayTracer raytracer, QWindow* parent = nullptr)
+    {
 
         QToolBar* toolbar = new QToolBar(this);
         toolbar->setMovable(false);

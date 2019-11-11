@@ -1,11 +1,11 @@
-#include "entities.h"
+#include "implicit_sphere.h"
 
-ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius)
+implicit_sphere::implicit_sphere(const glm::dvec3 center, const double radius)
     : center(center), radius(radius)
 {
 }
 
-bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // O = ray.origin
     // D = ray.dir
@@ -60,4 +60,4 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
     return true;
 }
 
-BoundingBox ImplicitSphere::boundingBox() const { return {center - radius, center + radius}; }
+BoundingBox implicit_sphere::boundingBox() const { return {center - radius, center + radius}; }

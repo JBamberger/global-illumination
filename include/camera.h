@@ -6,7 +6,8 @@
 /// Represents the camera with information about the 'sensor' size.
 struct Camera {
     explicit Camera(glm::dvec3 pos) : Camera(pos, {0, 0, 0}) {}
-    Camera(glm::dvec3 pos, glm::dvec3 lookAt) : pos(pos), up({0, 0, 1.0}), forward(lookAt - pos) {
+    Camera(glm::dvec3 pos, glm::dvec3 lookAt) : pos(pos), up({0, 0, 1.0}), forward(lookAt - pos)
+    {
         forward = glm::normalize(forward);
     }
 
@@ -16,7 +17,8 @@ struct Camera {
     const double sensorDiag = 0.035; // diagonal of the sensor
     const double focalDist = 0.04;   // focal distance
 
-    inline Ray getRay(double x, double y, double x_size, double y_size) {
+    inline Ray getRay(double x, double y, double x_size, double y_size)
+    {
         // TODO: right and scale should be cached for better performance
 
         y = y_size - y; // invert the y axis to match the world coordinate system

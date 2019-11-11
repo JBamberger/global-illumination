@@ -1,7 +1,12 @@
 #pragma once
 
-struct explicit_entity final : Entity {
-    explicit explicit_entity(std::vector<Triangle> faces) : faces(std::move(faces)) {}
+#include "entity.h"
+#include "triangle.h"
+
+#include <vector>
+
+struct explicit_entity final : entity {
+    explicit explicit_entity(std::vector<triangle> faces) : faces(std::move(faces)) {}
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
@@ -23,5 +28,5 @@ struct explicit_entity final : Entity {
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& write_obj(std::ostream& os);
 
-    std::vector<Triangle> faces;
+    std::vector<triangle> faces;
 };

@@ -36,28 +36,28 @@ int main(int argc, char** argv)
     scene.push_back(cube.get());
 
     // sphere at center
-    auto sphere = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 0}, 1);
+    auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
     // sphere->radius = 1;
     sphere->material = green;
     sphere->material.specular_exponent = 64;
     scene.push_back(sphere.get());
 
     // triangle upper right corner
-    auto t3 = std::make_unique<Triangle>();
+    auto t3 = std::make_unique<triangle>();
     t3->A = {1, 2.5, 0.5};
     t3->B = {1, 2.5, 2.5};
     t3->C = {1, 0.5, 2.5};
     t3->material = red;
     scene.push_back(t3.get());
 
-    auto t1 = std::make_unique<Triangle>();
+    auto t1 = std::make_unique<triangle>();
     t1->A = {-1, 1.5, -0.5};
     t1->B = {-1, 1.5, 1.5};
     t1->C = {-1, -0.5, 1.5};
     t1->material = blue;
     scene.push_back(t1.get());
 
-    auto t2 = std::make_unique<Triangle>();
+    auto t2 = std::make_unique<triangle>();
     t2->A = {0, 2, 0};
     t2->B = {0, 2, 2};
     t2->C = {0, 0, 2};

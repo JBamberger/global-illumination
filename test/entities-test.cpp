@@ -13,29 +13,34 @@ struct ray_spec {
 
     ray_spec(const bool s, const glm::dvec3 d, const glm::dvec3 i, const glm::dvec3 n)
         : success(s), direction(glm::normalize(d)), expected_intersect(i),
-          expected_normal(glm::normalize(n)) {}
+          expected_normal(glm::normalize(n))
+    {
+    }
 };
 
 struct TriangleIntersectionTest : public testing::TestWithParam<ray_spec> {
-    Triangle triangle;
+    triangle triangle;
     glm::dvec3 intersect;
     glm::dvec3 normal;
 
-    TriangleIntersectionTest() {
+    TriangleIntersectionTest()
+    {
         triangle.A = {0, 0, 0};
         triangle.B = {0, 1, 0};
         triangle.C = {0, 0, 1};
     }
 };
 
-TEST_P(TriangleIntersectionTest, testSuccess) {
+TEST_P(TriangleIntersectionTest, testSuccess)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     const auto success = triangle.intersect(ray, intersect, normal);
     EXPECT_EQ(success, params.success);
 }
 
-TEST_P(TriangleIntersectionTest, testIntersect) {
+TEST_P(TriangleIntersectionTest, testIntersect)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     triangle.intersect(ray, intersect, normal);
@@ -47,7 +52,8 @@ TEST_P(TriangleIntersectionTest, testIntersect) {
     }
 }
 
-TEST_P(TriangleIntersectionTest, testNormal) {
+TEST_P(TriangleIntersectionTest, testNormal)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     triangle.intersect(ray, intersect, normal);
@@ -73,14 +79,15 @@ INSTANTIATE_TEST_SUITE_P(Default, TriangleIntersectionTest, testing::Values(
 // clang-format on
 
 struct ImplicitSphereIntersectionTest : public testing::TestWithParam<ray_spec> {
-    ImplicitSphere sphere;
+    implicit_sphere sphere;
     glm::dvec3 intersect;
     glm::dvec3 normal;
 
     ImplicitSphereIntersectionTest() { sphere.radius = 1; }
 };
 
-TEST_P(ImplicitSphereIntersectionTest, testSuccess) {
+TEST_P(ImplicitSphereIntersectionTest, testSuccess)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     const auto success = sphere.intersect(ray, intersect, normal);
@@ -88,7 +95,8 @@ TEST_P(ImplicitSphereIntersectionTest, testSuccess) {
     EXPECT_EQ(success, params.success);
 }
 
-TEST_P(ImplicitSphereIntersectionTest, testIntersect) {
+TEST_P(ImplicitSphereIntersectionTest, testIntersect)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     sphere.intersect(ray, intersect, normal);
@@ -100,7 +108,8 @@ TEST_P(ImplicitSphereIntersectionTest, testIntersect) {
     }
 }
 
-TEST_P(ImplicitSphereIntersectionTest, testNormal) {
+TEST_P(ImplicitSphereIntersectionTest, testNormal)
+{
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
     sphere.intersect(ray, intersect, normal);
@@ -138,8 +147,9 @@ INSTANTIATE_TEST_SUITE_P(Default, ImplicitSphereIntersectionTest, testing::Value
 );
 // clang-format on
 
-TEST(ImplicitSphere, center) {
-    ImplicitSphere s1;
+TEST(ImplicitSphere, center)
+{
+    implicit_sphere s1;
     s1.radius = 1;
 
     glm::dvec3 a, b;

@@ -1,13 +1,14 @@
-#include "entities.h"
+#include "triangle.h"
 #include "glm/gtc/epsilon.hpp"
 
-Triangle::Triangle() : Entity() {}
+triangle::triangle() : entity() {}
 
-Triangle::Triangle(const Material& material) : Entity(material) {}
+triangle::triangle(const Material& material) : entity(material) {}
 
-Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c) {}
+triangle::triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c) {}
 
-bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const {
+bool triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+{
     const auto N = this->normal();
     const auto DN = glm::dot(N, ray.dir);
 
@@ -38,6 +39,7 @@ bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& norm
     return true;
 }
 
-BoundingBox Triangle::boundingBox() const {
+BoundingBox triangle::boundingBox() const
+{
     return BoundingBox{glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
 }
