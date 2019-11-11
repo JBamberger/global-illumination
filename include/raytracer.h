@@ -35,13 +35,16 @@ class RayTracer {
             for (auto x = 0; x < w && running_; ++x) {
                 const auto ray = camera_.getRay(x, y, w, h);
 
-                image_->setPixel(x, y, compute_pixel(ray, x, y));
+                image_->setPixel(x, y, compute_pixel(ray, 3));
             }
         }
     }
 
-    glm::dvec3 compute_pixel(const Ray& ray, int x, int y) const
+    glm::dvec3 compute_pixel(const Ray& ray, int max_reflections) const
     {
+        if (max_reflections <= 0)
+            return {0, 0, 0};
+
         glm::dvec3 i, n; // working variables
 
         auto min = std::numeric_limits<double>::infinity();
@@ -127,7 +130,8 @@ class RayTracer {
                     // reflection direction
                     const auto r = 2. * normal * glm::dot(normal, v) - v;
                     const auto mirror_ray = Ray{intersect, r};
-                    const auto mirror = glm::dvec3{0., 0., 0.}; // TODO trace(mirror_ray);
+                    const auto mirror = compute_pixel(mirror_ray, max_reflections - 1);
+
                     color += min_ent->material.glazed * mirror;
                 }
 #endif

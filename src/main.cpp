@@ -68,6 +68,10 @@ int main(int argc, char** argv)
         explicit_entity::make_quad(glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1},
                                    glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1}));
     quad->material = Material(glm::dvec3{0.5, 0.5, 0.5});
+    quad->material.glazed = 1.0;
+    quad->material.ambient = 0.0;
+    quad->material.diffuse = 0.3;
+    quad->material.specular = 0.7;
     scene.push_back(quad.get());
 
     raytracer.setScene(&scene);
