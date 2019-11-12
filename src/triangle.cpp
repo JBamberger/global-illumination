@@ -27,11 +27,11 @@ bool triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& norm
     const auto I = ray.origin + c * ray.dir;
 
     // Ray intersects plane at I, perform half-space tests
-    if (glm::dot(N, glm::cross(B - A, I - A)) <= 0)
+    if (glm::dot(N, glm::cross(B - A, I - A)) < 0)
         return false;
-    if (glm::dot(N, glm::cross(C - B, I - B)) <= 0)
+    if (glm::dot(N, glm::cross(C - B, I - B)) < 0)
         return false;
-    if (glm::dot(N, glm::cross(A - C, I - C)) <= 0)
+    if (glm::dot(N, glm::cross(A - C, I - C)) < 0)
         return false;
 
     intersect = I;
