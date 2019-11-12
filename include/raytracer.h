@@ -22,7 +22,7 @@ class RayTracer {
     {
     }
 
-    void setScene(const Octree* scene) { scene_ = scene; }
+    void setScene(const octree* scene) { scene_ = scene; }
 
     void run(int w, int h)
     {
@@ -154,7 +154,7 @@ class RayTracer {
 
   private:
     bool running_ = false;
-    const Octree* scene_;
+    const octree* scene_;
     Camera camera_;
     glm::dvec3 light_;
     std::shared_ptr<Image> image_;

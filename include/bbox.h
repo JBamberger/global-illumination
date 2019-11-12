@@ -3,6 +3,7 @@
 #include <array>
 #include <cassert>
 
+#include "ray.h"
 #include <glm/glm.hpp>
 
 /// Represents an axis-aligned bounding box.
@@ -17,6 +18,7 @@ struct BoundingBox {
     double dx() const { return max.x - min.x; }
     double dy() const { return max.y - min.y; }
     double dz() const { return max.z - min.z; }
+    glm::dvec3 center() const { return (max + min) / 2.0; }
 
     const glm::dvec3 min;
     const glm::dvec3 max;
@@ -28,6 +30,28 @@ struct BoundingBox {
         return (min.x <= other.max.x && other.min.x <= max.x) && // test x dimension
                (min.y <= other.max.y && other.min.y <= max.y) && // test y dimension
                (min.z <= other.max.z && other.min.z <= max.z);   // test z dimension
+    }
+
+    bool intersect(const Ray& ray) const
+    {
+        auto t_low = (min - ray.origin) / ray.dir;
+        auto t_high = (max - ray.origin) / ray.dir;
+
+        if (ray.dir.x == 0) {
+            t_low.x = -std::numeric_limits<double>::infinity();
+            t_high.x = std::numeric_limits<double>::infinity();
+        }
+        if (ray.dir.y == 0) {
+            t_low.y = -std::numeric_limits<double>::infinity();
+            t_high.y = std::numeric_limits<double>::infinity();
+        }
+        if (ray.dir.z == 0) {
+            t_low.z = -std::numeric_limits<double>::infinity();
+            t_high.z = std::numeric_limits<double>::infinity();
+        }
+        const auto t_min = glm::max(t_low.x, glm::max(t_low.y, t_low.z));
+        const auto t_max = glm::min(t_high.x, glm::max(t_high.y, t_high.z));
+        return t_min >= t_max;
     }
 
     /// Check if a point lies within the bounding box.

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     Material blue{{0, 0, 1}};
 
     // Set up scene
-    Octree scene({-20, -20, -20}, {20, 20, 20});
+    octree scene({-20, -20, -20}, {20, 20, 20});
 
     // explicit sphere
     auto esphere = std::make_unique<explicit_entity>(
