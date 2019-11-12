@@ -5,6 +5,7 @@ add_executable(
 	unit_tests
 	main.cpp
 	entities-test.cpp
+	bbox-test.cpp
 )
 
 target_link_libraries(

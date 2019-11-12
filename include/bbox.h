@@ -34,24 +34,28 @@ struct BoundingBox {
 
     bool intersect(const Ray& ray) const
     {
-        auto t_low = (min - ray.origin) / ray.dir;
-        auto t_high = (max - ray.origin) / ray.dir;
+        // compute the intersection with each slab given by the box
+        const auto mins = (min - ray.origin) / ray.dir;
+        const auto maxes = (max - ray.origin) / ray.dir;
 
-        if (ray.dir.x == 0) {
-            t_low.x = -std::numeric_limits<double>::infinity();
-            t_high.x = std::numeric_limits<double>::infinity();
-        }
-        if (ray.dir.y == 0) {
-            t_low.y = -std::numeric_limits<double>::infinity();
-            t_high.y = std::numeric_limits<double>::infinity();
-        }
-        if (ray.dir.z == 0) {
-            t_low.z = -std::numeric_limits<double>::infinity();
-            t_high.z = std::numeric_limits<double>::infinity();
-        }
-        const auto t_min = glm::max(t_low.x, glm::max(t_low.y, t_low.z));
-        const auto t_max = glm::min(t_high.x, glm::max(t_high.y, t_high.z));
-        return t_min >= t_max;
+        // build valid intervals
+        const auto t_mins = glm::min(mins, maxes);
+        const auto t_maxes = glm::max(mins, maxes);
+
+        // Intersect first and second interval
+        auto t_min = glm::max(t_mins.x, t_mins.y);
+        auto t_max = glm::min(t_maxes.x, t_maxes.y);
+        if (t_min >= t_max)
+            return false;
+
+        // Intersect remaining interval with result
+        t_min = glm::max(t_min, t_mins.z);
+        t_max = glm::min(t_max, t_maxes.z);
+        if (t_min >= t_max)
+            return false;
+
+        // check that the intersection is not behind the ray starting point
+        return t_max > 0;
     }
 
     /// Check if a point lies within the bounding box.
