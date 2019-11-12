@@ -138,28 +138,27 @@ TEST_P(ImplicitSphereIntersectionTest, testNormal)
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(InsideOutside, ImplicitSphereIntersectionTest, testing::Values(
-    ray_spec{true,  glm::dvec3{-1,             0,             0           }, glm::dvec3{1,             0,             0           }, glm::dvec3{1,            0,             0            }, "center"			   },
-
-    ray_spec{false, glm::dvec3{-1,             1,             0           }, glm::dvec3{0,             0,             0           }, glm::dvec3{0,            0,             0            }, "right  far outside"  },
-    ray_spec{false, glm::dvec3{-1,            -1,             0           }, glm::dvec3{0,             0,             0           }, glm::dvec3{0,            0,             0            }, "left   far outside"  },
-    ray_spec{false, glm::dvec3{-1,             0,             1           }, glm::dvec3{0,             0,             0           }, glm::dvec3{0,            0,             0            }, "top    far outside"  },
-    ray_spec{false, glm::dvec3{-1,             0,            -1           }, glm::dvec3{0,             0,             0           }, glm::dvec3{0,            0,             0            }, "bottom far outside"  }
+    ray_spec{true,  {-1,  0,  0}, {1, 0, 0}, {1, 0, 0}, "center"            },						  			 
+    ray_spec{false, {-1,  1,  0}, {0, 0, 0}, {0, 0, 0}, "right  far outside"},
+    ray_spec{false, {-1, -1,  0}, {0, 0, 0}, {0, 0, 0}, "left   far outside"},
+    ray_spec{false, {-1,  0,  1}, {0, 0, 0}, {0, 0, 0}, "top    far outside"},
+    ray_spec{false, {-1,  0, -1}, {0, 0, 0}, {0, 0, 0}, "bottom far outside"}
 ));
 INSTANTIATE_TEST_SUITE_P(CloseToBorder, ImplicitSphereIntersectionTest, testing::Values(
-    ray_spec{true,  glm::dvec3{-9.8955634474,  0.9945315513,  0           }, glm::dvec3{0.1044365526,  0.9945315513,  0           }, glm::dvec3{0.1021811887,  0.9730540950,  0           }, "right  close inside" },
-    ray_spec{true,  glm::dvec3{-9.8955634474, -0.9945315513,  0           }, glm::dvec3{0.1044365526, -0.9945315513,  0           }, glm::dvec3{0.1021811887, -0.9730540950,  0           }, "left   close inside" },
-    ray_spec{true,  glm::dvec3{-9.8955634474,  0,             0.9945315513}, glm::dvec3{0.1044365526,  0,             0.9945315513}, glm::dvec3{0.1021811887,  0,             0.9730540950}, "top    close inside" },
-    ray_spec{true,  glm::dvec3{-9.8955634474,  0,            -0.9945315513}, glm::dvec3{0.1044365526,  0,            -0.9945315513}, glm::dvec3{0.1021811887,  0,            -0.9730540950}, "bottom close inside" },
+    ray_spec{true,  {-9.8955634474,  0.9945315513,  0           }, {0.1044365526,  0.9945315513,  0           }, {0.1021811887,  0.9730540950,  0           }, "right  close inside" },
+    ray_spec{true,  {-9.8955634474, -0.9945315513,  0           }, {0.1044365526, -0.9945315513,  0           }, {0.1021811887, -0.9730540950,  0           }, "left   close inside" },
+    ray_spec{true,  {-9.8955634474,  0,             0.9945315513}, {0.1044365526,  0,             0.9945315513}, {0.1021811887,  0,             0.9730540950}, "top    close inside" },
+    ray_spec{true,  {-9.8955634474,  0,            -0.9945315513}, {0.1044365526,  0,            -0.9945315513}, {0.1021811887,  0,            -0.9730540950}, "bottom close inside" },
 
-    ray_spec{true,  glm::dvec3{-9.9,           0.9949874371,  0           }, glm::dvec3{0.1,           0.9949874371,  0           }, glm::dvec3{0.0400670164,  0.3986617801,  0           }, "right  exact"		   },
-    ray_spec{true,  glm::dvec3{-9.9,          -0.9949874371,  0           }, glm::dvec3{0.1,          -0.9949874371,  0           }, glm::dvec3{0.0400670164, -0.3986617801,  0           }, "left   exact"		   },
-    ray_spec{true,  glm::dvec3{-9.9,           0,             0.9949874371}, glm::dvec3{0.1,           0,             0.9949874371}, glm::dvec3{0.0400670164,  0,             0.3986617801}, "top    exact"		   },
-    ray_spec{true,  glm::dvec3{-9.9,           0,            -0.9949874371}, glm::dvec3{0.1,           0,            -0.9949874371}, glm::dvec3{0.0400670164,  0,            -0.3986617801}, "bottom exact"		   },
+    ray_spec{true,  {-9.9,           0.9949874371,  0           }, {0.1,           0.9949874371,  0           }, {0.0400670164,  0.3986617801,  0           }, "right  exact"        },
+    ray_spec{true,  {-9.9,          -0.9949874371,  0           }, {0.1,          -0.9949874371,  0           }, {0.0400670164, -0.3986617801,  0           }, "left   exact"        },
+    ray_spec{true,  {-9.9,           0,             0.9949874371}, {0.1,           0,             0.9949874371}, {0.0400670164,  0,             0.3986617801}, "top    exact"        },
+    ray_spec{true,  {-9.9,           0,            -0.9949874371}, {0.1,           0,            -0.9949874371}, {0.0400670164,  0,            -0.3986617801}, "bottom exact"        },
 
-    ray_spec{false, glm::dvec3{-0.04,          0.00403,       0           }, glm::dvec3{0,             0,            0            }, glm::dvec3{0,             0,             0           }, "right  close outside"},
-    ray_spec{false, glm::dvec3{-0.04,         -0.00403,       0           }, glm::dvec3{0,             0,            0            }, glm::dvec3{0,             0,             0           }, "left   close outside"},
-    ray_spec{false, glm::dvec3{-0.04,          0,             0.00403     }, glm::dvec3{0,             0,            0            }, glm::dvec3{0,             0,             0           }, "top    close outside"},
-    ray_spec{false, glm::dvec3{-0.04,          0,            -0.00403     }, glm::dvec3{0,             0,            0            }, glm::dvec3{0,             0,             0           }, "bottom close outside"}
+    ray_spec{false, {-0.04,          0.00403,       0           }, {0,             0,            0            }, {0,             0,             0           }, "right  close outside"},
+    ray_spec{false, {-0.04,         -0.00403,       0           }, {0,             0,            0            }, {0,             0,             0           }, "left   close outside"},
+    ray_spec{false, {-0.04,          0,             0.00403     }, {0,             0,            0            }, {0,             0,             0           }, "top    close outside"},
+    ray_spec{false, {-0.04,          0,            -0.00403     }, {0,             0,            0            }, {0,             0,             0           }, "bottom close outside"}
 ));
 // clang-format on
 
