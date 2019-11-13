@@ -45,13 +45,13 @@ struct BoundingBox {
         // Intersect first and second interval
         auto t_min = glm::max(t_mins.x, t_mins.y);
         auto t_max = glm::min(t_maxes.x, t_maxes.y);
-        if (t_min >= t_max)
+        if (t_min > t_max)
             return false;
 
         // Intersect remaining interval with result
         t_min = glm::max(t_min, t_mins.z);
         t_max = glm::min(t_max, t_maxes.z);
-        if (t_min >= t_max)
+        if (t_min > t_max)
             return false;
 
         // check that the intersection is not behind the ray starting point

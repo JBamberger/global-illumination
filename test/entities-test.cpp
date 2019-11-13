@@ -39,10 +39,8 @@ struct TriangleIntersectionTest : public testing::TestWithParam<ray_spec> {
     glm::dvec3 normal;
 
     TriangleIntersectionTest()
+        : triangle(glm::dvec3{0, 0, 0}, glm::dvec3{0, 1, 0}, glm::dvec3{0, 0, 1})
     {
-        triangle.A = {0, 0, 0};
-        triangle.B = {0, 1, 0};
-        triangle.C = {0, 0, 1};
     }
 };
 

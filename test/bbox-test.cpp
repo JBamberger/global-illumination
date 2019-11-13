@@ -177,3 +177,27 @@ INSTANTIATE_TEST_SUITE_P(Default, BBoxBBoxIntersectionTest, testing::Values(
 
 ));
 // clang-format on
+
+TEST(FlatBBoxTest, testFlatboxFront)
+{
+    const BoundingBox box({0, -1, -1}, {0, 1, 1});
+    const Ray r({-1, 0, 0}, {1, 0, 0});
+
+    ASSERT_TRUE(box.intersect(r));
+}
+
+TEST(FlatBBoxTest, testFlatboxRight)
+{
+    const BoundingBox box({-1, 0, -1}, {1, 0, 1});
+    const Ray r({0, -1, 0}, {0, 1, 0});
+
+    ASSERT_TRUE(box.intersect(r));
+}
+
+TEST(FlatBBoxTest, testFlatboxTop)
+{
+    const BoundingBox box({-1, -1, 0}, {1, 1, 0});
+    const Ray r({0, 0, -1}, {0, 0, 1});
+
+    ASSERT_TRUE(box.intersect(r));
+}
