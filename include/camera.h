@@ -4,48 +4,71 @@
 #include <glm/glm.hpp>
 
 /// Represents the camera with information about the 'sensor' size.
-struct Camera {
-    explicit Camera(glm::dvec3 pos) : Camera(pos, {0, 0, 0}) {}
-    Camera(glm::dvec3 pos, glm::dvec3 lookAt) : pos(pos), up({0, 0, 1.0}), forward(lookAt - pos)
+class Camera {
+    /// Location of the camera focus point.
+    glm::dvec3 pos_;
+
+    /// Normalized vector pointing upwards.
+    glm::dvec3 up_;
+    /// Normalized vector pointing to the right.
+    glm::dvec3 right_;
+    /// Normalized vector pointing in viewing direction.
+    glm::dvec3 forward_;
+
+    /// Diagonal of the sensor
+    const double sensor_diag_ = 0.035;
+
+    /// Focal distance of the camera
+    const double focal_dist_ = 0.04;
+
+    /// Window width.
+    double window_width_ = 0;
+    /// Window height.
+    double windows_height_ = 0;
+    /// The factor by which the sensor is stretched to match the display size.
+    double window_scale_ = 0.0;
+
+  public:
+    explicit Camera(const glm::dvec3 pos) : Camera(pos, {0, 0, 0}) {}
+    Camera(glm::dvec3 pos, glm::dvec3 look_at)
+        : pos_(pos), up_({0, 0, 1.0}), forward_(look_at - pos)
     {
-        forward = glm::normalize(forward);
+        forward_ = glm::normalize(forward_);
+        right_ = {0, 1.0, 0};
+
+        // not necessary as up is fixed
+        // up = glm::normalize(up);
+
         // The side direction can be computed from the up and forward vector since it is
         // perpendicular to both of them. The value is negated, because the sensor points in the
         // other direction than the viewer sees the image.
-        right = -glm::normalize(glm::cross(up, forward));
+        // This computation is not necessary as the up vector is fixed
+        // right = -glm::normalize(glm::cross(up, forward));
     }
 
-    glm::dvec3 pos;
-    glm::dvec3 up;
-    glm::dvec3 right;
-    glm::dvec3 forward;              // normalized vector of the view direction
-    const double sensorDiag = 0.035; // diagonal of the sensor
-    const double focalDist = 0.04;   // focal distance
-    double scale =
-        0.0; // scale is the factor by which the sensor is stretched to match the display size
-
-    Ray getRay(double x, double y, double x_size, double y_size)
+    Ray get_ray(const double x, const double y) const
     {
-        y = y_size - y; // invert the y axis to match the world coordinate system
-
         // computes the relative location of the pixel in the sensor, i.e. the middle pixel of the
         // screen is in the middle of the sensor
-        const auto px = scale * (x + 0.5 - x_size / 2);
-        const auto py = scale * (y + 0.5 - y_size / 2);
+        const auto px = window_scale_ * (x + 0.5 - window_width_ / 2);
+        // for the y location we also need to invert the input axis, as the qt image points y
+        // downwards and we point y upwards
+        const auto py = window_scale_ * (windows_height_ / 2 - y + 0.5);
 
         // Finally compute the direction of the ray which goes through the given pixel.
         // this requires that forward, up and right are normalized.
-        glm::dvec3 direction = forward * focalDist + up * py + right * px;
+        const auto direction = forward_ * focal_dist_ + up_ * py + right_ * px;
 
         // let rays originate in the camera center
         // TODO: It might be better to originate in the sensor to avoid objects between sensor and
         // eye?
-        return {pos, direction};
+        return {pos_, direction};
     }
 
-    void set_window_size(double w, double h)
+    void set_window_size(const double w, const double h)
     {
-        // scale is the factor by which the sensor is stretched to match the display size
-        scale = sensorDiag / glm::sqrt(w * w + h * h);
+        window_width_ = w;
+        windows_height_ = h;
+        window_scale_ = sensor_diag_ / glm::sqrt(w * w + h * h);
     }
 };

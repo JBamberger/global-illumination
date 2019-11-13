@@ -34,7 +34,7 @@ class RayTracer {
 #pragma omp parallel for schedule(dynamic, 4)
         for (auto y = 0; y < h; ++y) {
             for (auto x = 0; x < w && running_; ++x) {
-                const auto ray = camera_.getRay(x, y, w, h);
+                const auto ray = camera_.get_ray(x, y);
                 const auto pix = compute_pixel(ray, 3);
 #pragma omp critical
                 {
