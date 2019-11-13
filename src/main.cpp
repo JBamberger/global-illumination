@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     // Set up scene
     octree scene({-20, -20, -20}, {20, 20, 20});
 
-#if 0
+#if 1
     // explicit sphere
     auto esphere = std::make_unique<explicit_entity>(
         explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 0));
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     scene.push_back(cone2.get());
     scene.push_back(cone3.get());
 
-#if 0
+#if 1
     // sphere at center
     auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
     // sphere->radius = 1;
@@ -79,8 +79,8 @@ int main(int argc, char** argv)
     scene.push_back(t2.get());
 
     auto quad = std::make_unique<explicit_entity>(
-        explicit_entity::make_quad(glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1},
-                                   glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1}));
+        explicit_entity::make_quad(glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1},
+                                   glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1}));
     quad->material = Material(glm::dvec3{0.5, 0.5, 0.5});
     quad->material.glazed = 1.0;
     quad->material.ambient = 0.0;

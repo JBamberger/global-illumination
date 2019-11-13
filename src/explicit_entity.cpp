@@ -7,6 +7,12 @@
 bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // TODO: check intersection direction
+
+    // quickly discard all rays that don't even intersect the bounding box
+    if (!boundingBox().intersect(ray)) {
+        return false;
+    }
+
     glm::dvec3 i, n;
     auto min = std::numeric_limits<double>::infinity();
     for (const auto& t : faces) {

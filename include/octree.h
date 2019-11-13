@@ -10,7 +10,7 @@
 #include "bbox.h"
 #include "entities.h"
 
-#define USE_OCTREE
+// #define USE_OCTREE
 
 class octree {
   public:
