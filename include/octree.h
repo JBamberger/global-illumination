@@ -9,6 +9,7 @@
 
 #include "bbox.h"
 #include "entities.h"
+#include <set>
 
 // #define USE_OCTREE
 
@@ -30,8 +31,10 @@ class octree {
     std::vector<entity*> intersect(const Ray& ray) const
     {
 #ifdef USE_OCTREE
+        std::set<entity*> out_set;
+        root_.intersect(ray, out_set);
         std::vector<entity*> output;
-        root_.intersect(ray, output);
+        output.insert(output.end(), out_set.begin(), out_set.end());
         return output;
 #else
         return root_.entities;
@@ -78,7 +81,15 @@ class octree {
             // clang-format on
 
             // insert all entities into the children
-            for (auto entity : entities) insert(entity);
+            for (auto entity : entities) {
+                const auto bb = entity->boundingBox();
+
+                for (auto& i : children) {
+                    if (i->bbox.intersect(bb)) {
+                        i->entities.push_back(entity);
+                    }
+                }
+            }
             // clear and shrink the own entities vector because it is no longer needed.
             entities.clear();
             entities.shrink_to_fit();
@@ -99,19 +110,19 @@ class octree {
 
                 for (auto& i : children) {
                     if (i->bbox.intersect(bb)) {
-                        i->insert(e);
+                        i->entities.push_back(e);
                     }
                 }
             }
         }
 
-        void intersect(const Ray& ray, std::vector<entity*>& output) const
+        void intersect(const Ray& ray, std::set<entity*>& output) const
         {
             if (!bbox.intersect(ray))
                 return;
 
             if (is_leaf()) {
-                output.insert(output.end(), entities.begin(), entities.end());
+                output.insert(entities.begin(), entities.end());
             } else {
                 for (const auto& child : children) { child->intersect(ray, output); }
             }
