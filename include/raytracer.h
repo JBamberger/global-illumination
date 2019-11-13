@@ -27,15 +27,19 @@ class RayTracer {
     void run(int w, int h)
     {
         image_ = std::make_shared<Image>(w, h);
-
-        // The structure of the for loop should remain for incremental rendering.
-        // termination criterion: add  && _running
-        // #pragma omp parallel for
-        for (auto y = 0; y < h && running_; ++y) {
+        camera_.set_window_size(w, h);
+// The structure of the for loop should remain for incremental rendering.
+// termination criterion: add  && _running
+// # schedule(dynamic, 4)
+#pragma omp parallel for schedule(dynamic, 4)
+        for (auto y = 0; y < h; ++y) {
             for (auto x = 0; x < w && running_; ++x) {
                 const auto ray = camera_.getRay(x, y, w, h);
-
-                image_->setPixel(x, y, compute_pixel(ray, 3));
+                const auto pix = compute_pixel(ray, 3);
+#pragma omp critical
+                {
+                    image_->setPixel(x, y, pix);
+                }
             }
         }
     }

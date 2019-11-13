@@ -54,7 +54,6 @@ bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
         }
     }
 
-    // TODO: select correct solution
     intersect = ray.origin + solution * ray.dir;
     normal = glm::normalize(intersect - center);
     return true;

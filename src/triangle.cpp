@@ -1,11 +1,10 @@
 #include "triangle.h"
 #include "glm/gtc/epsilon.hpp"
 
-triangle::triangle() : entity() {}
-
-triangle::triangle(const Material& material) : entity(material) {}
-
-triangle::triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c) {}
+triangle::triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c)
+{
+    assert(glm::abs(glm::dot(glm::normalize(b - a), glm::normalize(c - a))) != 1);
+}
 
 bool triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {

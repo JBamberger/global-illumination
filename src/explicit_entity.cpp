@@ -1,6 +1,9 @@
 #include "explicit_entity.h"
 #include "implicit_sphere.h"
 
+#include <glm/gtc/constants.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+
 bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // TODO: check intersection direction
@@ -224,6 +227,45 @@ explicit_entity explicit_entity::make_sphere(const glm::dvec3 center,
     auto faces = perform_subdivision(initial_shape, ref, sub_divisions);
 
     return explicit_entity(std::move(faces));
+}
+
+explicit_entity explicit_entity::make_cone(const glm::dvec3 center,
+                                           const glm::dvec3 tip,
+                                           const double radius,
+                                           const size_t slices)
+{
+    // prevent figures without volume (the orientation would not be specified completely)
+    assert(center != tip);
+    assert(radius > 0);
+    assert(slices > 2);
+
+    std::vector<triangle> faces;
+    faces.reserve(slices * 2);
+    // The cone is built from many wedges which meet in the tip and center of the bottom
+    const auto wedge_angle = 2 * glm::pi<double>() / static_cast<double>(slices);
+    const auto rotation_axis = glm::normalize(tip - center);
+
+    // find a vector that is not linearly dependent of rotation_axis
+    const auto n = glm::abs(glm::dot(rotation_axis, {1, 0, 0})) != 1 ? glm::dvec3{1, 0, 0}
+                                                                     : glm::dvec3{0, 1, 0};
+
+    // compute the first point on the bottom plane
+    auto last_vec = radius * glm::normalize(glm::cross(rotation_axis, n));
+    auto last_border = center + last_vec;
+
+    for (size_t i = 0; i < slices; i++) {
+
+        auto next_vec = glm::rotate(last_vec, wedge_angle, rotation_axis);
+        auto next_border = center + next_vec;
+
+        faces.emplace_back(center, next_border, last_border);
+        faces.emplace_back(tip, last_border, next_border);
+
+        last_vec = next_vec;
+        last_border = next_border;
+    }
+
+    return explicit_entity(faces);
 }
 
 std::ostream& explicit_entity::write_obj(std::ostream& os)

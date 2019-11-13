@@ -10,9 +10,9 @@
 struct BoundingBox {
     BoundingBox(glm::dvec3 min, glm::dvec3 max) : min(min), max(max)
     {
-        assert(min.x < max.x);
-        assert(min.y < max.y);
-        assert(min.z < max.z);
+        assert(min.x <= max.x);
+        assert(min.y <= max.y);
+        assert(min.z <= max.z);
     }
 
     double dx() const { return max.x - min.x; }

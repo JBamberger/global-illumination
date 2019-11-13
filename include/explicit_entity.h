@@ -25,6 +25,10 @@ struct explicit_entity final : entity {
     /// Creates an explicit axis-aligned cube.
     static explicit_entity make_cube(glm::dvec3 center, double side_length);
 
+    /// Creates an explicit cone.
+    static explicit_entity
+    make_cone(glm::dvec3 center, glm::dvec3 tip, double radius, size_t slices);
+
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& write_obj(std::ostream& os);
 

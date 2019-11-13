@@ -10,19 +10,32 @@
 #include "bbox.h"
 #include "entities.h"
 
+#define USE_OCTREE
+
 class octree {
   public:
     octree(const glm::dvec3 min, const glm::dvec3 max) : root_(node({min, max})) {}
 
     /// Store an entity in the correct position of the octree.
-    void push_back(entity* object) { root_.insert(object); }
+    void push_back(entity* object)
+    {
+#ifdef USE_OCTREE
+        root_.insert(object);
+#else
+        root_.entities.push_back(object);
+#endif
+    }
 
     /// Returns list of entities that have the possibility to be intersected by the ray.
     std::vector<entity*> intersect(const Ray& ray) const
     {
+#ifdef USE_OCTREE
         std::vector<entity*> output;
         root_.intersect(ray, output);
         return output;
+#else
+        return root_.entities;
+#endif
     }
 
   private:
