@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 #if 1
     // explicit sphere
     auto esphere = std::make_unique<explicit_entity>(
-        explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 0));
+        explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 3));
     esphere->material = Material{{0.3, 0.3, 1}};
     esphere->material.ambient = 0.3;
     scene.push_back(esphere.get());

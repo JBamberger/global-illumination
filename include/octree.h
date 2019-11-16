@@ -11,7 +11,7 @@
 #include "entities.h"
 #include <set>
 
-// #define USE_OCTREE
+#define USE_OCTREE
 
 class octree {
   public:
@@ -21,7 +21,7 @@ class octree {
     void push_back(entity* object)
     {
 #ifdef USE_OCTREE
-        root_.insert(object);
+        root_.insert(object, 0);
 #else
         root_.entities.push_back(object);
 #endif
@@ -97,12 +97,12 @@ class octree {
 
         bool is_leaf() const { return children[0] == nullptr; }
 
-        void insert(entity* e)
+        void insert(entity* e, size_t depth)
         {
             if (is_leaf()) {
                 entities.push_back(e);
 
-                if (entities.size() > split_threshold) {
+                if (depth < split_threshold && entities.size() > split_threshold) {
                     partition();
                 }
             } else {
@@ -110,7 +110,7 @@ class octree {
 
                 for (auto& i : children) {
                     if (i->bbox.intersect(bb)) {
-                        i->entities.push_back(e);
+                        i->insert(e, depth + 1);
                     }
                 }
             }
@@ -133,6 +133,7 @@ class octree {
         std::array<std::unique_ptr<node>, 8> children;
 
         const size_t split_threshold = 8;
+        const size_t max_depth = 5;
     };
 
     node root_;
