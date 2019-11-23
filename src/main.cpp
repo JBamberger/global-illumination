@@ -6,11 +6,11 @@
 #include "entities.h"
 #include "gui.h"
 
-//#define SHOW_AXIS
-//#define SHOW_CUBE
-//#define SHOW_EXPLICIT_SPHERE
+#define SHOW_AXIS
+#define SHOW_CUBE
+#define SHOW_EXPLICIT_SPHERE
 #define SHOW_SPHERE
-//#define SHOW_TRIANGLES
+#define SHOW_TRIANGLES
 #define SHOW_FLOOR
 
 int main(int argc, char** argv)
@@ -22,19 +22,19 @@ int main(int argc, char** argv)
 
     RayTracer raytracer(camera, light);
 
-    Material red{{1, 0, 0}};
-    Material green{{0, 1, 0}};
-    Material blue{{0, 0, 1}};
+    auto red = std::make_shared<simple_material>(glm::dvec3{1, 0, 0});
+    auto green = std::make_shared<simple_material>(glm::dvec3{0, 1, 0});
+    auto blue = std::make_shared<simple_material>(glm::dvec3{0, 0, 1});
 
     // Set up scene
     octree scene({-20, -20, -20}, {20, 20, 20});
 
-#if SHOW_EXPLICIT_SPHERE
+#ifdef SHOW_EXPLICIT_SPHERE
     // explicit sphere
     auto esphere = std::make_unique<explicit_entity>(
         explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 1));
-    esphere->material = Material{{0.3, 0.3, 1}};
-    esphere->material.ambient = 0.3;
+    esphere->material = std::make_shared<simple_material>(glm::dvec3{0.3, 0.3, 1});
+    esphere->material->ambient = 0.3;
     scene.push_back(esphere.get());
 #endif
 
@@ -67,14 +67,14 @@ int main(int argc, char** argv)
 
 #ifdef SHOW_SPHERE
     auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
-    sphere->material = green;
-    sphere->material.specular_exponent = 64;
-    sphere->material.ambient = 0;
-    sphere->material.diffuse = 1;
-    sphere->material.specular = 0.5;
-    sphere->material.glazed = 0;
-    sphere->material.refractive = 1;
-    sphere->material.refractive_index = 1;
+    sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
+    sphere->material->specular_exponent = 64;
+    sphere->material->ambient = 0;
+    sphere->material->diffuse = 1;
+    sphere->material->specular = 0.5;
+    sphere->material->glazed = 0;
+    sphere->material->refractive = 1;
+    sphere->material->refractive_index = 1;
     scene.push_back(sphere.get());
 
     // auto sphere2 = std::make_unique<implicit_sphere>(glm::dvec3{-1, 1, 0}, 1.0);
@@ -86,7 +86,9 @@ int main(int argc, char** argv)
     // triangle upper right corner
     auto t3 = std::make_unique<triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
                                          glm::dvec3{1, 0.5, 2.5});
-    t3->material = red;
+    t3->material = std::make_shared<simple_material>(glm::dvec3(1, 0, 0));
+    t3->material->refractive = 1.0;
+    t3->material->refractive_index = 2;
     scene.push_back(t3.get());
 
     auto t1 = std::make_unique<triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
@@ -104,11 +106,11 @@ int main(int argc, char** argv)
     auto quad = std::make_unique<explicit_entity>(
         explicit_entity::make_quad(glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1},
                                    glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1}));
-    quad->material = Material(glm::dvec3{0.5, 0.5, 0.5});
-    quad->material.glazed = 1.0;
-    quad->material.ambient = 0.0;
-    quad->material.diffuse = 0.3;
-    quad->material.specular = 0.7;
+    quad->material = std::make_shared<simple_material>(glm::dvec3{0.5, 0.5, 0.5});
+    quad->material->glazed = 1.0;
+    quad->material->ambient = 0.0;
+    quad->material->diffuse = 0.3;
+    quad->material->specular = 0.7;
     scene.push_back(quad.get());
 
 #endif

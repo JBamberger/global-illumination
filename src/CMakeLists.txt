@@ -24,6 +24,7 @@ set(HEADERS
 
 
 add_library(global_illu_lib
+    simple_material.cpp
 	explicit_entity.cpp
 	implicit_sphere.cpp
 	triangle.cpp

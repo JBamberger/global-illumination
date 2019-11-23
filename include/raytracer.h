@@ -17,7 +17,7 @@
 #define USE_DIFFUSE
 #define USE_SPECULAR
 #define USE_MIRROR
-//#define USE_REFRACTION
+#define USE_REFRACTION
 
 class RayTracer {
   public:
@@ -93,71 +93,75 @@ class RayTracer {
             }
 
 #ifdef USE_AMBIENT
-            color = min_ent->material.color * min_ent->material.ambient;
+            // ambient:
+            // L_a = k_a * I_a
+
+            color = min_ent->material->get_color(0, 0) * min_ent->material->ambient;
 #endif
 
             if (!blocked) {
-                // ambient:
-                // L_a = k_a * I_a
-                // diffuse:
-                // L_d = k_d * I * glm::max(0.0, glm::dot(n, l))
-                // specular:
-                // h = glm::normalize(v + l)
-                // L_s = k_s * I * glm::pow(glm::max(0.0, glm::dot(n,h)), p)
-                // mirror: (trace another ray in reflection direction)
-                // r = 2n(dot(n,v)) - v
-                // L_m = Ray(P, r).color
-                // glazed:
-                // L = L_a + L_d + L_m
-                //
-                // For many light sources:
-                // L = L_a + sum(L_d(i) + L_s(i))
 
                 // eye direction
                 const auto v = glm::normalize(-ray.dir);
 
 #ifdef USE_DIFFUSE
+                // diffuse:
+                // L_d = k_d * I * max(0.0, dot(n, l))
+
                 const auto diffuse = glm::max(0.0, glm::dot(normal, l));
-                color += min_ent->material.color * min_ent->material.diffuse * diffuse;
+                color += min_ent->material->get_color(0, 0) * min_ent->material->diffuse * diffuse;
 #endif
 #ifdef USE_SPECULAR
+                // Specular (Blinn-Phong) Illumination
+                // compute the bisector: h = normalize(v + l)
+                // L_s = k_s * I * max(0.0, dot(n,h))^p
+
                 // center between view and light
                 const auto h = glm::normalize(v + l);
                 const auto specular = glm::pow(glm::max(0.0, glm::dot(normal, h)),
-                                               min_ent->material.specular_exponent);
-                color += min_ent->material.specular * specular;
+                                               min_ent->material->specular_exponent);
+                color += min_ent->material->specular * specular;
 #endif
 #ifdef USE_MIRROR
-                if (min_ent->material.glazed > 0) {
-                    // reflection direction
-                    // const auto r = 2. * normal * glm::dot(normal, v) - v;
+                // mirror: (trace another ray in reflection direction)
+                // compute the reflection direction: r = 2n * dot(n,v) - v  === glm::reflect(-v, n)
+                // L_m = k_m * trace(Ray(P, r))
+
+                if (min_ent->material->glazed > 0) {
                     const auto mirror_ray = Ray::offset_ray(intersect, glm::reflect(-v, normal));
                     const auto mirror = compute_pixel(mirror_ray, max_reflections - 1);
 
-                    color += min_ent->material.glazed * mirror;
+                    color += min_ent->material->glazed * mirror;
                 }
 #endif
 #ifdef USE_REFRACTION
-                if (min_ent->material.refractive > 0) {
+                // glazed: (trace another ray in refraction direction)
+                // It is not clear what should happen in the intersection of two objects. Which
+                // material / refractive index is used?
+
+                if (min_ent->material->refractive > 0) {
                     const auto entering = glm::dot(normal, ray.dir);
 
                     // if entering == false -> divide by 1.0 for air
-                    const auto eta = entering
-                                         ? ray.refractive_index / min_ent->material.refractive_index
-                                         : min_ent->material.refractive_index;
+                    const auto eta =
+                        entering ? ray.refractive_index / min_ent->material->refractive_index
+                                 : min_ent->material->refractive_index;
 
                     const auto refraction_direction = glm::refract(ray.dir, normal, eta);
                     auto refract_ray = Ray::offset_ray(intersect, refraction_direction);
 
                     // reset the index if we leave an object
                     refract_ray.refractive_index =
-                        entering ? min_ent->material.refractive_index : 1.0;
+                        entering ? min_ent->material->refractive_index : 1.0;
 
                     const auto refraction = compute_pixel(refract_ray, max_reflections - 1);
-                    color += min_ent->material.refractive * refraction;
+                    color += min_ent->material->refractive * refraction;
                 }
 #endif
             }
+
+            // the color value must be clamped because otherwise high illumination will produce
+            // values above 1. This results in errors from Qt.
             color = glm::clamp(color, 0., 1.);
         }
 
