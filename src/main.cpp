@@ -6,6 +6,13 @@
 #include "entities.h"
 #include "gui.h"
 
+//#define SHOW_AXIS
+//#define SHOW_CUBE
+//#define SHOW_EXPLICIT_SPHERE
+#define SHOW_SPHERE
+//#define SHOW_TRIANGLES
+#define SHOW_FLOOR
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
@@ -22,14 +29,16 @@ int main(int argc, char** argv)
     // Set up scene
     octree scene({-20, -20, -20}, {20, 20, 20});
 
-#if 1
+#if SHOW_EXPLICIT_SPHERE
     // explicit sphere
     auto esphere = std::make_unique<explicit_entity>(
-        explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 3));
+        explicit_entity::make_sphere(glm::dvec3{0, -2, 2}, 0.5, 1));
     esphere->material = Material{{0.3, 0.3, 1}};
     esphere->material.ambient = 0.3;
     scene.push_back(esphere.get());
+#endif
 
+#ifdef SHOW_CUBE
     // explicit cube
     auto cube =
         std::make_unique<explicit_entity>(explicit_entity::make_cube(glm::dvec3{0, -2, 0}, 0.5));
@@ -38,6 +47,7 @@ int main(int argc, char** argv)
 
 #endif
 
+#ifdef SHOW_AXIS
     // explicit cone
     const auto tip = glm::dvec3{0, 0, 0};
 
@@ -53,15 +63,26 @@ int main(int argc, char** argv)
     scene.push_back(cone1.get());
     scene.push_back(cone2.get());
     scene.push_back(cone3.get());
+#endif
 
-#if 1
-    // sphere at center
+#ifdef SHOW_SPHERE
     auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
-    // sphere->radius = 1;
     sphere->material = green;
     sphere->material.specular_exponent = 64;
+    sphere->material.ambient = 0;
+    sphere->material.diffuse = 1;
+    sphere->material.specular = 0.5;
+    sphere->material.glazed = 0;
+    sphere->material.refractive = 1;
+    sphere->material.refractive_index = 1;
     scene.push_back(sphere.get());
 
+    // auto sphere2 = std::make_unique<implicit_sphere>(glm::dvec3{-1, 1, 0}, 1.0);
+    // sphere2->material = green;
+    // scene.push_back(sphere2.get());
+#endif
+
+#ifdef SHOW_TRIANGLES
     // triangle upper right corner
     auto t3 = std::make_unique<triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
                                          glm::dvec3{1, 0.5, 2.5});
@@ -77,7 +98,9 @@ int main(int argc, char** argv)
         std::make_unique<triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
     t2->material = green;
     scene.push_back(t2.get());
+#endif
 
+#ifdef SHOW_FLOOR
     auto quad = std::make_unique<explicit_entity>(
         explicit_entity::make_quad(glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1},
                                    glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1}));

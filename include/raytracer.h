@@ -13,6 +13,12 @@
 #include "image.h"
 #include "octree.h"
 
+#define USE_AMBIENT
+#define USE_DIFFUSE
+#define USE_SPECULAR
+#define USE_MIRROR
+//#define USE_REFRACTION
+
 class RayTracer {
   public:
     RayTracer() = delete;
@@ -75,10 +81,7 @@ class RayTracer {
             const auto l = glm::normalize(light_ - intersect);
             normal = glm::normalize(normal);
 
-            // the offset value starts the ray slightly in the direction of the light to avoid
-            // intersecting the entity itself.
-            const auto offset = 1e-7;
-            const auto shadow_ray = Ray{intersect + l * offset, l};
+            const auto shadow_ray = Ray::offset_ray(intersect, l);
             entities = scene_->intersect(shadow_ray);
 
             auto blocked = false;
@@ -88,11 +91,6 @@ class RayTracer {
                     break;
                 }
             }
-
-#define USE_AMBIENT
-#define USE_DIFFUSE
-#define USE_SPECULAR
-#define USE_MIRROR
 
 #ifdef USE_AMBIENT
             color = min_ent->material.color * min_ent->material.ambient;
@@ -132,15 +130,33 @@ class RayTracer {
 #ifdef USE_MIRROR
                 if (min_ent->material.glazed > 0) {
                     // reflection direction
-                    const auto r = 2. * normal * glm::dot(normal, v) - v;
-                    const auto mirror_ray = Ray{intersect, r};
+                    // const auto r = 2. * normal * glm::dot(normal, v) - v;
+                    const auto mirror_ray = Ray::offset_ray(intersect, glm::reflect(-v, normal));
                     const auto mirror = compute_pixel(mirror_ray, max_reflections - 1);
 
                     color += min_ent->material.glazed * mirror;
                 }
 #endif
+#ifdef USE_REFRACTION
+                if (min_ent->material.refractive > 0) {
+                    const auto entering = glm::dot(normal, ray.dir);
 
-                // apply diffuse shading
+                    // if entering == false -> divide by 1.0 for air
+                    const auto eta = entering
+                                         ? ray.refractive_index / min_ent->material.refractive_index
+                                         : min_ent->material.refractive_index;
+
+                    const auto refraction_direction = glm::refract(ray.dir, normal, eta);
+                    auto refract_ray = Ray::offset_ray(intersect, refraction_direction);
+
+                    // reset the index if we leave an object
+                    refract_ray.refractive_index =
+                        entering ? min_ent->material.refractive_index : 1.0;
+
+                    const auto refraction = compute_pixel(refract_ray, max_reflections - 1);
+                    color += min_ent->material.refractive * refraction;
+                }
+#endif
             }
             color = glm::clamp(color, 0., 1.);
         }
