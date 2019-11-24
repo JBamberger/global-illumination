@@ -46,63 +46,32 @@ class RayTracer {
 
     glm::dvec3 compute_pixel(const Ray& ray, int max_reflections) const
     {
-        if (max_reflections <= 0)
-            return {0, 0, 0};
-
-        glm::dvec3 intersect, normal; // values at minimum
-        entity* min_ent = nullptr;
-
-        {
-            auto min = std::numeric_limits<double>::infinity();
-            glm::dvec3 i, n; // working variables
-            const auto entities = scene_->intersect(ray);
-
-            // find closest intersecting entity
-            for (auto entity : entities) {
-                if (entity->intersect(ray, i, n)) {
-                    const auto dist = glm::distance(ray.origin, i);
-                    if (dist < min) {
-                        min = dist;
-                        normal = n;
-                        intersect = i;
-                        min_ent = entity;
-                    }
-                }
-            }
-        }
-
         glm::dvec3 color{0, 0, 0}; // background color
 
-        if (min_ent == nullptr) {
+        if (max_reflections <= 0)
             return color;
-        }
 
+        glm::dvec3 intersect, normal; // values at minimum
+        auto min_ent = scene_->closest_intersection(ray, intersect, normal);
+
+        if (min_ent == nullptr)
+            return color;
+
+        // this is the entity material at the intersection location
+        const auto mat = min_ent->material; // TODO: use material of sub-entity if explicit_entity
+        // this is the base color value of the entity at the intersection location
+        const auto color_at_intersect = min_ent->get_color_at_intersect(intersect);
         // compute light and normal vector at the intersection point
         const auto l = glm::normalize(light_ - intersect);
-        normal = glm::normalize(normal);
 
-        auto blocked = false;
-        {
-            const auto shadow_ray = Ray::offset_ray(intersect, l);
-            const auto entities = scene_->intersect(shadow_ray);
-            glm::dvec3 i, n; // working variables
-            for (auto entity : entities) {
-                if (entity->intersect(shadow_ray, i, n)) {
-                    blocked = true;
-                    break;
-                }
-            }
-        }
-
-        const auto mat = min_ent->material;
-        const auto color_at_intersect = min_ent->get_color_at_intersect(intersect);
+        // check if the light is obstructed by some an entity
+        // TODO: this only works for opaque objects
+        auto blocked = scene_->is_blocked(Ray::offset_ray(intersect, l));
 
         // ambient: L_a = k_a * I_a
-        color = color_at_intersect * mat->ambient;
+        color = color + color_at_intersect * mat->ambient;
 
         if (!blocked) {
-
-            const auto v = glm::normalize(-ray.dir); // eye direction
 
             // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
             const auto diffuse = glm::dot(normal, l);
@@ -111,6 +80,7 @@ class RayTracer {
             }
 
             // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
+            const auto v = glm::normalize(-ray.dir);     // eye direction
             const auto bisector = glm::normalize(v + l); // center between view and light
             const auto base = glm::dot(normal, bisector);
             if (base > 0) {

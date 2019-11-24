@@ -41,6 +41,42 @@ class octree {
 #endif
     }
 
+    entity* closest_intersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
+    {
+        entity* min_ent = nullptr;
+        auto min = std::numeric_limits<double>::infinity();
+        glm::dvec3 i, n;
+
+        const auto entities = intersect(ray);
+        for (auto entity : entities) {
+            if (entity->intersect(ray, i, n)) {
+                const auto dist = glm::distance(ray.origin, i);
+                if (dist < min) {
+                    min = dist;
+                    normal = n;
+                    inter = i;
+                    min_ent = entity;
+                }
+            }
+        }
+        return min_ent;
+    }
+
+    bool is_blocked(const Ray& ray) const
+    {
+        auto blocked = false;
+        glm::dvec3 i, n;
+
+        const auto entities = intersect(ray);
+        for (auto entity : entities) {
+            if (entity->intersect(ray, i, n)) {
+                blocked = true;
+                break;
+            }
+        }
+        return blocked;
+    }
+
   private:
     struct node {
         explicit node(BoundingBox bbox) : bbox(std::move(bbox)) {}
