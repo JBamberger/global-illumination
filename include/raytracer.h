@@ -96,7 +96,7 @@ class RayTracer {
             // ambient:
             // L_a = k_a * I_a
 
-            color = min_ent->material->get_color(0, 0) * min_ent->material->ambient;
+            color = min_ent->material->get_color({0, 0}) * min_ent->material->ambient;
 #endif
 
             if (!blocked) {
@@ -109,7 +109,8 @@ class RayTracer {
                 // L_d = k_d * I * max(0.0, dot(n, l))
 
                 const auto diffuse = glm::max(0.0, glm::dot(normal, l));
-                color += min_ent->material->get_color(0, 0) * min_ent->material->diffuse * diffuse;
+                color +=
+                    min_ent->material->get_color({0, 0}) * min_ent->material->diffuse * diffuse;
 #endif
 #ifdef USE_SPECULAR
                 // Specular (Blinn-Phong) Illumination
@@ -124,7 +125,7 @@ class RayTracer {
 #endif
 #ifdef USE_MIRROR
                 // mirror: (trace another ray in reflection direction)
-                // compute the reflection direction: r = 2n * dot(n,v) - v  === glm::reflect(-v, n)
+                // compute the reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
                 // L_m = k_m * trace(Ray(P, r))
 
                 if (min_ent->material->glazed > 0) {

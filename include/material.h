@@ -23,5 +23,5 @@ struct Material {
      * \param v v-coordinate of the texture
      * \return the color value at the given position
      */
-    virtual glm::dvec3 get_color(double u, double v) = 0;
+    virtual glm::dvec3 get_color(glm::dvec2 uv) = 0;
 };
