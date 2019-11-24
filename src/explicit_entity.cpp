@@ -48,6 +48,17 @@ BoundingBox explicit_entity::boundingBox() const
     return BoundingBox{min, max};
 }
 
+glm::dvec3 explicit_entity::get_color_at_intersect(glm::dvec3 intersect) const
+{
+    // TODO: implement uv texture mapping
+    // simply project the texture up through the object
+    const auto bbox = boundingBox();
+    const auto u = (intersect.x - bbox.min.x) / bbox.dx();
+    const auto v = (intersect.y - bbox.min.y) / bbox.dy();
+
+    return material->get_color({u, v});
+}
+
 explicit_entity explicit_entity::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
 {
     std::vector<triangle> faces;

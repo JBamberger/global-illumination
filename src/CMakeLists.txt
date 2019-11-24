@@ -24,6 +24,7 @@ set(HEADERS
 
 
 add_library(global_illu_lib
+    checkerboard_material.cpp
     simple_material.cpp
 	explicit_entity.cpp
 	implicit_sphere.cpp

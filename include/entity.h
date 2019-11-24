@@ -22,6 +22,8 @@ struct entity {
     /// Returns an axis-aligned bounding box of the entity.
     virtual BoundingBox boundingBox() const = 0;
 
+    virtual glm::dvec3 get_color_at_intersect(glm::dvec3 intersect) const = 0;
+
     // TODO: make material private
     // TODO: add function to obtain material for an intersection location
     // TODO: every implementor must provide the correct material. This allows to use different

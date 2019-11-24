@@ -6,6 +6,7 @@ add_executable(
 	main.cpp
 	entities-test.cpp
 	bbox-test.cpp
+	checkerboard-test.cpp
 )
 
 target_link_libraries(

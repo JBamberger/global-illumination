@@ -42,3 +42,8 @@ BoundingBox triangle::boundingBox() const
 {
     return BoundingBox{glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
 }
+
+glm::dvec3 triangle::get_color_at_intersect(glm::dvec3 intersect) const
+{
+    return material->get_color({0, 0});
+}

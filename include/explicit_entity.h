@@ -10,6 +10,7 @@ struct explicit_entity final : entity {
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
+    glm::dvec3 get_color_at_intersect(glm::dvec3 intersect) const override;
 
     /// Creates an explicit sphere from a center and radius by iteratively subdividing each triangle
     /// and projecting it to the implicit sphere. The starting shape is an icosahedron or a

@@ -1,5 +1,7 @@
 #include "implicit_sphere.h"
 
+#include "glm/gtc/constants.hpp"
+
 implicit_sphere::implicit_sphere(const glm::dvec3 center, const double radius)
     : center(center), radius(radius)
 {
@@ -60,3 +62,25 @@ bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
 }
 
 BoundingBox implicit_sphere::boundingBox() const { return {center - radius, center + radius}; }
+
+glm::dvec3 implicit_sphere::get_color_at_intersect(const glm::dvec3 intersect) const
+{
+    const auto n = glm::normalize(intersect - center);
+
+#ifdef CYLINDRICAL_PROJECTION
+    const auto u = atan2(n.x, n.z) / (2 * glm::pi<double>()) + 0.5;
+    const auto v = n.y * 0.5 + 0.5;
+#elif AXIAL_PROJECTION
+    const auto u = n.z * 0.5 + 0.5;
+    const auto v = n.y * 0.5 + 0.5;
+#elseif SPHERICAL_PROJECTION
+    const auto u = 0.5 + atan2(n.x, n.z) / (2 * glm::pi<double>());
+    const auto v = 0.5 + atan2(n.x, n.y) / (2 * glm::pi<double>());
+#else
+    // from https://en.wikipedia.org/wiki/UV_mapping
+    const auto u = 0.5 + atan2(n.x, n.z) / (2 * glm::pi<double>());
+    const auto v = 0.5 - asin(n.y) / glm::pi<double>();
+#endif
+
+    return material->get_color({u, v});
+}

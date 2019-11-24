@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "camera.h"
+#include "checkerboard_material.h"
 #include "entities.h"
 #include "gui.h"
 
@@ -67,14 +68,20 @@ int main(int argc, char** argv)
 
 #ifdef SHOW_SPHERE
     auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
-    sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
-    sphere->material->specular_exponent = 64;
-    sphere->material->ambient = 0;
-    sphere->material->diffuse = 1;
-    sphere->material->specular = 0.5;
-    sphere->material->glazed = 0;
-    sphere->material->refractive = 1;
-    sphere->material->refractive_index = 1;
+    sphere->material = std::make_shared<checkerboard_material>();
+    sphere->material->specular_exponent = 0;
+    sphere->material->ambient = 0.0;
+    sphere->material->diffuse = 1.0;
+    sphere->material->specular = 0.0;
+    sphere->material->glazed = 0.0;
+    // sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
+    // sphere->material->specular_exponent = 64;
+    // sphere->material->ambient = 0;
+    // sphere->material->diffuse = 1;
+    // sphere->material->specular = 0.5;
+    // sphere->material->glazed = 0;
+    // sphere->material->refractive = 1;
+    // sphere->material->refractive_index = 1;
     scene.push_back(sphere.get());
 
     // auto sphere2 = std::make_unique<implicit_sphere>(glm::dvec3{-1, 1, 0}, 1.0);
@@ -106,11 +113,14 @@ int main(int argc, char** argv)
     auto quad = std::make_unique<explicit_entity>(
         explicit_entity::make_quad(glm::dvec3{10, 10, -1}, glm::dvec3{-10, 10, -1},
                                    glm::dvec3{-10, -10, -1}, glm::dvec3{10, -10, -1}));
-    quad->material = std::make_shared<simple_material>(glm::dvec3{0.5, 0.5, 0.5});
-    quad->material->glazed = 1.0;
-    quad->material->ambient = 0.0;
-    quad->material->diffuse = 0.3;
-    quad->material->specular = 0.7;
+    quad->material =
+        std::make_shared<checkerboard_material>(10, glm::dvec3{0, 0, 0}, glm::dvec3{0, 1, 0});
+
+    // quad->material = std::make_shared<simple_material>(glm::dvec3{0.5, 0.5, 0.5});
+    // quad->material->glazed = 1.0;
+    // quad->material->ambient = 0.0;
+    // quad->material->diffuse = 0.3;
+    // quad->material->specular = 0.7;
     scene.push_back(quad.get());
 
 #endif
