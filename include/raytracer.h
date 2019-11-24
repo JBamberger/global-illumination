@@ -11,9 +11,6 @@
 #include "image.h"
 #include "octree.h"
 
-#define USE_AMBIENT
-#define USE_DIFFUSE
-#define USE_SPECULAR
 #define USE_MIRROR
 #define USE_REFRACTION
 
@@ -99,46 +96,37 @@ class RayTracer {
 
         const auto mat = min_ent->material;
         const auto color_at_intersect = min_ent->get_color_at_intersect(intersect);
-#ifdef USE_AMBIENT
-        // ambient:
-        // L_a = k_a * I_a
 
+        // ambient: L_a = k_a * I_a
         color = color_at_intersect * mat->ambient;
-#endif
 
         if (!blocked) {
 
-            // eye direction
-            const auto v = glm::normalize(-ray.dir);
+            const auto v = glm::normalize(-ray.dir); // eye direction
 
-#ifdef USE_DIFFUSE
-            // diffuse:
-            // L_d = k_d * I * max(0.0, dot(n, l))
+            // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
+            const auto diffuse = glm::dot(normal, l);
+            if (diffuse > 0) {
+                color += color_at_intersect * mat->diffuse * diffuse;
+            }
 
-            const auto diffuse = glm::max(0.0, glm::dot(normal, l));
-            color += color_at_intersect * mat->diffuse * diffuse;
-#endif
-#ifdef USE_SPECULAR
-            // Specular (Blinn-Phong) Illumination
-            // compute the bisector: h = normalize(v + l)
-            // L_s = k_s * I * max(0.0, dot(n,h))^p
+            // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
+            const auto bisector = glm::normalize(v + l); // center between view and light
+            const auto base = glm::dot(normal, bisector);
+            if (base > 0) {
+                color += mat->specular * glm::pow(base, mat->specular_exponent);
+            }
 
-            // center between view and light
-            const auto h = glm::normalize(v + l);
-            const auto specular =
-                glm::pow(glm::max(0.0, glm::dot(normal, h)), mat->specular_exponent);
-            color += mat->specular * specular;
-#endif
 #ifdef USE_MIRROR
-            // mirror: (trace another ray in reflection direction)
-            // compute the reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
-            // L_m = k_m * trace(Ray(P, r))
-
-            if (mat->glazed > 0) {
-                const auto mirror_ray = Ray::offset_ray(intersect, glm::reflect(-v, normal));
+            // mirror: L_m = k_m * trace(Ray(P, r))
+            if (mat->reflective > 0) {
+                // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
+                const auto reflect_dir = glm::reflect(-v, normal);
+                const auto mirror_ray = Ray::offset_ray(intersect, reflect_dir);
+                // Trace another ray in reflection direction
                 const auto mirror = compute_pixel(mirror_ray, max_reflections - 1);
 
-                color += mat->glazed * mirror;
+                color += mat->reflective * mirror;
             }
 #endif
 #ifdef USE_REFRACTION

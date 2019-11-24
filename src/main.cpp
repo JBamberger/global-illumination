@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     sphere->material->ambient = 0.0;
     sphere->material->diffuse = 1.0;
     sphere->material->specular = 0.0;
-    sphere->material->glazed = 0.0;
+    sphere->material->reflective = 0.0;
     // sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
     // sphere->material->specular_exponent = 64;
     // sphere->material->ambient = 0;

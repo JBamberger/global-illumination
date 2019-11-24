@@ -11,7 +11,7 @@ struct Material {
     double ambient = 0.1;
     double diffuse = 1.0;
     double specular = 1.0;
-    double glazed = 0.0;
+    double reflective = 0.0;
     double refractive = 0.0;
 
     double specular_exponent = 20;
