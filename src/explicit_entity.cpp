@@ -59,16 +59,30 @@ glm::dvec3 explicit_entity::get_color_at_intersect(glm::dvec3 intersect) const
     return material->get_color({u, v});
 }
 
-explicit_entity explicit_entity::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
+std::ostream& explicit_entity::write_obj(std::ostream& os)
+{
+    auto vertex = 1;
+    for (const auto& face : faces) {
+        os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
+        os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
+        os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
+
+        os << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
+        vertex += 3;
+    }
+    return os;
+}
+std::unique_ptr<explicit_entity>
+entities::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
 {
     std::vector<triangle> faces;
     faces.reserve(2);
     faces.emplace_back(a, b, c);
     faces.emplace_back(c, d, a);
-    return explicit_entity(std::move(faces));
+    return std::make_unique<explicit_entity>(std::move(faces));
 }
 
-explicit_entity explicit_entity::make_cube(glm::dvec3 center, const double side_length)
+std::unique_ptr<explicit_entity> entities::make_cube(glm::dvec3 center, double side_length)
 {
     const double l = side_length / 2;
 
@@ -102,7 +116,7 @@ explicit_entity explicit_entity::make_cube(glm::dvec3 center, const double side_
     faces.emplace_back(a, h, e);
     faces.emplace_back(a, d, h);
 
-    return explicit_entity(std::move(faces));
+    return std::make_unique<explicit_entity>(std::move(faces));
 }
 
 /// Projects a point to the given sphere.
@@ -233,23 +247,23 @@ inline std::vector<triangle> get_icosahedron(const implicit_sphere& ref)
     return faces;
 }
 
-explicit_entity explicit_entity::make_sphere(const glm::dvec3 center,
-                                             const double radius,
-                                             const int sub_divisions,
-                                             const bool use_tetrahedron)
+std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
+                                                       const double radius,
+                                                       const int sub_divisions,
+                                                       const bool use_tetrahedron)
 {
     const auto ref = implicit_sphere{center, radius};
     const auto initial_shape = use_tetrahedron ? get_tetrahedron(ref) : get_icosahedron(ref);
 
     auto faces = perform_subdivision(initial_shape, ref, sub_divisions);
 
-    return explicit_entity(std::move(faces));
+    return std::make_unique<explicit_entity>(std::move(faces));
 }
 
-explicit_entity explicit_entity::make_cone(const glm::dvec3 center,
-                                           const glm::dvec3 tip,
-                                           const double radius,
-                                           const size_t slices)
+std::unique_ptr<explicit_entity> entities::make_cone(const glm::dvec3 center,
+                                                     const glm::dvec3 tip,
+                                                     const double radius,
+                                                     const size_t slices)
 {
     // prevent figures without volume (the orientation would not be specified completely)
     assert(center != tip);
@@ -282,19 +296,5 @@ explicit_entity explicit_entity::make_cone(const glm::dvec3 center,
         last_border = next_border;
     }
 
-    return explicit_entity(faces);
-}
-
-std::ostream& explicit_entity::write_obj(std::ostream& os)
-{
-    auto vertex = 1;
-    for (const auto& face : faces) {
-        os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
-        os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
-        os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
-
-        os << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
-        vertex += 3;
-    }
-    return os;
+    return std::make_unique<explicit_entity>(faces);
 }
