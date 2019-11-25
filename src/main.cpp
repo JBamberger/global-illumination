@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     quad->material->specular = 0.7;
     scene.push_back(quad.get());
 
-    raytracer.setScene(&scene);
+    raytracer.set_scene(&scene);
 
     Gui window(500, 500, raytracer);
     window.show();

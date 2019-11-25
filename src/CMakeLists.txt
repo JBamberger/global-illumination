@@ -5,20 +5,22 @@ set(SOURCES
 	main.cpp
 )
 set(HEADERS
+	include/bbox.h
+	include/camera.h
+    include/checkerboard_material.h
+	include/entities.h
+	include/entity.h
+	include/explicit_entity.h
 	include/gui.h
 	include/image.h
-	include/ray.h
-	include/entities.h
-	include/camera.h
-	include/raytracer.h
-	include/viewer.h
-	include/octree.h
-	include/bbox.h
-	include/material.h
-	include/entity.h
 	include/implicit_sphere.h
+	include/material.h
+	include/octree.h
+	include/ray.h
+	include/raytracer.h
+    include/simple_material.h
 	include/triangle.h
-	include/explicit_entity.h
+	include/viewer.h
 )
 
 
@@ -29,10 +31,14 @@ add_library(global_illu_lib
 	explicit_entity.cpp
 	implicit_sphere.cpp
 	triangle.cpp
+    raytracer.cpp
 )
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/3rd_party"
+)
+target_link_libraries(global_illu_lib PUBLIC
+    Qt5::Widgets
 )
 
 find_package(OpenMP)

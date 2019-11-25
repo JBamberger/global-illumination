@@ -19,8 +19,7 @@ struct Material {
 
     /**
      * \brief Returns the color at the given uv coordinates. U and v must be in the range [0,1]
-     * \param u u-coordinate of the texture
-     * \param v v-coordinate of the texture
+     * \param uv texture coordinates
      * \return the color value at the given position
      */
     virtual glm::dvec3 get_color(glm::dvec2 uv) = 0;

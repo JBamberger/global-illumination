@@ -42,7 +42,7 @@ class Viewer : public QWidget {
 
     void resizeEvent(QResizeEvent*) { restart_raytrace(); }
 
-    QImage getImage() const { return _raytracer.getImage()->_image; }
+    QImage getImage() const { return _raytracer.get_image()->_image; }
 
   private:
     void restart_raytrace()
