@@ -34,16 +34,11 @@ class Camera {
         : pos_(pos), up_({0, 0, 1.0}), forward_(look_at - pos)
     {
         forward_ = glm::normalize(forward_);
-        right_ = {0, 1.0, 0};
-
-        // not necessary as up is fixed
-        // up = glm::normalize(up);
-
+        up_ = glm::normalize(up_);
         // The side direction can be computed from the up and forward vector since it is
         // perpendicular to both of them. The value is negated, because the sensor points in the
         // other direction than the viewer sees the image.
-        // This computation is not necessary as the up vector is fixed
-        // right = -glm::normalize(glm::cross(up, forward));
+        right_ = -glm::normalize(glm::cross(up_, forward_));
     }
 
     Ray get_ray(const double x, const double y) const
