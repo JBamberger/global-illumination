@@ -91,20 +91,20 @@ std::vector<std::unique_ptr<entity>> create_complex_scene()
     scene.push_back(std::move(sphere));
 
     // triangle upper right corner
-    auto t3 = std::make_unique<triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
-                                         glm::dvec3{1, 0.5, 2.5});
-    t3->material = std::make_shared<simple_material>(magenta);
-    scene.push_back(std::move(t3));
+    // auto t3 = std::make_unique<triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
+    //                                     glm::dvec3{1, 0.5, 2.5});
+    // t3->material = std::make_shared<simple_material>(magenta);
+    // scene.push_back(std::move(t3));
 
-    auto t1 = std::make_unique<triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
-                                         glm::dvec3{-1, -0.5, 1.5});
-    t1->material = std::make_shared<simple_material>(cyan);
-    scene.push_back(std::move(t1));
+    // auto t1 = std::make_unique<triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
+    //                                     glm::dvec3{-1, -0.5, 1.5});
+    // t1->material = std::make_shared<simple_material>(cyan);
+    // scene.push_back(std::move(t1));
 
-    auto t2 =
-        std::make_unique<triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
-    t2->material = std::make_shared<simple_material>(yellow);
-    scene.push_back(std::move(t2));
+    // auto t2 =
+    //    std::make_unique<triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
+    // t2->material = std::make_shared<simple_material>(yellow);
+    // scene.push_back(std::move(t2));
 
     // floor
     auto quad = make_quad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
