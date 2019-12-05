@@ -1,6 +1,8 @@
 #pragma once
 #include "entity.h"
 
+struct explicit_entity;
+
 struct triangle final : entity {
     triangle(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C);
 
@@ -12,13 +14,21 @@ struct triangle final : entity {
 
     glm::dvec2 tex_mapping(glm::dvec3 p) const;
 
-    /// corner points (ccw)
+    void setTexCoords(glm::dvec2 Ca, glm::dvec2 Cb, glm::dvec2 Cc);
+    void setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c);
+
     glm::dvec3 A = {0, 0, 0};
     glm::dvec3 B = {0, 0, 0};
     glm::dvec3 C = {0, 0, 0};
 
+  private:
+    void updateCaches();
+    /// corner points (ccw)
+
     /// texture coordinates
-    glm::dvec2 t1 = {0, 0};
-    glm::dvec2 t2 = {0, 0};
-    glm::dvec2 t3 = {0, 0};
+    glm::dvec2 tA = {0, 0};
+    glm::dvec2 tAB = {0, 0};
+    glm::dvec2 tAC = {0, 0};
+
+    glm::dmat2x3 to_tex_map;
 };

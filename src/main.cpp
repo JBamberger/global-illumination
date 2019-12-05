@@ -150,8 +150,8 @@ int main(int argc, char** argv)
     octree scene({-20, -20, -20}, {20, 20, 20});
 
     // auto elems = create_sphere_scene();
-    // auto elems = create_complex_scene();
-    auto elems = create_tex_mapping_scene();
+    auto elems = create_complex_scene();
+    // auto elems = create_tex_mapping_scene();
     for (const auto& entity : elems) scene.push_back(entity.get());
 
     raytracer.set_scene(&scene);

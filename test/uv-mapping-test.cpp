@@ -35,9 +35,7 @@ struct TextureMappingTest : public testing::TestWithParam<mapping_def> {
 
     TextureMappingTest() : t({0, -1, 0}, {0, 1, 0}, {0, 0, 1})
     {
-        t.t1 = {0, 1};
-        t.t2 = {1, 1};
-        t.t3 = {0.5, 0};
+        t.setTexCoords(glm::dvec2{0, 1}, glm::dvec2{1, 1}, glm::dvec2{0.5, 0});
     }
 };
 

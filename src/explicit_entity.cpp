@@ -40,12 +40,9 @@ BoundingBox explicit_entity::boundingBox() const
     auto max = b1.max;
 
     for (const auto& t : faces) {
-        min = glm::min(min, t.A);
-        max = glm::max(max, t.A);
-        min = glm::min(min, t.B);
-        max = glm::max(max, t.B);
-        min = glm::min(min, t.C);
-        max = glm::max(max, t.C);
+        const auto bbox = t.boundingBox();
+        min = glm::min(min, bbox.min);
+        max = glm::max(max, bbox.max);
     }
 
     return BoundingBox{min, max};
@@ -87,12 +84,8 @@ entities::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
     faces.emplace_back(a, b, c);
     faces.emplace_back(c, d, a);
 
-    faces.at(0).t1 = {1, 1};
-    faces.at(0).t2 = {1, 0};
-    faces.at(0).t3 = {0, 0};
-    faces.at(1).t1 = {0, 0};
-    faces.at(1).t2 = {0, 1};
-    faces.at(1).t3 = {1, 1};
+    faces.at(0).setTexCoords(glm::dvec2{1, 1}, glm::dvec2{1, 0}, glm::dvec2{0, 0});
+    faces.at(1).setTexCoords(glm::dvec2{0, 0}, glm::dvec2{0, 1}, glm::dvec2{1, 1});
 
     return std::make_unique<explicit_entity>(std::move(faces));
 }
