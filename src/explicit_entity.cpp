@@ -3,6 +3,7 @@
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <ostream>
 
 static const triangle* last_hit = nullptr;
 

@@ -143,21 +143,17 @@ int main(int argc, char** argv)
 
     RayTracer raytracer(camera, light);
 
-    auto mat_red = std::make_shared<simple_material>(red);
-    auto mat_green = std::make_shared<simple_material>(green);
-    auto mat_blue = std::make_shared<simple_material>(blue);
-
-    // Set up scene
     octree scene({-20, -20, -20}, {20, 20, 20});
 
     // auto elems = create_sphere_scene();
-    auto elems = create_complex_scene();
-    // auto elems = create_tex_mapping_scene();
+    // auto elems = create_complex_scene();
+    auto elems = create_tex_mapping_scene();
+
     for (const auto& entity : elems) scene.push_back(entity.get());
 
     raytracer.set_scene(&scene);
 
     Gui window(500, 500, raytracer);
     window.show();
-    return app.exec();
+    return QApplication::exec();
 }

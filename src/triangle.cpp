@@ -58,10 +58,28 @@ glm::dvec3 triangle::get_color_at_intersect(glm::dvec3 intersect) const
 
 glm::dvec2 triangle::tex_mapping(const glm::dvec3 I) const
 {
+    // The triangle is given in 3D spaces and forms a 2D plane A + i*AB + j*AC within. The vectors
+    // AB and AC form a basis of this subspace. The texture coordinates similarly form a basis of a
+    // 2D space. The goal is to perform a change of basis on the intersection point.
+
+    // First the offset must be removed such that a normal change of basis suffices.
     const auto b = I - A;
+
+    // Secondly the coordinate vector of the intersection is computed. The simplest approach is to
+    // solve X * c = b for c. Here X is the matrix with AB and AC as columns. Because X is not
+    // square we cannot compute the inverse. Additionally the intersection location might not lie on
+    // the plane exactly (due to numeric errors). These problems are countered by using the
+    // pseudo-inverse X+ instead of X^-1. Because X has full rank (the columns form a basis) X+ can
+    // be computed as X+ = (X^T * X)^-1 * X^T. This behaves similarly to using the inverse but
+    // solves the linear system of equations in a least-squares sense if no exact solution exists.
     const auto coords = b * to_tex_map;
+
+    // With the coordinate vector the new uv location can be computed directly from the texture
+    // basis.
     auto uv = tA + coords.x * tAB + coords.y * tAC;
 
+    // If the intersection point lies within the triangle and the triangle has valid coordinates the
+    // result must be between 0 and 1.
     assert(0 <= uv.x && uv.x <= 1);
     assert(0 <= uv.y && uv.y <= 1);
     return uv;
@@ -85,11 +103,7 @@ void triangle::setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c)
 
 void triangle::updateCaches()
 {
-    const auto AB = B - A;
-    const auto AC = C - A;
-    const auto X = glm::dmat3x2(AB.x, AC.x, AB.y, AC.y, AB.z, AC.z);
-    const glm::dmat2x3 XT = glm::transpose(X);
-    const glm::dmat2x2 XC = X * XT;
-    const glm::dmat2x2 XI = glm::inverse(XC);
-    to_tex_map = XT * XI;
+    // recomputes the matrix which computes the coordinates of a point in the triangle plane
+    const auto xt = glm::dmat2x3(B - A, C - A);
+    to_tex_map = xt * glm::inverse(glm::transpose(xt) * xt);
 }
