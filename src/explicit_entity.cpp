@@ -76,8 +76,10 @@ std::ostream& explicit_entity::write_obj(std::ostream& os)
     return os;
 }
 
-std::unique_ptr<explicit_entity>
-entities::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
+std::unique_ptr<explicit_entity> entities::make_quad(glm::dvec3 a,
+                                                     glm::dvec3 b,
+                                                     glm::dvec3 c,
+                                                     glm::dvec3 d)
 {
     std::vector<triangle> faces;
     faces.reserve(2);
@@ -127,139 +129,113 @@ std::unique_ptr<explicit_entity> entities::make_cube(glm::dvec3 center, double s
     return std::make_unique<explicit_entity>(std::move(faces));
 }
 
-/// Projects a point to the given sphere.
-inline glm::dvec3 project_to_sphere(const implicit_sphere& s, const glm::dvec3 p)
-{
-    const auto r = Ray{s.center, p - s.center};
-    glm::dvec3 i, n;
-    const auto success = s.intersect(r, i, n);
-
-    assert(success);
-    return i;
-}
-
-/// Computes the point in the middle between two points.
-inline glm::dvec3 find_line_center(const glm::dvec3 p1, const glm::dvec3 p2)
-{
-    return (p1 + p2) * 0.5;
-}
-
-/// Subdivision algorithm which splits each triangle side in the middle and projects the new points
-/// to the given sphere. If equilateral the resulting triangles will be equilateral too.
-inline std::vector<triangle>
-perform_subdivision(std::vector<triangle> ts, const implicit_sphere& ref, const int sub_divisions)
-{
-    // Algorithm:
-    // for subDivisions do
-    //     split every triangle side in half
-    //     move the split points to the sphere
-    //     form four triangles from them
-    // end
-
-    std::vector<triangle> ts2;
-    for (auto d = 0; d < sub_divisions; d++) {
-        ts2.clear();
-        for (const auto& t : ts) {
-            const auto x = project_to_sphere(ref, find_line_center(t.A, t.B));
-            const auto y = project_to_sphere(ref, find_line_center(t.B, t.C));
-            const auto z = project_to_sphere(ref, find_line_center(t.C, t.A));
-
-            ts2.emplace_back(t.A, x, z);
-            ts2.emplace_back(x, t.B, y);
-            ts2.emplace_back(y, t.C, z);
-            ts2.emplace_back(x, y, z);
-
-            // const auto t1 = Triangle(t.A, x, z);
-            // const auto t2 = Triangle(x, t.B, y);
-            // const auto t3 = Triangle(y, t.C, z);
-            // const auto t4 = Triangle(x, y, z);
-
-            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t2.normal())));
-            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t3.normal())));
-            // assert(0 >= glm::dot(glm::normalize(t1.normal()), glm::normalize(t4.normal())));
-            // assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t3.normal())));
-            // assert(0 >= glm::dot(glm::normalize(t2.normal()), glm::normalize(t4.normal())));
-            // assert(0 >= glm::dot(glm::normalize(t3.normal()), glm::normalize(t4.normal())));
-
-            // ts2.push_back(t1);
-            // ts2.push_back(t2);
-            // ts2.push_back(t3);
-            // ts2.push_back(t4);
-        }
-        std::swap(ts, ts2);
-    }
-    return ts;
-}
-
-/// Creates a tetrahedron where all vertices lie on the given sphere.
-inline std::vector<triangle> get_tetrahedron(const implicit_sphere& ref)
-{
-    std::vector<triangle> faces;
-    faces.reserve(4);
-
-    const auto a = project_to_sphere(ref, ref.center + glm::dvec3{1, 1, 1});
-    const auto b = project_to_sphere(ref, ref.center + glm::dvec3{-1, -1, 1});
-    const auto c = project_to_sphere(ref, ref.center + glm::dvec3{-1, 1, -1});
-    const auto d = project_to_sphere(ref, ref.center + glm::dvec3{1, -1, -1});
-
-    faces.emplace_back(a, c, b);
-    faces.emplace_back(a, d, c);
-    faces.emplace_back(a, b, d);
-    faces.emplace_back(b, c, d);
-
-    return faces;
-}
-
-/// Creates an icosahedron where all vertices lie on the given sphere.
-inline std::vector<triangle> get_icosahedron(const implicit_sphere& ref)
-{
-    std::vector<triangle> faces;
-    faces.reserve(20);
-
-    const auto t = (1.0 + glm::sqrt(5.0)) / 2.0;
-
-    const auto a = project_to_sphere(ref, ref.center + glm::dvec3{-1, t, 0});
-    const auto b = project_to_sphere(ref, ref.center + glm::dvec3{1, t, 0});
-    const auto c = project_to_sphere(ref, ref.center + glm::dvec3{-1, -t, 0});
-    const auto d = project_to_sphere(ref, ref.center + glm::dvec3{1, -t, 0});
-    const auto e = project_to_sphere(ref, ref.center + glm::dvec3{0, -1, t});
-    const auto f = project_to_sphere(ref, ref.center + glm::dvec3{0, 1, t});
-    const auto g = project_to_sphere(ref, ref.center + glm::dvec3{0, -1, -t});
-    const auto h = project_to_sphere(ref, ref.center + glm::dvec3{0, 1, -t});
-    const auto i = project_to_sphere(ref, ref.center + glm::dvec3{t, 0, -1});
-    const auto j = project_to_sphere(ref, ref.center + glm::dvec3{t, 0, 1});
-    const auto k = project_to_sphere(ref, ref.center + glm::dvec3{-t, 0, -1});
-    const auto l = project_to_sphere(ref, ref.center + glm::dvec3{-t, 0, 1});
-
-    faces.emplace_back(a, l, f);
-    faces.emplace_back(a, f, b);
-    faces.emplace_back(a, b, h);
-    faces.emplace_back(a, h, k);
-    faces.emplace_back(a, k, l);
-    faces.emplace_back(b, f, j);
-    faces.emplace_back(f, l, e);
-    faces.emplace_back(l, k, c);
-    faces.emplace_back(k, h, g);
-    faces.emplace_back(h, b, i);
-    faces.emplace_back(d, j, e);
-    faces.emplace_back(d, e, c);
-    faces.emplace_back(d, c, g);
-    faces.emplace_back(d, g, i);
-    faces.emplace_back(d, i, j);
-    faces.emplace_back(e, j, f);
-    faces.emplace_back(c, e, l);
-    faces.emplace_back(g, c, k);
-    faces.emplace_back(i, g, h);
-    faces.emplace_back(j, i, b);
-
-    return faces;
-}
-
 std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
                                                        const double radius,
                                                        const int sub_divisions,
                                                        const bool use_tetrahedron)
 {
+    /// Projects a point to the given sphere.
+    const auto project_to_sphere = [](const implicit_sphere& s, const glm::dvec3 p) {
+        const auto r = Ray{s.center, p - s.center};
+        glm::dvec3 i, n;
+        const auto success = s.intersect(r, i, n);
+
+        assert(success);
+        return i;
+    };
+
+    /// Computes the point in the middle between two points.
+    const auto find_line_center = [](const glm::dvec3 p1, const glm::dvec3 p2) {
+        return (p1 + p2) * 0.5;
+    };
+
+    /// Subdivision algorithm which splits each triangle side in the middle and projects the new
+    /// points to the given sphere. If equilateral the resulting triangles will be equilateral too.
+    const auto perform_subdivision = [&project_to_sphere, &find_line_center](
+                                         std::vector<triangle> ts, const implicit_sphere& ref,
+                                         const int sub_divisions) {
+        std::vector<triangle> ts2;
+        for (auto d = 0; d < sub_divisions; d++) {
+            ts2.clear();
+            for (const auto& t : ts) {
+                // split each triangle side and project the center to the sphere
+                const auto x = project_to_sphere(ref, find_line_center(t.A, t.B));
+                const auto y = project_to_sphere(ref, find_line_center(t.B, t.C));
+                const auto z = project_to_sphere(ref, find_line_center(t.C, t.A));
+
+                // use the new four triangles instead of the single one
+                ts2.emplace_back(t.A, x, z);
+                ts2.emplace_back(x, t.B, y);
+                ts2.emplace_back(y, t.C, z);
+                ts2.emplace_back(x, y, z);
+            }
+            std::swap(ts, ts2);
+        }
+        return ts;
+    };
+
+    /// Creates a tetrahedron where all vertices lie on the given sphere.
+    const auto get_tetrahedron = [&project_to_sphere](const implicit_sphere& ref) {
+        std::vector<triangle> faces;
+        faces.reserve(4);
+
+        const auto a = project_to_sphere(ref, ref.center + glm::dvec3{1, 1, 1});
+        const auto b = project_to_sphere(ref, ref.center + glm::dvec3{-1, -1, 1});
+        const auto c = project_to_sphere(ref, ref.center + glm::dvec3{-1, 1, -1});
+        const auto d = project_to_sphere(ref, ref.center + glm::dvec3{1, -1, -1});
+
+        faces.emplace_back(a, c, b);
+        faces.emplace_back(a, d, c);
+        faces.emplace_back(a, b, d);
+        faces.emplace_back(b, c, d);
+
+        return faces;
+    };
+
+    /// Creates an icosahedron where all vertices lie on the given sphere.
+    const auto get_icosahedron = [&project_to_sphere](const implicit_sphere& ref) {
+        std::vector<triangle> faces;
+        faces.reserve(20);
+
+        const auto t = (1.0 + glm::sqrt(5.0)) / 2.0;
+
+        const auto a = project_to_sphere(ref, ref.center + glm::dvec3{-1, t, 0});
+        const auto b = project_to_sphere(ref, ref.center + glm::dvec3{1, t, 0});
+        const auto c = project_to_sphere(ref, ref.center + glm::dvec3{-1, -t, 0});
+        const auto d = project_to_sphere(ref, ref.center + glm::dvec3{1, -t, 0});
+        const auto e = project_to_sphere(ref, ref.center + glm::dvec3{0, -1, t});
+        const auto f = project_to_sphere(ref, ref.center + glm::dvec3{0, 1, t});
+        const auto g = project_to_sphere(ref, ref.center + glm::dvec3{0, -1, -t});
+        const auto h = project_to_sphere(ref, ref.center + glm::dvec3{0, 1, -t});
+        const auto i = project_to_sphere(ref, ref.center + glm::dvec3{t, 0, -1});
+        const auto j = project_to_sphere(ref, ref.center + glm::dvec3{t, 0, 1});
+        const auto k = project_to_sphere(ref, ref.center + glm::dvec3{-t, 0, -1});
+        const auto l = project_to_sphere(ref, ref.center + glm::dvec3{-t, 0, 1});
+
+        faces.emplace_back(a, l, f);
+        faces.emplace_back(a, f, b);
+        faces.emplace_back(a, b, h);
+        faces.emplace_back(a, h, k);
+        faces.emplace_back(a, k, l);
+        faces.emplace_back(b, f, j);
+        faces.emplace_back(f, l, e);
+        faces.emplace_back(l, k, c);
+        faces.emplace_back(k, h, g);
+        faces.emplace_back(h, b, i);
+        faces.emplace_back(d, j, e);
+        faces.emplace_back(d, e, c);
+        faces.emplace_back(d, c, g);
+        faces.emplace_back(d, g, i);
+        faces.emplace_back(d, i, j);
+        faces.emplace_back(e, j, f);
+        faces.emplace_back(c, e, l);
+        faces.emplace_back(g, c, k);
+        faces.emplace_back(i, g, h);
+        faces.emplace_back(j, i, b);
+
+        return faces;
+    };
+
     const auto ref = implicit_sphere{center, radius};
     const auto initial_shape = use_tetrahedron ? get_tetrahedron(ref) : get_icosahedron(ref);
 
