@@ -46,28 +46,28 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     std::vector<std::unique_ptr<Entity>> scene;
 
     // explicit sphere
-    auto esphere = make_sphere(glm::dvec3{0, -2, 2}, 0.5, 1);
+    auto esphere = makeSphere(glm::dvec3{0, -2, 2}, 0.5, 1);
     esphere->material = std::make_shared<simple_material>(blue);
     esphere->material->ambient = 0.3;
     scene.push_back(std::move(esphere));
 
     // explicit cube
-    auto cube = make_cube(glm::dvec3{0, -2, 0}, 0.5);
+    auto cube = makeCube(glm::dvec3{0, -2, 0}, 0.5);
     cube->material = std::make_shared<simple_material>(red);
     scene.push_back(std::move(cube));
 
     // Defines x,y and z axis indicators
     const auto tip = glm::dvec3{0, 0, 0};
     const auto id_len = 2;
-    auto x_axis = make_cone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
+    auto x_axis = makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
     x_axis->material = std::make_shared<simple_material>(red);
     scene.push_back(std::move(x_axis));
 
-    auto y_axis = make_cone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
+    auto y_axis = makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
     y_axis->material = std::make_shared<simple_material>(green);
     scene.push_back(std::move(y_axis));
 
-    auto z_axis = make_cone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
+    auto z_axis = makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
     z_axis->material = std::make_shared<simple_material>(blue);
     scene.push_back(std::move(z_axis));
 
@@ -107,7 +107,7 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     // scene.push_back(std::move(t2));
 
     // floor
-    auto quad = make_quad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
+    auto quad = makeQuad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
     quad->material = std::make_shared<checkerboard_material>(10, glm::dvec3{0, 0, 0}, magenta);
     // quad->material = std::make_shared<simple_material>(glm::dvec3{0.5, 0.5, 0.5});
     quad->material->reflective = 1.0;
@@ -127,7 +127,7 @@ std::vector<std::unique_ptr<Entity>> create_tex_mapping_scene()
 
     // floor
     // auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
-    auto quad = make_quad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
+    auto quad = makeQuad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
     quad->material = std::make_shared<checkerboard_material>(10, glm::dvec3{0, 0, 0}, green);
     scene.push_back(std::move(quad));
 
