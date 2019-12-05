@@ -1,5 +1,5 @@
-#include "explicit_entity.h"
-#include "implicit_sphere.h"
+#include <ExplicitEntity.h>
+#include <implicit_sphere.h>
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -7,7 +7,7 @@
 
 static const Triangle* last_hit = nullptr;
 
-bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+bool ExplicitEntity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // TODO: check intersection direction
 
@@ -32,9 +32,9 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
     return min != std::numeric_limits<double>::infinity();
 }
 
-BoundingBox explicit_entity::boundingBox() const { return bbox; }
+BoundingBox ExplicitEntity::boundingBox() const { return bbox; }
 
-glm::dvec3 explicit_entity::getColorAtIntersect(glm::dvec3 intersect) const
+glm::dvec3 ExplicitEntity::getColorAtIntersect(glm::dvec3 intersect) const
 {
     assert(last_hit != nullptr);
 
@@ -43,7 +43,7 @@ glm::dvec3 explicit_entity::getColorAtIntersect(glm::dvec3 intersect) const
     return material->get_color(uv);
 }
 
-std::ostream& explicit_entity::write_obj(std::ostream& os)
+std::ostream& ExplicitEntity::write_obj(std::ostream& os)
 {
     auto vertex = 1;
     for (const auto& face : faces) {
@@ -57,10 +57,10 @@ std::ostream& explicit_entity::write_obj(std::ostream& os)
     return os;
 }
 
-std::unique_ptr<explicit_entity> entities::make_quad(glm::dvec3 a,
-                                                     glm::dvec3 b,
-                                                     glm::dvec3 c,
-                                                     glm::dvec3 d)
+std::unique_ptr<ExplicitEntity> entities::make_quad(glm::dvec3 a,
+                                                    glm::dvec3 b,
+                                                    glm::dvec3 c,
+                                                    glm::dvec3 d)
 {
     std::vector<Triangle> faces;
     faces.reserve(2);
@@ -70,10 +70,10 @@ std::unique_ptr<explicit_entity> entities::make_quad(glm::dvec3 a,
     faces.at(0).setTexCoords(glm::dvec2{1, 1}, glm::dvec2{1, 0}, glm::dvec2{0, 0});
     faces.at(1).setTexCoords(glm::dvec2{0, 0}, glm::dvec2{0, 1}, glm::dvec2{1, 1});
 
-    return std::make_unique<explicit_entity>(std::move(faces));
+    return std::make_unique<ExplicitEntity>(std::move(faces));
 }
 
-std::unique_ptr<explicit_entity> entities::make_cube(glm::dvec3 center, double side_length)
+std::unique_ptr<ExplicitEntity> entities::make_cube(glm::dvec3 center, double side_length)
 {
     const double l = side_length / 2;
 
@@ -107,13 +107,13 @@ std::unique_ptr<explicit_entity> entities::make_cube(glm::dvec3 center, double s
     faces.emplace_back(a, h, e);
     faces.emplace_back(a, d, h);
 
-    return std::make_unique<explicit_entity>(std::move(faces));
+    return std::make_unique<ExplicitEntity>(std::move(faces));
 }
 
-std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
-                                                       const double radius,
-                                                       const int sub_divisions,
-                                                       const bool use_tetrahedron)
+std::unique_ptr<ExplicitEntity> entities::make_sphere(const glm::dvec3 center,
+                                                      const double radius,
+                                                      const int sub_divisions,
+                                                      const bool use_tetrahedron)
 {
     /// Projects a point to the given sphere.
     const auto project_to_sphere = [](const implicit_sphere& s, const glm::dvec3 p) {
@@ -222,13 +222,13 @@ std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
 
     auto faces = perform_subdivision(initial_shape, ref, sub_divisions);
 
-    return std::make_unique<explicit_entity>(std::move(faces));
+    return std::make_unique<ExplicitEntity>(std::move(faces));
 }
 
-std::unique_ptr<explicit_entity> entities::make_cone(const glm::dvec3 center,
-                                                     const glm::dvec3 tip,
-                                                     const double radius,
-                                                     const size_t slices)
+std::unique_ptr<ExplicitEntity> entities::make_cone(const glm::dvec3 center,
+                                                    const glm::dvec3 tip,
+                                                    const double radius,
+                                                    const size_t slices)
 {
     // prevent figures without volume (the orientation would not be specified completely)
     assert(center != tip);
@@ -261,5 +261,5 @@ std::unique_ptr<explicit_entity> entities::make_cone(const glm::dvec3 center,
         last_border = next_border;
     }
 
-    return std::make_unique<explicit_entity>(faces);
+    return std::make_unique<ExplicitEntity>(faces);
 }

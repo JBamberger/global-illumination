@@ -1,7 +1,7 @@
 #pragma once
 #include "entity.h"
 
-struct implicit_sphere final : entity {
+struct implicit_sphere final : Entity {
     implicit_sphere() : implicit_sphere({0, 0, 0}, 1) {}
     implicit_sphere(glm::dvec3 center, double radius);
 

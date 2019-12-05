@@ -9,11 +9,11 @@
 #include <utility>
 
 /// A base class for all entities in the scene.
-struct entity {
+struct Entity {
 
-    explicit entity() : material(std::make_shared<simple_material>(glm::dvec3{1, 0, 0})) {}
-    explicit entity(std::shared_ptr<Material> material) : material(std::move(material)) {}
-    virtual ~entity() = default;
+    explicit Entity() : material(std::make_shared<simple_material>(glm::dvec3{1, 0, 0})) {}
+    explicit Entity(std::shared_ptr<Material> material) : material(std::move(material)) {}
+    virtual ~Entity() = default;
 
     /// Check if a ray intersects the object. The arguments intersect and normal will contain the
     /// point of intersection and its normals.

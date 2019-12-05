@@ -18,7 +18,7 @@ class octree {
     octree(const glm::dvec3 min, const glm::dvec3 max) : root_(node({min, max})) {}
 
     /// Store an entity in the correct position of the octree.
-    void push_back(entity* object)
+    void push_back(Entity* object)
     {
 #ifdef USE_OCTREE
         root_.insert(object, 0);
@@ -28,12 +28,12 @@ class octree {
     }
 
     /// Returns list of entities that have the possibility to be intersected by the ray.
-    std::vector<entity*> intersect(const Ray& ray) const
+    std::vector<Entity*> intersect(const Ray& ray) const
     {
 #ifdef USE_OCTREE
-        std::set<entity*> out_set;
+        std::set<Entity*> out_set;
         root_.intersect(ray, out_set);
-        std::vector<entity*> output;
+        std::vector<Entity*> output;
         output.insert(output.end(), out_set.begin(), out_set.end());
         return output;
 #else
@@ -41,9 +41,9 @@ class octree {
 #endif
     }
 
-    entity* closest_intersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
+    Entity* closest_intersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
     {
-        entity* min_ent = nullptr;
+        Entity* min_ent = nullptr;
         auto min = std::numeric_limits<double>::infinity();
         glm::dvec3 i, n;
 
@@ -133,7 +133,7 @@ class octree {
 
         bool is_leaf() const { return children[0] == nullptr; }
 
-        void insert(entity* e, size_t depth)
+        void insert(Entity* e, size_t depth)
         {
             if (is_leaf()) {
                 entities.push_back(e);
@@ -152,7 +152,7 @@ class octree {
             }
         }
 
-        void intersect(const Ray& ray, std::set<entity*>& output) const
+        void intersect(const Ray& ray, std::set<Entity*>& output) const
         {
             if (!bbox.intersect(ray))
                 return;
@@ -165,7 +165,7 @@ class octree {
         }
 
         BoundingBox bbox;
-        std::vector<entity*> entities;
+        std::vector<Entity*> entities;
         std::array<std::unique_ptr<node>, 8> children;
 
         const size_t split_threshold = 16;

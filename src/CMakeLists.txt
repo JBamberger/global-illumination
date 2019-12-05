@@ -9,17 +9,17 @@ set(HEADERS
 	include/camera.h
     include/checkerboard_material.h
 	include/entities.h
-	include/entity.h
-	include/explicit_entity.h
+	include/Entity.h
+	include/ExplicitEntity.h
+	include/Triangle.h
+	include/implicit_sphere.h
 	include/gui.h
 	include/image.h
-	include/implicit_sphere.h
 	include/material.h
 	include/octree.h
 	include/ray.h
 	include/raytracer.h
     include/simple_material.h
-	include/triangle.h
 	include/viewer.h
 )
 
@@ -28,9 +28,9 @@ set(HEADERS
 add_library(global_illu_lib
     checkerboard_material.cpp
     simple_material.cpp
-	explicit_entity.cpp
+	ExplicitEntity.cpp
 	implicit_sphere.cpp
-	triangle.cpp
+	Triangle.cpp
     raytracer.cpp
 )
 target_include_directories(global_illu_lib PUBLIC

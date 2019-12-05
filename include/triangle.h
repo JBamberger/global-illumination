@@ -1,9 +1,7 @@
 #pragma once
-#include "entity.h"
+#include "Entity.h"
 
-struct explicit_entity;
-
-struct Triangle final : entity {
+struct Triangle final : Entity {
     Triangle(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C);
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;

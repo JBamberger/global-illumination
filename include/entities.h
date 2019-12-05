@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Triangle.h"
-#include "entity.h"
-#include "explicit_entity.h"
-#include "implicit_sphere.h"
+#include <Entity.h>
+#include <ExplicitEntity.h>
+#include <Triangle.h>
+#include <implicit_sphere.h>

@@ -20,9 +20,9 @@ constexpr glm::dvec3 magenta(1, 0, 1);
 
 // dark blue glm::dvec3 { 0.3, 0.3, 1 }
 
-std::vector<std::unique_ptr<entity>> create_sphere_scene()
+std::vector<std::unique_ptr<Entity>> create_sphere_scene()
 {
-    std::vector<std::unique_ptr<entity>> scene;
+    std::vector<std::unique_ptr<Entity>> scene;
     auto s1 = std::make_unique<implicit_sphere>(glm::dvec3{0, 2, 0}, 1.0);
     auto s2 = std::make_unique<implicit_sphere>(glm::dvec3{0, -2, 0}, 1.0);
     auto s3 = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 2}, 1.0);
@@ -39,11 +39,11 @@ std::vector<std::unique_ptr<entity>> create_sphere_scene()
     return scene;
 }
 
-std::vector<std::unique_ptr<entity>> create_complex_scene()
+std::vector<std::unique_ptr<Entity>> create_complex_scene()
 {
     using namespace entities;
 
-    std::vector<std::unique_ptr<entity>> scene;
+    std::vector<std::unique_ptr<Entity>> scene;
 
     // explicit sphere
     auto esphere = make_sphere(glm::dvec3{0, -2, 2}, 0.5, 1);
@@ -119,11 +119,11 @@ std::vector<std::unique_ptr<entity>> create_complex_scene()
     return scene;
 }
 
-std::vector<std::unique_ptr<entity>> create_tex_mapping_scene()
+std::vector<std::unique_ptr<Entity>> create_tex_mapping_scene()
 {
     using namespace entities;
 
-    std::vector<std::unique_ptr<entity>> scene;
+    std::vector<std::unique_ptr<Entity>> scene;
 
     // floor
     // auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
