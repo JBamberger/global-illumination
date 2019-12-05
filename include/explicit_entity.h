@@ -7,7 +7,10 @@
 #include <vector>
 
 struct explicit_entity final : entity {
-    explicit explicit_entity(std::vector<triangle> faces) : faces(std::move(faces)) {}
+    explicit explicit_entity(std::vector<triangle> faces)
+        : faces(std::move(faces)), bbox(computeBBox(this->faces))
+    {
+    }
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
@@ -17,6 +20,25 @@ struct explicit_entity final : entity {
     std::ostream& write_obj(std::ostream& os);
 
     std::vector<triangle> faces;
+
+  private:
+    BoundingBox bbox;
+    static BoundingBox computeBBox(const std::vector<triangle>& faces)
+    {
+        assert(!faces.empty());
+
+        const auto b1 = faces[0].boundingBox();
+        auto min = b1.min;
+        auto max = b1.max;
+
+        for (const auto& t : faces) {
+            const auto bbox = t.boundingBox();
+            min = glm::min(min, bbox.min);
+            max = glm::max(max, bbox.max);
+        }
+
+        return BoundingBox{min, max};
+    }
 };
 
 namespace entities {
@@ -35,6 +57,8 @@ std::unique_ptr<explicit_entity> make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec
 std::unique_ptr<explicit_entity> make_cube(glm::dvec3 center, double side_length);
 
 /// Creates an explicit cone.
-std::unique_ptr<explicit_entity>
-make_cone(glm::dvec3 center, glm::dvec3 tip, double radius, size_t slices);
+std::unique_ptr<explicit_entity> make_cone(glm::dvec3 center,
+                                           glm::dvec3 tip,
+                                           double radius,
+                                           size_t slices);
 } // namespace entities

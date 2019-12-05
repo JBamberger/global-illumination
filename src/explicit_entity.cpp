@@ -31,34 +31,14 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
     return min != std::numeric_limits<double>::infinity();
 }
 
-BoundingBox explicit_entity::boundingBox() const
-{
-    assert(!faces.empty());
-
-    const auto b1 = faces[0].boundingBox();
-    auto min = b1.min;
-    auto max = b1.max;
-
-    for (const auto& t : faces) {
-        const auto bbox = t.boundingBox();
-        min = glm::min(min, bbox.min);
-        max = glm::max(max, bbox.max);
-    }
-
-    return BoundingBox{min, max};
-}
+BoundingBox explicit_entity::boundingBox() const { return bbox; }
 
 glm::dvec3 explicit_entity::get_color_at_intersect(glm::dvec3 intersect) const
 {
-    // TODO: implement uv texture mapping
-    // simply project the texture up through the object
-    // const auto bbox = boundingBox();
-    // const auto u = (intersect.x - bbox.min.x) / bbox.dx();
-    // const auto v = (intersect.y - bbox.min.y) / bbox.dy();
-
-    // return material->get_color({u, v});
     assert(last_hit != nullptr);
+
     const auto uv = last_hit->tex_mapping(intersect);
+
     return material->get_color(uv);
 }
 

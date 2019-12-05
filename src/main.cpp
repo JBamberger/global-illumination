@@ -126,7 +126,8 @@ std::vector<std::unique_ptr<entity>> create_tex_mapping_scene()
     std::vector<std::unique_ptr<entity>> scene;
 
     // floor
-    auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
+    // auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
+    auto quad = make_quad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
     quad->material = std::make_shared<checkerboard_material>(10, glm::dvec3{0, 0, 0}, green);
     scene.push_back(std::move(quad));
 
