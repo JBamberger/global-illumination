@@ -4,6 +4,8 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
+static const triangle* last_hit = nullptr;
+
 bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // TODO: check intersection direction
@@ -22,6 +24,7 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
                 min = d;
                 intersect = i;
                 normal = n;
+                last_hit = &t;
             }
         }
     }
@@ -52,11 +55,14 @@ glm::dvec3 explicit_entity::get_color_at_intersect(glm::dvec3 intersect) const
 {
     // TODO: implement uv texture mapping
     // simply project the texture up through the object
-    const auto bbox = boundingBox();
-    const auto u = (intersect.x - bbox.min.x) / bbox.dx();
-    const auto v = (intersect.y - bbox.min.y) / bbox.dy();
+    // const auto bbox = boundingBox();
+    // const auto u = (intersect.x - bbox.min.x) / bbox.dx();
+    // const auto v = (intersect.y - bbox.min.y) / bbox.dy();
 
-    return material->get_color({u, v});
+    // return material->get_color({u, v});
+    assert(last_hit != nullptr);
+    const auto uv = last_hit->tex_mapping(intersect);
+    return material->get_color(uv);
 }
 
 std::ostream& explicit_entity::write_obj(std::ostream& os)
@@ -72,6 +78,7 @@ std::ostream& explicit_entity::write_obj(std::ostream& os)
     }
     return os;
 }
+
 std::unique_ptr<explicit_entity>
 entities::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
 {
@@ -79,6 +86,14 @@ entities::make_quad(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c, glm::dvec3 d)
     faces.reserve(2);
     faces.emplace_back(a, b, c);
     faces.emplace_back(c, d, a);
+
+    faces.at(0).t1 = {1, 1};
+    faces.at(0).t2 = {1, 0};
+    faces.at(0).t3 = {0, 0};
+    faces.at(1).t1 = {0, 0};
+    faces.at(1).t2 = {0, 1};
+    faces.at(1).t3 = {1, 1};
+
     return std::make_unique<explicit_entity>(std::move(faces));
 }
 

@@ -168,7 +168,7 @@ class octree {
         std::vector<entity*> entities;
         std::array<std::unique_ptr<node>, 8> children;
 
-        const size_t split_threshold = 8;
+        const size_t split_threshold = 16;
         const size_t max_depth = 5;
     };
 

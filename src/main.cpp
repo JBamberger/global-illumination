@@ -74,10 +74,10 @@ std::vector<std::unique_ptr<entity>> create_complex_scene()
     auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
     sphere->material = std::make_shared<checkerboard_material>();
     sphere->material->ambient = 0.3;
-    sphere->material->diffuse = 0.6;
-    sphere->material->specular = 0.6;
+    sphere->material->diffuse = 1.0;
+    sphere->material->specular = 0.0;
     sphere->material->specular_exponent = 0;
-    sphere->material->reflective = 0.4;
+    sphere->material->reflective = 0.0;
     sphere->material->refractive = 0.0;
     sphere->material->refractive_index = 1;
     // sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
@@ -119,6 +119,20 @@ std::vector<std::unique_ptr<entity>> create_complex_scene()
     return scene;
 }
 
+std::vector<std::unique_ptr<entity>> create_tex_mapping_scene()
+{
+    using namespace entities;
+
+    std::vector<std::unique_ptr<entity>> scene;
+
+    // floor
+    auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
+    quad->material = std::make_shared<checkerboard_material>(10, glm::dvec3{0, 0, 0}, green);
+    scene.push_back(std::move(quad));
+
+    return scene;
+}
+
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
@@ -136,7 +150,8 @@ int main(int argc, char** argv)
     octree scene({-20, -20, -20}, {20, 20, 20});
 
     // auto elems = create_sphere_scene();
-    auto elems = create_complex_scene();
+    // auto elems = create_complex_scene();
+    auto elems = create_tex_mapping_scene();
     for (const auto& entity : elems) scene.push_back(entity.get());
 
     raytracer.set_scene(&scene);

@@ -1,12 +1,12 @@
 
 find_package(GTest CONFIG REQUIRED)
 
-add_executable(
-	unit_tests
-	main.cpp
-	entities-test.cpp
-	bbox-test.cpp
-	checkerboard-test.cpp
+add_executable(unit_tests
+    main.cpp
+    entities-test.cpp
+    bbox-test.cpp
+    checkerboard-test.cpp
+    uv-mapping-test.cpp
 )
 
 target_link_libraries(
