@@ -8,11 +8,11 @@ struct Triangle final : entity {
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
-    glm::dvec3 get_color_at_intersect(glm::dvec3 intersect) const override;
+    glm::dvec3 getColorAtIntersect(glm::dvec3 intersect) const override;
 
     glm::dvec3 normal() const { return glm::normalize(glm::cross(B - A, C - A)); }
 
-    glm::dvec2 tex_mapping(glm::dvec3 p) const;
+    glm::dvec2 texMapping(glm::dvec3 p) const;
 
     void setTexCoords(glm::dvec2 Ca, glm::dvec2 Cb, glm::dvec2 Cc);
     void setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c);

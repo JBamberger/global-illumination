@@ -34,11 +34,11 @@ bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
 
 BoundingBox explicit_entity::boundingBox() const { return bbox; }
 
-glm::dvec3 explicit_entity::get_color_at_intersect(glm::dvec3 intersect) const
+glm::dvec3 explicit_entity::getColorAtIntersect(glm::dvec3 intersect) const
 {
     assert(last_hit != nullptr);
 
-    const auto uv = last_hit->tex_mapping(intersect);
+    const auto uv = last_hit->texMapping(intersect);
 
     return material->get_color(uv);
 }

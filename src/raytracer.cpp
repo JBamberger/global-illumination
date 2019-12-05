@@ -43,7 +43,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
     const auto mat = min_ent->material; // TODO: use material of sub-entity if explicit_entity
 
     // this is the base color value of the entity at the intersection location
-    const auto color_at_intersect = min_ent->get_color_at_intersect(intersect);
+    const auto color_at_intersect = min_ent->getColorAtIntersect(intersect);
 
     // compute light and normal vector at the intersection point
     const auto l = glm::normalize(light_ - intersect);

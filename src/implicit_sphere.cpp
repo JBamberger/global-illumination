@@ -63,7 +63,7 @@ bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
 
 BoundingBox implicit_sphere::boundingBox() const { return {center - radius, center + radius}; }
 
-glm::dvec3 implicit_sphere::get_color_at_intersect(const glm::dvec3 intersect) const
+glm::dvec3 implicit_sphere::getColorAtIntersect(const glm::dvec3 intersect) const
 {
     const auto n = glm::normalize(intersect - center);
 

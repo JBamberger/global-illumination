@@ -42,7 +42,7 @@ struct TextureMappingTest : public testing::TestWithParam<mapping_def> {
 TEST_P(TextureMappingTest, testUVMapping)
 {
     const auto p = GetParam();
-    const auto uv = t.tex_mapping(p.intersect);
+    const auto uv = t.texMapping(p.intersect);
 
     ASSERT_EQ(uv, p.uv);
 }

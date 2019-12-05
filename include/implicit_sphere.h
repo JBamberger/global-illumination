@@ -7,7 +7,7 @@ struct implicit_sphere final : entity {
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
-    glm::dvec3 get_color_at_intersect(glm::dvec3 intersect) const override;
+    glm::dvec3 getColorAtIntersect(glm::dvec3 intersect) const override;
 
     glm::dvec3 center = {0, 0, 0};
     double radius = 0;

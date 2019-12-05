@@ -50,13 +50,13 @@ BoundingBox Triangle::boundingBox() const
     return BoundingBox{glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
 }
 
-glm::dvec3 Triangle::get_color_at_intersect(glm::dvec3 intersect) const
+glm::dvec3 Triangle::getColorAtIntersect(glm::dvec3 intersect) const
 {
-    const auto uv = tex_mapping(intersect);
+    const auto uv = texMapping(intersect);
     return material->get_color(uv);
 }
 
-glm::dvec2 Triangle::tex_mapping(const glm::dvec3 I) const
+glm::dvec2 Triangle::texMapping(const glm::dvec3 I) const
 {
     // The triangle is given in 3D spaces and forms a 2D plane A + i*AB + j*AC within. The vectors
     // AB and AC form a basis of this subspace. The texture coordinates similarly form a basis of a
