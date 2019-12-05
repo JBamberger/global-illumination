@@ -13,6 +13,10 @@ BreakBeforeBraces: Custom
 BraceWrapping:
 	AfterFunction: true
 
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+PenaltyReturnTypeOnItsOwnLine: 100000
+
 AllowShortLoopsOnASingleLine: true
 BinPackParameters: false
 
