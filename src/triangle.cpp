@@ -1,17 +1,17 @@
-#include "triangle.h"
-#include "glm/gtc/epsilon.hpp"
+#include <Triangle.h>
+
 #include <cassert>
-#include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <iostream>
 
-triangle::triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c)
+Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c)
 {
     assert(glm::abs(glm::dot(glm::normalize(b - a), glm::normalize(c - a))) != 1);
     updateCaches();
 }
 
-bool triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     const auto N = this->normal();
     const auto DN = glm::dot(N, ray.dir);
@@ -45,18 +45,18 @@ bool triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& norm
     return true;
 }
 
-BoundingBox triangle::boundingBox() const
+BoundingBox Triangle::boundingBox() const
 {
     return BoundingBox{glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
 }
 
-glm::dvec3 triangle::get_color_at_intersect(glm::dvec3 intersect) const
+glm::dvec3 Triangle::get_color_at_intersect(glm::dvec3 intersect) const
 {
     const auto uv = tex_mapping(intersect);
     return material->get_color(uv);
 }
 
-glm::dvec2 triangle::tex_mapping(const glm::dvec3 I) const
+glm::dvec2 Triangle::tex_mapping(const glm::dvec3 I) const
 {
     // The triangle is given in 3D spaces and forms a 2D plane A + i*AB + j*AC within. The vectors
     // AB and AC form a basis of this subspace. The texture coordinates similarly form a basis of a
@@ -85,14 +85,14 @@ glm::dvec2 triangle::tex_mapping(const glm::dvec3 I) const
     return uv;
 }
 
-void triangle::setTexCoords(glm::dvec2 Ca, glm::dvec2 Cb, glm::dvec2 Cc)
+void Triangle::setTexCoords(glm::dvec2 Ca, glm::dvec2 Cb, glm::dvec2 Cc)
 {
     tA = Ca;
     tAB = Cb - Ca;
     tAC = Cc - Ca;
 }
 
-void triangle::setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c)
+void Triangle::setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c)
 {
     A = a;
     B = b;
@@ -101,7 +101,7 @@ void triangle::setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c)
     updateCaches();
 }
 
-void triangle::updateCaches()
+void Triangle::updateCaches()
 {
     // recomputes the matrix which computes the coordinates of a point in the triangle plane
     const auto xt = glm::dmat2x3(B - A, C - A);

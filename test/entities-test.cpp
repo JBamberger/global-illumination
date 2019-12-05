@@ -34,7 +34,7 @@ struct ray_spec {
 };
 
 struct TriangleIntersectionTest : public testing::TestWithParam<ray_spec> {
-    triangle triangle;
+    Triangle triangle;
     glm::dvec3 intersect;
     glm::dvec3 normal;
 

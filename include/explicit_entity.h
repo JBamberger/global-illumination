@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Triangle.h"
 #include "entity.h"
-#include "triangle.h"
 
 #include <memory>
 #include <vector>
 
 struct explicit_entity final : entity {
-    explicit explicit_entity(std::vector<triangle> faces)
+    explicit explicit_entity(std::vector<Triangle> faces)
         : faces(std::move(faces)), bbox(computeBBox(this->faces))
     {
     }
@@ -19,11 +19,11 @@ struct explicit_entity final : entity {
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& write_obj(std::ostream& os);
 
-    std::vector<triangle> faces;
+    std::vector<Triangle> faces;
 
   private:
     BoundingBox bbox;
-    static BoundingBox computeBBox(const std::vector<triangle>& faces)
+    static BoundingBox computeBBox(const std::vector<Triangle>& faces)
     {
         assert(!faces.empty());
 

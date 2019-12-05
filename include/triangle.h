@@ -3,8 +3,8 @@
 
 struct explicit_entity;
 
-struct triangle final : entity {
-    triangle(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C);
+struct Triangle final : entity {
+    Triangle(glm::dvec3 A, glm::dvec3 B, glm::dvec3 C);
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;

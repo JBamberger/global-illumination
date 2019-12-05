@@ -5,7 +5,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <ostream>
 
-static const triangle* last_hit = nullptr;
+static const Triangle* last_hit = nullptr;
 
 bool explicit_entity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
@@ -62,7 +62,7 @@ std::unique_ptr<explicit_entity> entities::make_quad(glm::dvec3 a,
                                                      glm::dvec3 c,
                                                      glm::dvec3 d)
 {
-    std::vector<triangle> faces;
+    std::vector<Triangle> faces;
     faces.reserve(2);
     faces.emplace_back(a, b, c);
     faces.emplace_back(c, d, a);
@@ -86,7 +86,7 @@ std::unique_ptr<explicit_entity> entities::make_cube(glm::dvec3 center, double s
     const auto g = center + glm::dvec3{-l, -l, l};
     const auto h = center + glm::dvec3{-l, -l, -l};
 
-    std::vector<triangle> faces;
+    std::vector<Triangle> faces;
     faces.reserve(12);
     // front
     faces.emplace_back(a, b, c);
@@ -133,9 +133,9 @@ std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
     /// Subdivision algorithm which splits each triangle side in the middle and projects the new
     /// points to the given sphere. If equilateral the resulting triangles will be equilateral too.
     const auto perform_subdivision = [&project_to_sphere, &find_line_center](
-                                         std::vector<triangle> ts, const implicit_sphere& ref,
+                                         std::vector<Triangle> ts, const implicit_sphere& ref,
                                          const int sub_divisions) {
-        std::vector<triangle> ts2;
+        std::vector<Triangle> ts2;
         for (auto d = 0; d < sub_divisions; d++) {
             ts2.clear();
             for (const auto& t : ts) {
@@ -157,7 +157,7 @@ std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
 
     /// Creates a tetrahedron where all vertices lie on the given sphere.
     const auto get_tetrahedron = [&project_to_sphere](const implicit_sphere& ref) {
-        std::vector<triangle> faces;
+        std::vector<Triangle> faces;
         faces.reserve(4);
 
         const auto a = project_to_sphere(ref, ref.center + glm::dvec3{1, 1, 1});
@@ -175,7 +175,7 @@ std::unique_ptr<explicit_entity> entities::make_sphere(const glm::dvec3 center,
 
     /// Creates an icosahedron where all vertices lie on the given sphere.
     const auto get_icosahedron = [&project_to_sphere](const implicit_sphere& ref) {
-        std::vector<triangle> faces;
+        std::vector<Triangle> faces;
         faces.reserve(20);
 
         const auto t = (1.0 + glm::sqrt(5.0)) / 2.0;
@@ -235,7 +235,7 @@ std::unique_ptr<explicit_entity> entities::make_cone(const glm::dvec3 center,
     assert(radius > 0);
     assert(slices > 2);
 
-    std::vector<triangle> faces;
+    std::vector<Triangle> faces;
     faces.reserve(slices * 2);
     // The cone is built from many wedges which meet in the tip and center of the bottom
     const auto wedge_angle = 2 * glm::pi<double>() / static_cast<double>(slices);

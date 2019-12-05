@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "Triangle.h"
 #include "checkerboard_material.h"
-#include "triangle.h"
 #include <ostream>
 #include <string>
 #include <utility>
@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const glm::dvec2& obj)
 }
 
 struct TextureMappingTest : public testing::TestWithParam<mapping_def> {
-    triangle t;
+    Triangle t;
 
     TextureMappingTest() : t({0, -1, 0}, {0, 1, 0}, {0, 0, 1})
     {
