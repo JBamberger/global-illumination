@@ -1,6 +1,6 @@
-#include <checkerboard_material.h>
+#include <CheckerboardMaterial.h>
 
-glm::dvec3 checkerboard_material::get_color(const glm::dvec2 uv)
+glm::dvec3 CheckerboardMaterial::getColor(const glm::dvec2 uv)
 {
     assert(0. <= uv.x && uv.x <= 1.);
     assert(0. <= uv.y && uv.y <= 1.);

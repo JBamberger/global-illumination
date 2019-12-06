@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Triangle.h"
-#include "checkerboard_material.h"
+#include <Triangle.h>
 #include <ostream>
 #include <string>
 #include <utility>

@@ -40,7 +40,7 @@ glm::dvec3 ExplicitEntity::getColorAtIntersect(glm::dvec3 intersect) const
 
     const auto uv = last_hit->texMapping(intersect);
 
-    return material->get_color(uv);
+    return material->getColor(uv);
 }
 
 std::ostream& ExplicitEntity::writeObj(std::ostream& os)

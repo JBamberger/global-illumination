@@ -7,7 +7,9 @@ set(SOURCES
 set(HEADERS
 	include/bbox.h
 	include/camera.h
-    include/checkerboard_material.h
+	include/Material.h
+    include/CheckerboardMaterial.h
+    include/SimpleMaterial.h
 	include/entities.h
 	include/Entity.h
 	include/ExplicitEntity.h
@@ -15,19 +17,17 @@ set(HEADERS
 	include/implicit_sphere.h
 	include/gui.h
 	include/image.h
-	include/material.h
 	include/octree.h
 	include/ray.h
 	include/raytracer.h
-    include/simple_material.h
 	include/viewer.h
 )
 
 
 
 add_library(global_illu_lib
-    checkerboard_material.cpp
-    simple_material.cpp
+    CheckerboardMaterial.cpp
+    SimpleMaterial.cpp
 	ExplicitEntity.cpp
 	implicit_sphere.cpp
 	Triangle.cpp

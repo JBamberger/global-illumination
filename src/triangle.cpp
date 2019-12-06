@@ -53,7 +53,7 @@ BoundingBox Triangle::boundingBox() const
 glm::dvec3 Triangle::getColorAtIntersect(glm::dvec3 intersect) const
 {
     const auto uv = texMapping(intersect);
-    return material->get_color(uv);
+    return material->getColor(uv);
 }
 
 glm::dvec2 Triangle::texMapping(const glm::dvec3 I) const

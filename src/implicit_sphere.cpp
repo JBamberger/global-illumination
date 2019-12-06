@@ -82,5 +82,5 @@ glm::dvec3 implicit_sphere::getColorAtIntersect(const glm::dvec3 intersect) cons
     const auto v = 0.5 - asin(n.y) / glm::pi<double>();
 #endif
 
-    return material->get_color({u, v});
+    return material->getColor({u, v});
 }

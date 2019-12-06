@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "checkerboard_material.h"
+#include <CheckerboardMaterial.h>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -25,7 +25,7 @@ struct coord_def {
 };
 
 struct CheckerboardAccessTest : public testing::TestWithParam<coord_def> {
-    checkerboard_material material;
+    CheckerboardMaterial material;
 
     CheckerboardAccessTest() : material(10, black, white) {}
 };
@@ -33,7 +33,7 @@ struct CheckerboardAccessTest : public testing::TestWithParam<coord_def> {
 TEST_P(CheckerboardAccessTest, testCheckerboarAcces)
 {
     const auto p = GetParam();
-    const auto color = material.get_color(p.uv);
+    const auto color = material.getColor(p.uv);
 
     ASSERT_EQ(color, p.color);
 }

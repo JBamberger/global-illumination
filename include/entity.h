@@ -1,9 +1,9 @@
 #pragma once
 
 #include "bbox.h"
-#include "material.h"
 #include "ray.h"
-#include "simple_material.h"
+#include <Material.h>
+#include <SimpleMaterial.h>
 #include <glm/glm.hpp>
 #include <memory>
 #include <utility>
@@ -11,7 +11,7 @@
 /// A base class for all entities in the scene.
 struct Entity {
 
-    explicit Entity() : material(std::make_shared<simple_material>(glm::dvec3{1, 0, 0})) {}
+    explicit Entity() : material(std::make_shared<SimpleMaterial>(glm::dvec3{1, 0, 0})) {}
     explicit Entity(std::shared_ptr<Material> material) : material(std::move(material)) {}
     virtual ~Entity() = default;
 
