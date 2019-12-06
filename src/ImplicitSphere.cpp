@@ -1,6 +1,6 @@
 #include <ImplicitSphere.h>
 
-#include "glm/gtc/constants.hpp"
+#include <glm/gtc/constants.hpp>
 
 ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius)
     : center(center), radius(radius)

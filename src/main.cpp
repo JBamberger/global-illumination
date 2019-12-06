@@ -2,10 +2,10 @@
 
 #include <memory>
 
-#include "CheckerboardMaterial.h"
-#include "camera.h"
-#include "entities.h"
-#include "gui.h"
+#include <CheckerboardMaterial.h>
+#include <camera.h>
+#include <entities.h>
+#include <gui.h>
 
 constexpr glm::dvec3 black(0, 0, 0);
 constexpr glm::dvec3 white(1, 1, 1);

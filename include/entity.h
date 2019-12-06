@@ -1,9 +1,10 @@
 #pragma once
 
-#include "bbox.h"
-#include "ray.h"
 #include <Material.h>
 #include <SimpleMaterial.h>
+#include <bbox.h>
+#include <ray.h>
+
 #include <glm/glm.hpp>
 #include <memory>
 #include <utility>
