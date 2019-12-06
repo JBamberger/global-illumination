@@ -1,13 +1,13 @@
-#include "implicit_sphere.h"
+#include <ImplicitSphere.h>
 
 #include "glm/gtc/constants.hpp"
 
-implicit_sphere::implicit_sphere(const glm::dvec3 center, const double radius)
+ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius)
     : center(center), radius(radius)
 {
 }
 
-bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     // O = ray.origin
     // D = ray.dir
@@ -61,9 +61,9 @@ bool implicit_sphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec
     return true;
 }
 
-BoundingBox implicit_sphere::boundingBox() const { return {center - radius, center + radius}; }
+BoundingBox ImplicitSphere::boundingBox() const { return {center - radius, center + radius}; }
 
-glm::dvec3 implicit_sphere::getColorAtIntersect(const glm::dvec3 intersect) const
+glm::dvec3 ImplicitSphere::getColorAtIntersect(const glm::dvec3 intersect) const
 {
     const auto n = glm::normalize(intersect - center);
 

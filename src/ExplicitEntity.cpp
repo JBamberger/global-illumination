@@ -1,5 +1,5 @@
 #include <ExplicitEntity.h>
-#include <implicit_sphere.h>
+#include <ImplicitSphere.h>
 #include <ostream>
 
 static const Triangle* last_hit = nullptr;

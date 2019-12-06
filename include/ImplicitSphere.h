@@ -1,9 +1,9 @@
 #pragma once
-#include "entity.h"
+#include <Entity.h>
 
-struct implicit_sphere final : Entity {
-    implicit_sphere() : implicit_sphere({0, 0, 0}, 1) {}
-    implicit_sphere(glm::dvec3 center, double radius);
+struct ImplicitSphere final : Entity {
+    ImplicitSphere() : ImplicitSphere({0, 0, 0}, 1) {}
+    ImplicitSphere(glm::dvec3 center, double radius);
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;

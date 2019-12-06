@@ -92,7 +92,7 @@ INSTANTIATE_TEST_SUITE_P(InsideOutside, TriangleIntersectionTest, testing::Value
 // clang-format on
 
 struct ImplicitSphereIntersectionTest : public testing::TestWithParam<ray_spec> {
-    implicit_sphere sphere;
+    ImplicitSphere sphere;
     glm::dvec3 intersect;
     glm::dvec3 normal;
 

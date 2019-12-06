@@ -14,7 +14,7 @@ set(HEADERS
 	include/Entity.h
 	include/ExplicitEntity.h
 	include/Triangle.h
-	include/implicit_sphere.h
+	include/ImplicitSphere.h
 	include/gui.h
 	include/image.h
 	include/octree.h
@@ -29,7 +29,7 @@ add_library(global_illu_lib
     CheckerboardMaterial.cpp
     SimpleMaterial.cpp
 	ExplicitEntity.cpp
-	implicit_sphere.cpp
+	ImplicitSphere.cpp
 	Triangle.cpp
     raytracer.cpp
     entities.cpp

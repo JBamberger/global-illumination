@@ -60,7 +60,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
                                                      const bool use_tetrahedron)
 {
     /// Projects a point to the given sphere.
-    const auto project_to_sphere = [](const implicit_sphere& s, const glm::dvec3 p) {
+    const auto project_to_sphere = [](const ImplicitSphere& s, const glm::dvec3 p) {
         const auto r = Ray{s.center, p - s.center};
         glm::dvec3 i, n;
         const auto success = s.intersect(r, i, n);
@@ -76,31 +76,31 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
 
     /// Subdivision algorithm which splits each triangle side in the middle and projects the new
     /// points to the given sphere. If equilateral the resulting triangles will be equilateral too.
-    const auto perform_subdivision = [&project_to_sphere, &find_line_center](
-                                         std::vector<Triangle> ts, const implicit_sphere& ref,
-                                         const int sub_divisions) {
-        std::vector<Triangle> ts2;
-        for (auto d = 0; d < sub_divisions; d++) {
-            ts2.clear();
-            for (const auto& t : ts) {
-                // split each triangle side and project the center to the sphere
-                const auto x = project_to_sphere(ref, find_line_center(t.A, t.B));
-                const auto y = project_to_sphere(ref, find_line_center(t.B, t.C));
-                const auto z = project_to_sphere(ref, find_line_center(t.C, t.A));
+    const auto perform_subdivision =
+        [&project_to_sphere, &find_line_center](std::vector<Triangle> ts, const ImplicitSphere& ref,
+                                                const int sub_divisions) {
+            std::vector<Triangle> ts2;
+            for (auto d = 0; d < sub_divisions; d++) {
+                ts2.clear();
+                for (const auto& t : ts) {
+                    // split each triangle side and project the center to the sphere
+                    const auto x = project_to_sphere(ref, find_line_center(t.A, t.B));
+                    const auto y = project_to_sphere(ref, find_line_center(t.B, t.C));
+                    const auto z = project_to_sphere(ref, find_line_center(t.C, t.A));
 
-                // use the new four triangles instead of the single one
-                ts2.emplace_back(t.A, x, z);
-                ts2.emplace_back(x, t.B, y);
-                ts2.emplace_back(y, t.C, z);
-                ts2.emplace_back(x, y, z);
+                    // use the new four triangles instead of the single one
+                    ts2.emplace_back(t.A, x, z);
+                    ts2.emplace_back(x, t.B, y);
+                    ts2.emplace_back(y, t.C, z);
+                    ts2.emplace_back(x, y, z);
+                }
+                std::swap(ts, ts2);
             }
-            std::swap(ts, ts2);
-        }
-        return ts;
-    };
+            return ts;
+        };
 
     /// Creates a tetrahedron where all vertices lie on the given sphere.
-    const auto get_tetrahedron = [&project_to_sphere](const implicit_sphere& ref) {
+    const auto get_tetrahedron = [&project_to_sphere](const ImplicitSphere& ref) {
         std::vector<Triangle> faces;
         faces.reserve(4);
 
@@ -118,7 +118,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
     };
 
     /// Creates an icosahedron where all vertices lie on the given sphere.
-    const auto get_icosahedron = [&project_to_sphere](const implicit_sphere& ref) {
+    const auto get_icosahedron = [&project_to_sphere](const ImplicitSphere& ref) {
         std::vector<Triangle> faces;
         faces.reserve(20);
 
@@ -161,7 +161,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
         return faces;
     };
 
-    const auto ref = implicit_sphere{center, radius};
+    const auto ref = ImplicitSphere{center, radius};
     const auto initial_shape = use_tetrahedron ? get_tetrahedron(ref) : get_icosahedron(ref);
 
     auto faces = perform_subdivision(initial_shape, ref, sub_divisions);

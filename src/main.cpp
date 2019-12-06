@@ -23,10 +23,10 @@ constexpr glm::dvec3 magenta(1, 0, 1);
 std::vector<std::unique_ptr<Entity>> create_sphere_scene()
 {
     std::vector<std::unique_ptr<Entity>> scene;
-    auto s1 = std::make_unique<implicit_sphere>(glm::dvec3{0, 2, 0}, 1.0);
-    auto s2 = std::make_unique<implicit_sphere>(glm::dvec3{0, -2, 0}, 1.0);
-    auto s3 = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 2}, 1.0);
-    auto s4 = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, -2}, 1.0);
+    auto s1 = std::make_unique<ImplicitSphere>(glm::dvec3{0, 2, 0}, 1.0);
+    auto s2 = std::make_unique<ImplicitSphere>(glm::dvec3{0, -2, 0}, 1.0);
+    auto s3 = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 2}, 1.0);
+    auto s4 = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, -2}, 1.0);
     s1->material = std::make_shared<SimpleMaterial>(blue);
     s2->material = std::make_shared<SimpleMaterial>(green);
     s3->material = std::make_shared<SimpleMaterial>(red);
@@ -71,7 +71,7 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     z_axis->material = std::make_shared<SimpleMaterial>(blue);
     scene.push_back(std::move(z_axis));
 
-    auto sphere = std::make_unique<implicit_sphere>(glm::dvec3{0, 0, 0}, 1.0);
+    auto sphere = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 0}, 1.0);
     sphere->material = std::make_shared<CheckerboardMaterial>();
     sphere->material->ambient = 0.3;
     sphere->material->diffuse = 1.0;
