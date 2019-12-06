@@ -32,6 +32,7 @@ add_library(global_illu_lib
 	implicit_sphere.cpp
 	Triangle.cpp
     raytracer.cpp
+    entities.cpp
 )
 target_include_directories(global_illu_lib PUBLIC
 	"${CMAKE_SOURCE_DIR}/include"
