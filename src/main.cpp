@@ -6,6 +6,8 @@
 #include <camera.h>
 #include <entities.h>
 #include <gui.h>
+#include <iostream>
+#include <random>
 
 constexpr glm::dvec3 black(0, 0, 0);
 constexpr glm::dvec3 white(1, 1, 1);
@@ -19,6 +21,42 @@ constexpr glm::dvec3 cyan(0, 1, 1);
 constexpr glm::dvec3 magenta(1, 0, 1);
 
 // dark blue glm::dvec3 { 0.3, 0.3, 1 }
+
+std::vector<std::unique_ptr<Entity>> random_spheres(BoundingBox bounds, int count)
+{
+    std::array<glm::dvec3, 8> colors;
+    colors[0] = black;
+    colors[1] = white;
+    colors[2] = red;
+    colors[3] = green;
+    colors[4] = blue;
+    colors[5] = yellow;
+    colors[6] = cyan;
+    colors[7] = magenta;
+
+    std::default_random_engine gen;
+    std::normal_distribution<double> x_coord(0, (bounds.max.x - bounds.min.x) / 6);
+    std::normal_distribution<double> y_coord(0, (bounds.max.y - bounds.min.y) / 6);
+    std::normal_distribution<double> z_coord(0, (bounds.max.z - bounds.min.z) / 6);
+    const std::uniform_int_distribution<int> color_dist(0, 7);
+    // const std::uniform_real_distribution<double> x_coord(bounds.min.x, bounds.max.x);
+    // const std::uniform_real_distribution<double> y_coord(bounds.min.y, bounds.max.y);
+    // const std::uniform_real_distribution<double> z_coord(bounds.min.z, bounds.max.z);
+    const std::uniform_real_distribution<double> rad(0.1, 1);
+
+    std::vector<std::unique_ptr<Entity>> scene;
+    scene.reserve(count);
+
+    for (auto i = 0; i < count; ++i) {
+
+        auto s1 = std::make_unique<ImplicitSphere>(
+            glm::dvec3{x_coord(gen), y_coord(gen), z_coord(gen)}, rad(gen));
+        s1->material = std::make_shared<SimpleMaterial>(colors[color_dist(gen)]);
+        scene.push_back(std::move(s1));
+    }
+
+    return scene;
+}
 
 std::vector<std::unique_ptr<Entity>> create_sphere_scene()
 {
@@ -143,15 +181,17 @@ int main(int argc, char** argv)
 
     RayTracer raytracer(camera, light);
 
-    octree scene({-20, -20, -20}, {20, 20, 20});
+    Octree scene({-20, -20, -20}, {20, 20, 20});
 
     // auto elems = create_sphere_scene();
-    // auto elems = create_complex_scene();
-    auto elems = create_tex_mapping_scene();
-
-    for (const auto& entity : elems) scene.push_back(entity.get());
+    auto elems = create_complex_scene();
+    // auto elems = create_tex_mapping_scene();
+    // auto elems = random_spheres(scene.bounds(), 100);
+    for (const auto& entity : elems) scene.pushBack(entity.get());
 
     raytracer.set_scene(&scene);
+
+    std::cout << scene << std::endl;
 
     Gui window(500, 500, raytracer);
     window.show();

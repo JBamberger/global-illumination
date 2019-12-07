@@ -17,7 +17,7 @@
 class RayTracer {
 
     bool running_ = false;
-    const octree* scene_;
+    const Octree* scene_;
     Camera camera_;
     glm::dvec3 light_;
     std::shared_ptr<Image> image_;
@@ -26,7 +26,7 @@ class RayTracer {
     RayTracer() = delete;
     RayTracer(const Camera& camera, glm::dvec3 light);
 
-    void set_scene(const octree* scene);
+    void set_scene(const Octree* scene);
     void run(int w, int h);
     glm::dvec3 compute_pixel(const Ray& ray, int max_reflections) const;
     bool running() const;

@@ -13,12 +13,14 @@
 
 #define USE_OCTREE
 
-class octree {
+class Octree {
   public:
-    octree(const glm::dvec3 min, const glm::dvec3 max) : root_(node({min, max})) {}
+    Octree(const glm::dvec3 min, const glm::dvec3 max) : root_(Node({min, max})) {}
+
+    BoundingBox bounds() const { return root_.bbox; }
 
     /// Store an entity in the correct position of the octree.
-    void push_back(Entity* object)
+    void pushBack(Entity* object)
     {
 #ifdef USE_OCTREE
         root_.insert(object, 0);
@@ -41,7 +43,7 @@ class octree {
 #endif
     }
 
-    Entity* closest_intersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
+    Entity* closestIntersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
     {
         Entity* min_ent = nullptr;
         auto min = std::numeric_limits<double>::infinity();
@@ -62,7 +64,7 @@ class octree {
         return min_ent;
     }
 
-    bool is_blocked(const Ray& ray) const
+    bool isBlocked(const Ray& ray) const
     {
         auto blocked = false;
         glm::dvec3 i, n;
@@ -77,9 +79,14 @@ class octree {
         return blocked;
     }
 
+    friend std::ostream& operator<<(std::ostream& o, const Octree& t)
+    {
+        return o << "{" << t.root_ << "}";
+    }
+
   private:
-    struct node {
-        explicit node(BoundingBox bbox) : bbox(std::move(bbox)) {}
+    struct Node {
+        explicit Node(BoundingBox bbox) : bbox(std::move(bbox)) {}
 
         /// Subdivides the current node into 8 children.
         void partition()
@@ -90,28 +97,28 @@ class octree {
             const auto dy = bbox.dy() / 2.0;
             const auto dz = bbox.dz() / 2.0;
             // clang-format off
-            children[0] = std::make_unique<node>(
+            children[0] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y, min.z},
 					        glm::dvec3{center.x, center.y, center.z}});
-            children[1] = std::make_unique<node>(
+            children[1] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y, min.z + dz},
                             glm::dvec3{center.x, center.y, center.z + dz}});
-            children[2] = std::make_unique<node>(
+            children[2] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y + dy, min.z},
                             glm::dvec3{center.x, center.y + dy, center.z}});
-            children[3] = std::make_unique<node>(
+            children[3] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x, min.y + dy, min.z + dz},
                             glm::dvec3{center.x, center.y + dy, center.z + dz}});
-            children[4] = std::make_unique<node>(
+            children[4] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x + dx, min.y, min.z},
                             glm::dvec3{center.x + dx, center.y, center.z}});
-            children[5] = std::make_unique<node>(
+            children[5] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + dx, min.y, min.z + dz},
                             glm::dvec3{center.x + dx, center.y, center.z + dz}});
-            children[6] = std::make_unique<node>(
+            children[6] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + dx, min.y + dy, min.z},
                             glm::dvec3{center.x + dx, center.y + dy, center.z}});
-            children[7] = std::make_unique<node>(
+            children[7] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + dx, min.y + dy, min.z + dz},
                             glm::dvec3{center.x + dx, center.y + dy, center.z + dz}});
             // clang-format on
@@ -131,11 +138,11 @@ class octree {
             entities.shrink_to_fit();
         }
 
-        bool is_leaf() const { return children[0] == nullptr; }
+        bool isLeaf() const { return children[0] == nullptr; }
 
-        void insert(Entity* e, size_t depth)
+        void insert(Entity* e, const size_t depth)
         {
-            if (is_leaf()) {
+            if (isLeaf()) {
                 entities.push_back(e);
 
                 if (depth < split_threshold && entities.size() > split_threshold) {
@@ -157,20 +164,39 @@ class octree {
             if (!bbox.intersect(ray))
                 return;
 
-            if (is_leaf()) {
+            if (isLeaf()) {
                 output.insert(entities.begin(), entities.end());
             } else {
                 for (const auto& child : children) { child->intersect(ray, output); }
             }
         }
 
+        size_t size() const
+        {
+            assert(isLeaf());
+
+            return entities.size();
+        }
+
+        friend std::ostream& operator<<(std::ostream& o, const Node& n)
+        {
+            if (n.isLeaf()) {
+                o << "(" << n.size() << ")";
+            } else {
+                o << "(\n";
+                for (const auto& child : n.children) { o << *child << "\n"; }
+                o << ")";
+            }
+            return o;
+        }
+
         BoundingBox bbox;
         std::vector<Entity*> entities;
-        std::array<std::unique_ptr<node>, 8> children;
+        std::array<std::unique_ptr<Node>, 8> children;
 
         const size_t split_threshold = 16;
-        const size_t max_depth = 5;
+        const size_t max_depth = 10;
     };
 
-    node root_;
+    Node root_;
 };

@@ -5,7 +5,7 @@ RayTracer::RayTracer(const Camera& camera, glm::dvec3 light)
 {
 }
 
-void RayTracer::set_scene(const octree* scene) { scene_ = scene; }
+void RayTracer::set_scene(const Octree* scene) { scene_ = scene; }
 
 void RayTracer::run(int w, int h)
 {
@@ -34,7 +34,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
         return color;
 
     glm::dvec3 intersect, normal; // values at minimum
-    auto min_ent = scene_->closest_intersection(ray, intersect, normal);
+    auto min_ent = scene_->closestIntersection(ray, intersect, normal);
 
     if (min_ent == nullptr)
         return color;
@@ -50,7 +50,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
 
     // check if the light is obstructed by some an entity
     // TODO: this only works for opaque objects
-    const auto blocked = scene_->is_blocked(Ray::offset_ray(intersect, l));
+    const auto blocked = scene_->isBlocked(Ray::offset_ray(intersect, l));
 
     // ambient: L_a = k_a * I_a
     color = color + color_at_intersect * mat->ambient;
