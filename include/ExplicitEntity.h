@@ -13,7 +13,9 @@ struct ExplicitEntity final : Entity {
     }
 
     bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
+
     BoundingBox boundingBox() const override;
+
     glm::dvec3 getColorAtIntersect(glm::dvec3 intersect) const override;
 
     /// Writes the triangles and vertices in obj format to the output stream.
@@ -23,6 +25,7 @@ struct ExplicitEntity final : Entity {
 
   private:
     BoundingBox bbox;
+
     static BoundingBox computeBBox(const std::vector<Triangle>& faces)
     {
         assert(!faces.empty());

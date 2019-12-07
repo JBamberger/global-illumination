@@ -9,7 +9,6 @@
 
 #include "bbox.h"
 #include "entities.h"
-#include <set>
 
 #define USE_OCTREE
 
@@ -23,6 +22,12 @@ class Octree {
     void pushBack(Entity* object)
     {
 #ifdef USE_OCTREE
+        /*auto ee = dynamic_cast<ExplicitEntity*>(object);
+        if (ee) {
+            for (auto& face : ee->faces) { root_.insert(face, 0); }
+        } else {
+            root_.insert(object, 0);
+        }*/
         root_.insert(object, 0);
 #else
         root_.entities.push_back(object);
@@ -33,10 +38,8 @@ class Octree {
     std::vector<Entity*> intersect(const Ray& ray) const
     {
 #ifdef USE_OCTREE
-        std::set<Entity*> out_set;
-        root_.intersect(ray, out_set);
         std::vector<Entity*> output;
-        output.insert(output.end(), out_set.begin(), out_set.end());
+        root_.intersect(ray, output);
         return output;
 #else
         return root_.entities;
@@ -124,17 +127,29 @@ class Octree {
             // clang-format on
 
             // insert all entities into the children
+            std::vector<Entity*> tmp;
             for (auto entity : entities) {
                 const auto bb = entity->boundingBox();
 
+                Node* receiver = nullptr;
                 for (auto& i : children) {
                     if (i->bbox.intersect(bb)) {
-                        i->entities.push_back(entity);
+                        if (receiver != nullptr) {
+                            receiver = nullptr;
+                            break;
+                        }
+                        receiver = i.get();
                     }
+                }
+                if (receiver != nullptr) {
+                    receiver->entities.push_back(entity);
+                } else {
+                    tmp.push_back(entity);
                 }
             }
             // clear and shrink the own entities vector because it is no longer needed.
             entities.clear();
+            entities.insert(entities.end(), tmp.begin(), tmp.end());
             entities.shrink_to_fit();
         }
 
@@ -159,14 +174,14 @@ class Octree {
             }
         }
 
-        void intersect(const Ray& ray, std::set<Entity*>& output) const
+        void intersect(const Ray& ray, std::vector<Entity*>& output) const
         {
             if (!bbox.intersect(ray))
                 return;
 
-            if (isLeaf()) {
-                output.insert(entities.begin(), entities.end());
-            } else {
+            output.insert(output.end(), entities.begin(), entities.end());
+
+            if (!isLeaf()) {
                 for (const auto& child : children) { child->intersect(ray, output); }
             }
         }
@@ -183,7 +198,7 @@ class Octree {
             if (n.isLeaf()) {
                 o << "(" << n.size() << ")";
             } else {
-                o << "(\n";
+                o << "(" << n.size() << "\n";
                 for (const auto& child : n.children) { o << *child << "\n"; }
                 o << ")";
             }
