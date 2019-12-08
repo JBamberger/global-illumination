@@ -6,7 +6,8 @@ static const Triangle* last_hit = nullptr;
 
 bool ExplicitEntity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
-    // TODO: check intersection direction
+    // TODO: check intersection direction (for triangles with only one side)
+    // glm::dot(ray.direction, triangle.normal) > 0
 
     // quickly discard all rays that don't even intersect the bounding box
     if (!boundingBox().intersect(ray)) {
