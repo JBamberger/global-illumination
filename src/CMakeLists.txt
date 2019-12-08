@@ -33,6 +33,7 @@ add_library(global_illu_lib
 	Triangle.cpp
     RayTracer.cpp
     BoundingBox.cpp
+    Octree.cpp
     entities.cpp
 )
 target_include_directories(global_illu_lib PUBLIC
