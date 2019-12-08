@@ -5,7 +5,7 @@ set(SOURCES
 	main.cpp
 )
 set(HEADERS
-	include/bbox.h
+	include/BoundingBox.h
 	include/camera.h
 	include/Material.h
     include/CheckerboardMaterial.h
@@ -17,9 +17,9 @@ set(HEADERS
 	include/ImplicitSphere.h
 	include/gui.h
 	include/image.h
-	include/octree.h
-	include/ray.h
-	include/raytracer.h
+	include/Octree.h
+	include/Ray.h
+	include/RayTracer.h
 	include/viewer.h
 )
 
@@ -31,7 +31,8 @@ add_library(global_illu_lib
 	ExplicitEntity.cpp
 	ImplicitSphere.cpp
 	Triangle.cpp
-    raytracer.cpp
+    RayTracer.cpp
+    BoundingBox.cpp
     entities.cpp
 )
 target_include_directories(global_illu_lib PUBLIC

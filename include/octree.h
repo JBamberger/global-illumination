@@ -7,8 +7,8 @@
 
 #include <glm/glm.hpp>
 
-#include "bbox.h"
-#include "entities.h"
+#include <BoundingBox.h>
+#include <entities.h>
 
 #define USE_OCTREE
 
@@ -95,35 +95,33 @@ class Octree {
         void partition()
         {
             const auto min = bbox.min;
-            const auto center = bbox.center();
-            const auto dx = bbox.dx() / 2.0;
-            const auto dy = bbox.dy() / 2.0;
-            const auto dz = bbox.dz() / 2.0;
+            const auto c = (bbox.max + bbox.min) / 2.0;
+            const auto d = (bbox.max - bbox.min) / 2.0;
             // clang-format off
             children[0] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y, min.z},
-					        glm::dvec3{center.x, center.y, center.z}});
+					        glm::dvec3{c.x, c.y, c.z}});
             children[1] = std::make_unique<Node>(
-				BoundingBox{glm::dvec3{min.x, min.y, min.z + dz},
-                            glm::dvec3{center.x, center.y, center.z + dz}});
+				BoundingBox{glm::dvec3{min.x, min.y, min.z + d.z},
+                            glm::dvec3{c.x, c.y, c.z + d.z}});
             children[2] = std::make_unique<Node>(
-				BoundingBox{glm::dvec3{min.x, min.y + dy, min.z},
-                            glm::dvec3{center.x, center.y + dy, center.z}});
+				BoundingBox{glm::dvec3{min.x, min.y + d.y, min.z},
+                            glm::dvec3{c.x, c.y + d.y, c.z}});
             children[3] = std::make_unique<Node>(
-                BoundingBox{glm::dvec3{min.x, min.y + dy, min.z + dz},
-                            glm::dvec3{center.x, center.y + dy, center.z + dz}});
+                BoundingBox{glm::dvec3{min.x, min.y + d.y, min.z + d.z},
+                            glm::dvec3{c.x, c.y + d.y, c.z + d.z}});
             children[4] = std::make_unique<Node>(
-				BoundingBox{glm::dvec3{min.x + dx, min.y, min.z},
-                            glm::dvec3{center.x + dx, center.y, center.z}});
+				BoundingBox{glm::dvec3{min.x + d.x, min.y, min.z},
+                            glm::dvec3{c.x + d.x, c.y, c.z}});
             children[5] = std::make_unique<Node>(
-                BoundingBox{glm::dvec3{min.x + dx, min.y, min.z + dz},
-                            glm::dvec3{center.x + dx, center.y, center.z + dz}});
+                BoundingBox{glm::dvec3{min.x + d.x, min.y, min.z + d.z},
+                            glm::dvec3{c.x + d.x, c.y, c.z + d.z}});
             children[6] = std::make_unique<Node>(
-                BoundingBox{glm::dvec3{min.x + dx, min.y + dy, min.z},
-                            glm::dvec3{center.x + dx, center.y + dy, center.z}});
+                BoundingBox{glm::dvec3{min.x + d.x, min.y + d.y, min.z},
+                            glm::dvec3{c.x + d.x, c.y + d.y, c.z}});
             children[7] = std::make_unique<Node>(
-                BoundingBox{glm::dvec3{min.x + dx, min.y + dy, min.z + dz},
-                            glm::dvec3{center.x + dx, center.y + dy, center.z + dz}});
+                BoundingBox{glm::dvec3{min.x + d.x, min.y + d.y, min.z + d.z},
+                            glm::dvec3{c.x + d.x, c.y + d.y, c.z + d.z}});
             // clang-format on
 
             // insert all entities into the children

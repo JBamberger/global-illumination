@@ -1,9 +1,9 @@
 #pragma once
 
+#include <BoundingBox.h>
 #include <Material.h>
+#include <Ray.h>
 #include <SimpleMaterial.h>
-#include <bbox.h>
-#include <ray.h>
 
 #include <glm/glm.hpp>
 #include <memory>
