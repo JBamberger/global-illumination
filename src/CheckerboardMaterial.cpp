@@ -5,6 +5,9 @@ glm::dvec3 CheckerboardMaterial::getColor(const glm::dvec2 uv)
     assert(0.0 <= uv.x && uv.x <= 1.0);
     assert(0.0 <= uv.y && uv.y <= 1.0);
 
+    // TODO: Ensure consistent border values
+    // consistent for repetition vs. consistency for single texture
+
     // determine if the position is in x or y direction is in an even or odd row
     const auto u_even = static_cast<int>(uv.x / square_length) & 1;
     const auto v_even = static_cast<int>(uv.y / square_length) & 1;

@@ -1,4 +1,5 @@
-#include <raytracer.h>
+#include <RayTracer.h>
+#include <iostream>
 
 RayTracer::RayTracer(const Camera& camera, glm::dvec3 light)
     : camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0))
@@ -76,6 +77,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
     // mirror: L_m = k_m * trace(Ray(P, r))
     if (mat->reflective > 0) {
         // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
+
         const auto reflect_dir = glm::reflect(-v, normal);
         const auto mirror_ray = Ray::offset_ray(intersect, reflect_dir);
         // Trace another ray in reflection direction

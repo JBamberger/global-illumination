@@ -2,6 +2,9 @@
 #include <ImplicitSphere.h>
 #include <ostream>
 
+// TODO: produces data race
+// should i put all triangles into the scene separately?
+// This would prevent index-buffer optimization
 static const Triangle* last_hit = nullptr;
 
 bool ExplicitEntity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const

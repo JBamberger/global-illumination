@@ -118,36 +118,28 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     sphere->material->reflective = 0.0;
     sphere->material->refractive = 0.0;
     sphere->material->refractive_index = 1;
-    // sphere->material = std::make_shared<simple_material>(glm::dvec3(0, 1, 0));
-    // sphere->material->specular_exponent = 64;
-    // sphere->material->ambient = 0;
-    // sphere->material->diffuse = 1;
-    // sphere->material->specular = 0.5;
-    // sphere->material->reflective = 0;
-    // sphere->material->refractive = 1;
-    // sphere->material->refractive_index = 1;
     scene.push_back(std::move(sphere));
 
     // triangle upper right corner
-    // auto t3 = std::make_unique<triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
-    //                                     glm::dvec3{1, 0.5, 2.5});
-    // t3->material = std::make_shared<simple_material>(magenta);
-    // scene.push_back(std::move(t3));
+    auto t3 = std::make_unique<Triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
+                                         glm::dvec3{1, 0.5, 2.5});
+    t3->material = std::make_shared<SimpleMaterial>(magenta);
+    scene.push_back(std::move(t3));
 
-    // auto t1 = std::make_unique<triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
-    //                                     glm::dvec3{-1, -0.5, 1.5});
-    // t1->material = std::make_shared<simple_material>(cyan);
-    // scene.push_back(std::move(t1));
+    auto t1 = std::make_unique<Triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
+                                         glm::dvec3{-1, -0.5, 1.5});
+    t1->material = std::make_shared<SimpleMaterial>(cyan);
+    scene.push_back(std::move(t1));
 
-    // auto t2 =
-    //    std::make_unique<triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
-    // t2->material = std::make_shared<simple_material>(yellow);
-    // scene.push_back(std::move(t2));
+    auto t2 =
+        std::make_unique<Triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
+    t2->material = std::make_shared<SimpleMaterial>(yellow);
+    scene.push_back(std::move(t2));
 
     // floor
     auto quad = makeQuad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
-    quad->material = std::make_shared<CheckerboardMaterial>(10, glm::dvec3{0, 0, 0}, magenta);
-    // quad->material = std::make_shared<simple_material>(glm::dvec3{0.5, 0.5, 0.5});
+    quad->material = std::make_shared<CheckerboardMaterial>(10, green, magenta);
+    // quad->material = std::make_shared<SimpleMaterial>(magenta);
     quad->material->reflective = 1.0;
     quad->material->ambient = 0.0;
     quad->material->diffuse = 0.3;
@@ -166,7 +158,7 @@ std::vector<std::unique_ptr<Entity>> create_tex_mapping_scene()
     // floor
     // auto quad = make_quad({0, -3, -3}, {0, 3, -3}, {0, 3, 3}, {0, -3, 3});
     auto quad = makeQuad({10, 10, -1}, {-10, 10, -1}, {-10, -10, -1}, {10, -10, -1});
-    quad->material = std::make_shared<CheckerboardMaterial>(10, glm::dvec3{0, 0, 0}, green);
+    quad->material = std::make_shared<CheckerboardMaterial>(10, black, green);
     scene.push_back(std::move(quad));
 
     return scene;
