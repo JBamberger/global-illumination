@@ -27,10 +27,10 @@ class Octree {
     void pushBack(Entity* object) const;
 
     /// Returns list of entities that have the possibility to be intersected by the ray.
-    std::vector<Entity*> intersect(const Ray& ray) const;
+    std::vector<const Entity*> intersect(const Ray& ray) const;
 
     /// Returns the entity that is intersects the ray closest to the rays origin.
-    Entity* closestIntersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const;
+    const Entity* closestIntersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const;
 
     /// Checks if the ray is blocked by an object
     /// TODO: This should also check that the intersection appears between light and object, not

@@ -11,21 +11,21 @@ Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c)
     updateCaches();
 }
 
-bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+const Entity* Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
 {
     const auto N = this->normal();
     const auto DN = glm::dot(N, ray.dir);
 
     // discard rays that are nearly parallel to the triangle
     if (glm::epsilonEqual(0., DN, 1e-11)) {
-        return false;
+        return nullptr;
     }
 
     const auto c = glm::dot(A - ray.origin, N) / DN;
 
     // test if the triangle is behind the ray origin
     if (c <= 0)
-        return false;
+        return nullptr;
 
     // compute the intersection point
     const auto I = ray.origin + c * ray.dir;
@@ -34,15 +34,15 @@ bool Triangle::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& norm
     // The cross product points in the same direction as the normal if the point is inside of the
     // half-space
     if (glm::dot(N, glm::cross(B - A, I - A)) < 0)
-        return false;
+        return nullptr;
     if (glm::dot(N, glm::cross(C - B, I - B)) < 0)
-        return false;
+        return nullptr;
     if (glm::dot(N, glm::cross(A - C, I - C)) < 0)
-        return false;
+        return nullptr;
 
     intersect = I;
     normal = N;
-    return true;
+    return this;
 }
 
 BoundingBox Triangle::boundingBox() const

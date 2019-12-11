@@ -7,7 +7,9 @@ ImplicitSphere::ImplicitSphere(const glm::dvec3 center, const double radius)
 {
 }
 
-bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+const Entity* ImplicitSphere::intersect(const Ray& ray,
+                                        glm::dvec3& intersect,
+                                        glm::dvec3& normal) const
 {
     // O = ray.origin
     // D = ray.dir
@@ -45,7 +47,7 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
 
     // There exists no solution. The ray missed the sphere.
     if (q < 0) {
-        return false;
+        return nullptr;
     }
 
     double solution; // possible solutions
@@ -72,7 +74,7 @@ bool ImplicitSphere::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3
 
     intersect = ray.origin + solution * ray.dir;
     normal = glm::normalize(intersect - center);
-    return true;
+    return this;
 }
 
 BoundingBox ImplicitSphere::boundingBox() const { return {center - radius, center + radius}; }

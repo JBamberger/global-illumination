@@ -5,7 +5,9 @@ struct ImplicitSphere final : Entity {
     ImplicitSphere() : ImplicitSphere({0, 0, 0}, 1) {}
     ImplicitSphere(glm::dvec3 center, double radius);
 
-    bool intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const override;
+    const Entity* intersect(const Ray& ray,
+                            glm::dvec3& intersect,
+                            glm::dvec3& normal) const override;
     BoundingBox boundingBox() const override;
     glm::dvec3 getColorAtIntersect(glm::dvec3 intersect) const override;
 

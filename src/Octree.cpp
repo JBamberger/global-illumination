@@ -94,7 +94,7 @@ struct Octree::Node {
         }
     }
 
-    void intersect(const Ray& ray, std::vector<Entity*>& output) const
+    void intersect(const Ray& ray, std::vector<const Entity*>& output) const
     {
         if (!bbox.intersect(ray))
             return;
@@ -159,10 +159,10 @@ void Octree::pushBack(Entity* object) const
 }
 
 /// Returns list of entities that have the possibility to be intersected by the ray.
-std::vector<Entity*> Octree::intersect(const Ray& ray) const
+std::vector<const Entity*> Octree::intersect(const Ray& ray) const
 {
 #ifdef USE_OCTREE
-    std::vector<Entity*> output;
+    std::vector<const Entity*> output;
     root_->intersect(ray, output);
     return output;
 #else
@@ -170,21 +170,24 @@ std::vector<Entity*> Octree::intersect(const Ray& ray) const
 #endif
 }
 
-Entity* Octree::closestIntersection(const Ray& ray, glm::dvec3& inter, glm::dvec3& normal) const
+const Entity* Octree::closestIntersection(const Ray& ray,
+                                          glm::dvec3& inter,
+                                          glm::dvec3& normal) const
 {
-    Entity* min_ent = nullptr;
+    const Entity* min_ent = nullptr;
     auto min = std::numeric_limits<double>::infinity();
     glm::dvec3 i, n;
 
     const auto entities = intersect(ray);
     for (auto entity : entities) {
-        if (entity->intersect(ray, i, n)) {
+        const auto e = entity->intersect(ray, i, n);
+        if (e) {
             const auto dist = glm::distance(ray.origin, i);
             if (dist < min) {
                 min = dist;
                 normal = n;
                 inter = i;
-                min_ent = entity;
+                min_ent = e;
             }
         }
     }

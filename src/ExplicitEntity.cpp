@@ -2,46 +2,52 @@
 #include <ImplicitSphere.h>
 #include <ostream>
 
-// TODO: produces data race
-// should i put all triangles into the scene separately?
-// This would prevent index-buffer optimization
-static const Triangle* last_hit = nullptr;
+void ExplicitEntity::setMaterial(std::shared_ptr<Material> material)
+{
+    this->material = material;
+    for (auto& face : faces) { face.material = material; }
+}
 
-bool ExplicitEntity::intersect(const Ray& ray, glm::dvec3& intersect, glm::dvec3& normal) const
+const Entity* ExplicitEntity::intersect(const Ray& ray,
+                                        glm::dvec3& intersect,
+                                        glm::dvec3& normal) const
 {
     // TODO: check intersection direction (for triangles with only one side)
     // glm::dot(ray.direction, triangle.normal) > 0
 
     // quickly discard all rays that don't even intersect the bounding box
     if (!boundingBox().intersect(ray)) {
-        return false;
+        return nullptr;
     }
 
+    const Entity* last_hit = nullptr;
     glm::dvec3 i, n;
     auto min = std::numeric_limits<double>::infinity();
     for (const auto& t : faces) {
-        if (t.intersect(ray, i, n)) {
+        const Entity* e = t.intersect(ray, i, n);
+        if (e) {
             const auto d = glm::distance(i, ray.origin);
             if (d < min) {
                 min = d;
                 intersect = i;
                 normal = n;
-                last_hit = &t;
+                last_hit = e;
             }
         }
     }
-    return min != std::numeric_limits<double>::infinity();
+    return last_hit;
 }
 
 BoundingBox ExplicitEntity::boundingBox() const { return bbox; }
 
 glm::dvec3 ExplicitEntity::getColorAtIntersect(glm::dvec3 intersect) const
 {
-    assert(last_hit != nullptr);
+    throw std::exception();
+    // assert(last_hit != nullptr);
 
-    const auto uv = last_hit->texMapping(intersect);
+    // const auto uv = last_hit->texMapping(intersect);
 
-    return material->getColor(uv);
+    // return material->getColor(uv);
 }
 
 std::ostream& ExplicitEntity::writeObj(std::ostream& os)
