@@ -127,7 +127,7 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     sphere2->material->specular_exponent = 0;
     sphere2->material->reflective = 0.0;
     sphere2->material->refractive = 1.0;
-    sphere2->material->refractive_index = 1.0;
+    sphere2->material->refractive_index = 1.5;
     scene.push_back(std::move(sphere2));
 
     // triangle upper right corner

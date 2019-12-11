@@ -13,7 +13,6 @@ void RayTracer::run(int w, int h)
     image_ = std::make_shared<Image>(w, h);
     camera_.set_window_size(w, h);
 // The structure of the for loop should remain for incremental rendering.
-// termination criterion: add  && _running
 #pragma omp parallel for schedule(dynamic, 4)
     for (auto y = 0; y < h; ++y) {
         for (auto x = 0; x < w; ++x) {
@@ -22,9 +21,7 @@ void RayTracer::run(int w, int h)
                 const auto ray = camera_.get_ray(x, y);
                 const auto pix = compute_pixel(ray);
 #pragma omp critical
-                {
-                    image_->setPixel(x, y, pix);
-                }
+                image_->setPixel(x, y, pix);
             }
         }
     }
@@ -34,8 +31,9 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
 {
     glm::dvec3 color{0, 0, 0}; // background color
 
-    if (ray.child_level >= 5)
+    if (ray.child_level >= 5) {
         return glm::dvec3{0, 1, 0};
+    }
 
     glm::dvec3 intersect, normal; // values at minimum
     auto min_ent = scene_->closestIntersection(ray, intersect, normal);
@@ -59,61 +57,66 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
     // ambient: L_a = k_a * I_a
     color = color + color_at_intersect * mat->ambient;
 
-    if (blocked)
-        return color;
+    // if (blocked)
+    //    return {1, 0, 1};
 
-    // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
-    const auto diffuse = glm::dot(normal, l);
-    if (diffuse > 0) {
-        color += color_at_intersect * mat->diffuse * diffuse;
+    { // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
+        const auto diffuse = glm::dot(normal, l);
+        if (diffuse > 0) {
+            color += color_at_intersect * mat->diffuse * diffuse;
+        }
     }
 
-    // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
-    const auto v = glm::normalize(-ray.dir);     // eye direction
-    const auto bisector = glm::normalize(v + l); // center between view and light
-    const auto base = glm::dot(normal, bisector);
-    if (base > 0) {
-        color += mat->specular * glm::pow(base, mat->specular_exponent);
+    { // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
+        const auto v = -ray.dir;                     // eye direction
+        const auto bisector = glm::normalize(v + l); // center between view and light
+        const auto base = glm::dot(normal, bisector);
+        if (base > 0) {
+            color += mat->specular * glm::pow(base, mat->specular_exponent);
+        }
     }
 
-    // mirror: L_m = k_m * trace(Ray(P, r))
-    if (mat->reflective > 0) {
-        // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
+    { // reflective: L_m = k_m * trace(Ray(P, r))
+        if (mat->reflective > 0) {
+            // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
 
-        const auto reflect_dir = glm::reflect(-v, normal);
-        const auto mirror_ray = ray.getChildRay(intersect, reflect_dir);
-        // Trace another ray in reflection direction
-        const auto mirror = compute_pixel(mirror_ray);
+            const auto reflect_dir = glm::reflect(ray.dir, normal);
+            const auto mirror_ray = ray.getChildRay(intersect, reflect_dir);
+            // Trace another ray in reflection direction
+            const auto mirror = compute_pixel(mirror_ray);
 
-        color += mat->reflective * mirror;
+            color += mat->reflective * mirror;
+        }
     }
 
-    // glazed: (trace another ray in refraction direction)
-    // It is not clear what should happen in the intersection of two objects. Which
-    // material / refractive index is used?
+    { // refractive: (trace another ray in refraction direction)
+        // It is not clear what should happen in the intersection of two objects. Which
+        // material / refractive index is used?
 
-    if (mat->refractive > 0) {
-        // check if the ray and the normal point are on the same side
-        const auto entering = glm::dot(normal, -ray.dir) > 0;
+        if (mat->refractive > 0) {
+            auto n = normal;
+            auto m2 = mat->refractive_index;
 
-        // if entering == false -> divide by 1.0 for air
+            // check it normal and ray point in the same direction, i.e. if the ray is inside or
+            // outside of the object
+            if (glm::dot(ray.dir, normal) > 0) {
+                n = -n;
+                m2 = 1.0; // exiting, i.e. reset to air
+            }
 
-        const auto m1 = ray.refractive_index;
-        const auto m2 = entering ? mat->refractive_index : 1.0;
+            // ratio of refraction indices
+            const auto eta = ray.refractive_index / m2;
 
-        // const auto d = ray.dir;
-        // const auto dn = glm::dot(d, normal);
-        // const auto r = glm::sqrt(1 - m1 * m1 * (1 - dn * dn) / (m2 * m2));
-        // const auto tr = m1 * (d - normal * dn) / m2 - normal * r;
+            const auto refract_dir = glm::refract(ray.dir, n, eta);
+            auto refract_ray = ray.getChildRay(intersect, refract_dir);
 
-        const auto refraction_direction = glm::refract(-v, normal, m1 / m2);
-        auto refract_ray = ray.getChildRay(intersect, -refraction_direction);
+            // the child ray is in a new material -> fix the refraction index
+            refract_ray.refractive_index = m2;
 
-        // reset the index if we leave an object
-        refract_ray.refractive_index = m2;
+            const auto refraction = compute_pixel(refract_ray);
 
-        const auto refraction = compute_pixel(refract_ray);
-        color += mat->refractive * refraction; // glm::normalize(tr);
+            color += mat->refractive * refraction;
+        }
     }
 
     // the color value must be clamped because otherwise high illumination will produce
