@@ -48,7 +48,6 @@ std::vector<std::unique_ptr<Entity>> random_spheres(BoundingBox bounds, int coun
     scene.reserve(count);
 
     for (auto i = 0; i < count; ++i) {
-
         auto s1 = std::make_unique<ImplicitSphere>(
             glm::dvec3{x_coord(gen), y_coord(gen), z_coord(gen)}, rad(gen));
         s1->setMaterial(std::make_shared<SimpleMaterial>(colors[color_dist(gen)]));
@@ -119,6 +118,17 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     sphere->material->refractive = 0.0;
     sphere->material->refractive_index = 1;
     scene.push_back(std::move(sphere));
+
+    auto sphere2 = std::make_unique<ImplicitSphere>(glm::dvec3{1.5, 0.5, 0.5}, 0.4);
+    sphere2->setMaterial(std::make_shared<SimpleMaterial>(blue));
+    sphere2->material->ambient = 0.0;
+    sphere2->material->diffuse = 0.0;
+    sphere2->material->specular = 0.0;
+    sphere2->material->specular_exponent = 0;
+    sphere2->material->reflective = 0.0;
+    sphere2->material->refractive = 1.0;
+    sphere2->material->refractive_index = 1.0;
+    scene.push_back(std::move(sphere2));
 
     // triangle upper right corner
     auto t3 = std::make_unique<Triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},

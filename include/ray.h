@@ -5,16 +5,34 @@
 constexpr auto offset = 1e-7;
 
 struct Ray {
-    Ray(const glm::dvec3 origin, const glm::dvec3 dir) : origin(origin), dir(glm::normalize(dir)) {}
 
+    /// The origination point of the ray.
     glm::dvec3 origin;
-    glm::dvec3 dir; // normalized directional vector
-    double refractive_index = 1;
+
+    /// Normalized directional vector.
+    glm::dvec3 dir;
+
+    /// The number of predecessor rays, i.e. 0 = primary, 1 = secondary, 3 = ternary, ...
+    size_t child_level;
+
+    /// The material density where the ray originates.
+    double refractive_index;
+
+    /// Creates a new ray but adopts the parent rays properties.
+    Ray(const glm::dvec3 origin,
+        const glm::dvec3 dir,
+        const size_t child_level = 0,
+        const double refractive_index = 1)
+        : origin(origin), dir(glm::normalize(dir)), child_level(child_level),
+          refractive_index(refractive_index)
+    {
+    }
 
     /// Creates a new ray which is offset a tiny bit in the direction of the ray. This avoids
-    /// self-intersections of objects due to numeric instabilities.
-    static Ray offset_ray(const glm::dvec3 origin, const glm::dvec3 dir)
+    /// self-intersections of objects due to numeric instabilities. The properties of the parent ray
+    /// are adopted.
+    Ray getChildRay(const glm::dvec3 origin, const glm::dvec3 dir) const
     {
-        return Ray{origin + dir * offset, dir};
+        return {origin + dir * offset, dir, child_level + 1, refractive_index};
     }
 };

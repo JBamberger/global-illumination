@@ -6,13 +6,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "Octree.h"
 #include "camera.h"
 #include "entities.h"
 #include "image.h"
-#include "octree.h"
-
-#define USE_MIRROR
-//#define USE_REFRACTION
 
 class RayTracer {
 
@@ -28,7 +25,7 @@ class RayTracer {
 
     void set_scene(const Octree* scene);
     void run(int w, int h);
-    glm::dvec3 compute_pixel(const Ray& ray, int max_reflections) const;
+    glm::dvec3 compute_pixel(const Ray& ray) const;
     bool running() const;
     void stop();
     void start();

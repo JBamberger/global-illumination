@@ -16,23 +16,26 @@ void RayTracer::run(int w, int h)
 // termination criterion: add  && _running
 #pragma omp parallel for schedule(dynamic, 4)
     for (auto y = 0; y < h; ++y) {
-        for (auto x = 0; x < w && running_; ++x) {
-            const auto ray = camera_.get_ray(x, y);
-            const auto pix = compute_pixel(ray, 3);
+        for (auto x = 0; x < w; ++x) {
+            if (running_) {
+
+                const auto ray = camera_.get_ray(x, y);
+                const auto pix = compute_pixel(ray);
 #pragma omp critical
-            {
-                image_->setPixel(x, y, pix);
+                {
+                    image_->setPixel(x, y, pix);
+                }
             }
         }
     }
 }
 
-glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
+glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
 {
     glm::dvec3 color{0, 0, 0}; // background color
 
-    if (max_reflections <= 0)
-        return color;
+    if (ray.child_level >= 5)
+        return glm::dvec3{0, 1, 0};
 
     glm::dvec3 intersect, normal; // values at minimum
     auto min_ent = scene_->closestIntersection(ray, intersect, normal);
@@ -41,7 +44,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
         return color;
 
     // this is the entity material at the intersection location
-    const auto mat = min_ent->material; // TODO: use material of sub-entity if explicit_entity
+    const auto mat = min_ent->material;
 
     // this is the base color value of the entity at the intersection location
     const auto color_at_intersect = min_ent->getColorAtIntersect(intersect);
@@ -51,7 +54,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
 
     // check if the light is obstructed by some an entity
     // TODO: this only works for opaque objects
-    const auto blocked = scene_->isBlocked(Ray::offset_ray(intersect, l));
+    const auto blocked = scene_->isBlocked(ray.getChildRay(intersect, l));
 
     // ambient: L_a = k_a * I_a
     color = color + color_at_intersect * mat->ambient;
@@ -73,41 +76,45 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray, int max_reflections) const
         color += mat->specular * glm::pow(base, mat->specular_exponent);
     }
 
-#ifdef USE_MIRROR
     // mirror: L_m = k_m * trace(Ray(P, r))
     if (mat->reflective > 0) {
         // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
 
         const auto reflect_dir = glm::reflect(-v, normal);
-        const auto mirror_ray = Ray::offset_ray(intersect, reflect_dir);
+        const auto mirror_ray = ray.getChildRay(intersect, reflect_dir);
         // Trace another ray in reflection direction
-        const auto mirror = compute_pixel(mirror_ray, max_reflections - 1);
+        const auto mirror = compute_pixel(mirror_ray);
 
         color += mat->reflective * mirror;
     }
-#endif
-#ifdef USE_REFRACTION
+
     // glazed: (trace another ray in refraction direction)
     // It is not clear what should happen in the intersection of two objects. Which
     // material / refractive index is used?
 
     if (mat->refractive > 0) {
-        const auto entering = glm::dot(normal, ray.dir);
+        // check if the ray and the normal point are on the same side
+        const auto entering = glm::dot(normal, -ray.dir) > 0;
 
         // if entering == false -> divide by 1.0 for air
-        const auto ref_idx = mat->refractive_index;
-        const auto eta = entering ? ray.refractive_index / ref_idx : ref_idx;
 
-        const auto refraction_direction = glm::refract(ray.dir, normal, eta);
-        auto refract_ray = Ray::offset_ray(intersect, refraction_direction);
+        const auto m1 = ray.refractive_index;
+        const auto m2 = entering ? mat->refractive_index : 1.0;
+
+        // const auto d = ray.dir;
+        // const auto dn = glm::dot(d, normal);
+        // const auto r = glm::sqrt(1 - m1 * m1 * (1 - dn * dn) / (m2 * m2));
+        // const auto tr = m1 * (d - normal * dn) / m2 - normal * r;
+
+        const auto refraction_direction = glm::refract(-v, normal, m1 / m2);
+        auto refract_ray = ray.getChildRay(intersect, -refraction_direction);
 
         // reset the index if we leave an object
-        refract_ray.refractive_index = entering ? ref_idx : 1.0;
+        refract_ray.refractive_index = m2;
 
-        const auto refraction = compute_pixel(refract_ray, max_reflections - 1);
-        color += mat->refractive * refraction;
+        const auto refraction = compute_pixel(refract_ray);
+        color += mat->refractive * refraction; // glm::normalize(tr);
     }
-#endif
 
     // the color value must be clamped because otherwise high illumination will produce
     // values above 1. This results in errors from Qt.
