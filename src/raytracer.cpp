@@ -57,22 +57,23 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
     // ambient: L_a = k_a * I_a
     color = color + color_at_intersect * mat->ambient;
 
-    // if (blocked)
-    //    return {1, 0, 1};
+    if (!blocked) {
+        // direct light is only considered if the light is not blocked
 
-    { // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
-        const auto diffuse = glm::dot(normal, l);
-        if (diffuse > 0) {
-            color += color_at_intersect * mat->diffuse * diffuse;
+        { // diffuse:  L_d = k_d * I * max(0.0, dot(n, l))
+            const auto diffuse = glm::dot(normal, l);
+            if (diffuse > 0) {
+                color += color_at_intersect * mat->diffuse * diffuse;
+            }
         }
-    }
 
-    { // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
-        const auto v = -ray.dir;                     // eye direction
-        const auto bisector = glm::normalize(v + l); // center between view and light
-        const auto base = glm::dot(normal, bisector);
-        if (base > 0) {
-            color += mat->specular * glm::pow(base, mat->specular_exponent);
+        { // specular (Blinn-Phong): L_s = k_s * I * max(0.0, dot(n,normalize(v + l)))^p
+            const auto v = -ray.dir;                     // eye direction
+            const auto bisector = glm::normalize(v + l); // center between view and light
+            const auto base = glm::dot(normal, bisector);
+            if (base > 0) {
+                color += mat->specular * glm::pow(base, mat->specular_exponent);
+            }
         }
     }
 

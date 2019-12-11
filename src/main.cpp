@@ -91,6 +91,9 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     // explicit cube
     auto cube = makeCube(glm::dvec3{0, -2, 0}, 0.5);
     cube->setMaterial(std::make_shared<SimpleMaterial>(red));
+    // cube->material->diffuse = 0.0;
+    // cube->material->refractive_index = 1.5;
+    // cube->material->refractive = 0.7;
     scene.push_back(std::move(cube));
 
     // Defines x,y and z axis indicators
@@ -131,18 +134,15 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     scene.push_back(std::move(sphere2));
 
     // triangle upper right corner
-    auto t3 = std::make_unique<Triangle>(glm::dvec3{1, 2.5, 0.5}, glm::dvec3{1, 2.5, 2.5},
-                                         glm::dvec3{1, 0.5, 2.5});
+    auto t3 = std::make_unique<ImplicitSphere>(glm::dvec3{1, 2.5, 0.5}, 0.5);
     t3->setMaterial(std::make_shared<SimpleMaterial>(magenta));
     scene.push_back(std::move(t3));
 
-    auto t1 = std::make_unique<Triangle>(glm::dvec3{-1, 1.5, -0.5}, glm::dvec3{-1, 1.5, 1.5},
-                                         glm::dvec3{-1, -0.5, 1.5});
+    auto t1 = std::make_unique<ImplicitSphere>(glm::dvec3{-1, 1.5, -0.5}, 0.5);
     t1->setMaterial(std::make_shared<SimpleMaterial>(cyan));
     scene.push_back(std::move(t1));
 
-    auto t2 =
-        std::make_unique<Triangle>(glm::dvec3{0, 2, 0}, glm::dvec3{0, 2, 2}, glm::dvec3{0, 0, 2});
+    auto t2 = std::make_unique<ImplicitSphere>(glm::dvec3{0, 2, 0}, 0.5);
     t2->setMaterial(std::make_shared<SimpleMaterial>(yellow));
     scene.push_back(std::move(t2));
 
