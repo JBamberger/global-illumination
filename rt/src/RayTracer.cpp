@@ -1,5 +1,6 @@
 #include <RayTracer.h>
 #include <iostream>
+#include <random>
 
 RayTracer::RayTracer(const Camera& camera, glm::dvec3 light)
     : camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0))
@@ -51,7 +52,6 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
     const auto l = glm::normalize(light_ - intersect);
 
     // check if the light is obstructed by some an entity
-    // TODO: this only works for opaque objects
     const auto blocked = scene_->isBlocked(ray.getChildRay(intersect, l));
 
     // ambient: L_a = k_a * I_a
@@ -74,19 +74,6 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
             if (base > 0) {
                 color += mat->specular * glm::pow(base, mat->specular_exponent);
             }
-        }
-    }
-
-    { // reflective: L_m = k_m * trace(Ray(P, r))
-        if (mat->reflective > 0) {
-            // reflection direction: r = 2n * dot(n,v) - v === glm::reflect(-v, n)
-
-            const auto reflect_dir = glm::reflect(ray.dir, normal);
-            const auto mirror_ray = ray.getChildRay(intersect, reflect_dir);
-            // Trace another ray in reflection direction
-            const auto mirror = compute_pixel(mirror_ray);
-
-            color += mat->reflective * mirror;
         }
     }
 
@@ -117,6 +104,48 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
             const auto refraction = compute_pixel(refract_ray);
 
             color += mat->refractive * refraction;
+        }
+    }
+
+    { // rough and reflective surfaces
+        if (mat->reflective > 0) {
+            const auto reflect_dir = glm::normalize(glm::reflect(ray.dir, normal));
+            glm::dvec3 avg_color;
+            if (mat->rough_radius > 0) {
+                // rough surfaces: L = k * avg(trace_n(Ray(P, r + rand()))
+                //
+                // find a vector that is not linearly dependent of reflect_dir
+                const auto d = glm::abs(glm::dot(reflect_dir, {1, 0, 0})) != 1
+                                   ? glm::dvec3{1, 0, 0}
+                                   : glm::dvec3{0, 1, 0};
+
+                const auto a = glm::normalize(glm::cross(reflect_dir, d));
+                const auto b = glm::normalize(glm::cross(reflect_dir, a));
+
+                static std::default_random_engine rng;
+                static std::uniform_real_distribution<double> angle_distribution(
+                    0.0, 2 * glm::pi<double>());
+
+                std::uniform_real_distribution<double> radius_distribution(0.0, mat->rough_radius);
+
+                avg_color = glm::dvec3(0, 0, 0);
+                for (size_t i = 0; i < mat->reflect_rays; i++) {
+                    // Actually a glm::sqrt() would be necessary to obtain a real uniform
+                    // distribution. In this case the center-heavy distribution does no harm and is
+                    // computationally cheaper.
+                    const auto radius = radius_distribution(rng);
+                    const auto theta = angle_distribution(rng);
+                    const auto deflection = radius * (sin(theta) * a + cos(theta) * b);
+                    const auto rough_ray = ray.getChildRay(intersect, reflect_dir + deflection);
+                    avg_color += compute_pixel(rough_ray);
+                }
+                avg_color = avg_color / static_cast<double>(mat->reflect_rays);
+            } else {
+                // reflective: L_m = k_m * trace(Ray(P, r))
+                avg_color = compute_pixel(ray.getChildRay(intersect, reflect_dir));
+            }
+
+            color += mat->reflective * avg_color;
         }
     }
 
