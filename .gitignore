@@ -1,8 +1,11 @@
-build/
+# ide data
 .idea
-cmake-build-*/
 .vscode/
 .vs/
-out/
 *.code-workspace
+
+# build data
+cmake-build-*/
+build/
+out/
 
