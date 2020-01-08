@@ -1,3 +1,4 @@
+#include "NoiseTexture.h"
 #include <RayTracer.h>
 #include <iostream>
 #include <random>
@@ -18,9 +19,9 @@ void RayTracer::run(int w, int h)
     for (auto y = 0; y < h; ++y) {
         for (auto x = 0; x < w; ++x) {
             if (running_) {
-
                 const auto ray = camera_.get_ray(x, y);
                 const auto pix = compute_pixel(ray);
+
 #pragma omp critical
                 image_->setPixel(x, y, pix);
             }

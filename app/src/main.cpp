@@ -156,6 +156,15 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     quad->material->specular = 0.7;
     scene.push_back(std::move(quad));
 
+    auto s1 = std::make_unique<ImplicitSphere>(glm::dvec3{0, 0, 2}, 0.5);
+    s1->setMaterial(std::make_shared<SimpleMaterial>(green));
+    s1->material->reflective = 0.5;
+    s1->material->diffuse = 0.5;
+    s1->material->specular = 0;
+    s1->material->rough_radius = 0.7;
+    s1->material->reflect_rays = 5;
+    scene.push_back(std::move(s1));
+
     return scene;
 }
 
@@ -220,10 +229,10 @@ int main(int argc, char** argv)
     Octree scene({-20, -20, -20}, {20, 20, 20});
 
     // auto elems = create_sphere_scene();
-    // auto elems = create_complex_scene();
+    auto elems = create_complex_scene();
     // auto elems = create_tex_mapping_scene();
     // auto elems = random_spheres(scene.bounds(), 100);
-    auto elems = create_material_scene();
+    // auto elems = create_material_scene();
     for (const auto& entity : elems) scene.pushBack(entity.get());
 
     raytracer.set_scene(&scene);
