@@ -35,7 +35,7 @@ class Octree {
     /// Checks if the ray is blocked by an object
     /// TODO: This should also check that the intersection appears between light and object, not
     /// behind the light
-    bool isBlocked(const Ray& ray) const;
+    bool isBlocked(const Ray& ray, const glm::dvec3& light) const;
 
     friend std::ostream& operator<<(std::ostream& o, const Octree& t);
 };

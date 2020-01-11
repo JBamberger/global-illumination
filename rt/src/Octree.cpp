@@ -194,16 +194,22 @@ const Entity* Octree::closestIntersection(const Ray& ray,
     return min_ent;
 }
 
-bool Octree::isBlocked(const Ray& ray) const
+bool Octree::isBlocked(const Ray& ray, const glm::dvec3& light) const
 {
     auto blocked = false;
     glm::dvec3 i, n;
 
+    const auto light_dist = glm::length(light - ray.origin);
+
     const auto entities = intersect(ray);
     for (auto entity : entities) {
         if (entity->intersect(ray, i, n)) {
-            blocked = true;
-            break;
+            // check that the entity is not behind the light source
+            const auto entity_dist = glm::length(i - ray.origin);
+            if (light_dist > entity_dist) {
+                blocked = true;
+                break;
+            }
         }
     }
     return blocked;

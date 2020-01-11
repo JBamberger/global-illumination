@@ -53,7 +53,7 @@ glm::dvec3 RayTracer::compute_pixel(const Ray& ray) const
     const auto l = glm::normalize(light_ - intersect);
 
     // check if the light is obstructed by some an entity
-    const auto blocked = scene_->isBlocked(ray.getChildRay(intersect, l));
+    const auto blocked = scene_->isBlocked(ray.getChildRay(intersect, l), light_);
 
     // ambient: L_a = k_a * I_a
     color = color + color_at_intersect * mat->ambient;
