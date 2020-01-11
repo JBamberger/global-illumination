@@ -9,63 +9,63 @@
 #include <QWidget>
 #include <utility>
 
+#include "RayTracer.h"
 #include "image.h"
-#include "raytracer.h"
 
 class Viewer : public QWidget {
   public:
-    Viewer(RayTracer raytracer, QLabel* durationText, QWidget* parent)
-        : QWidget(parent), _durationText(durationText), _raytracer(std::move(raytracer))
+    Viewer(RayTracer raytracer, QLabel* duration_text, QWidget* parent)
+        : QWidget(parent), duration_text_(duration_text), raytracer_(std::move(raytracer))
     {
-        _timer = new QTimer(this);
-        _timer->setInterval(32);
-        _timer->start();
-        connect(_timer, &QTimer::timeout, [this]() { this->repaint(); });
-        restart_raytrace();
+        timer_ = new QTimer(this);
+        timer_->setInterval(32);
+        timer_->start();
+        connect(timer_, &QTimer::timeout, [this]() { this->repaint(); });
+        restartRaytrace();
     }
 
-    ~Viewer() { stop_raytrace(); }
+    ~Viewer() { stopRaytrace(); }
 
-    void stop_raytrace()
+    void stopRaytrace()
     {
-        if (_raytracer.running()) {
-            _raytracer.stop();
-            _thread.join();
+        if (raytracer_.running()) {
+            raytracer_.stop();
+            thread_.join();
         }
     }
 
-    void paintEvent(QPaintEvent*)
+    void paintEvent(QPaintEvent*) override
     {
         QPainter painter(this);
         painter.drawImage(QPoint(0, 0), getImage());
     }
 
-    void resizeEvent(QResizeEvent*) { restart_raytrace(); }
+    void resizeEvent(QResizeEvent*) override { restartRaytrace(); }
 
-    QImage getImage() const { return _raytracer.get_image()->_image; }
+    QImage getImage() const { return raytracer_.get_image()->_image; }
 
   private:
-    void restart_raytrace()
+    void restartRaytrace()
     {
-        if (_raytracer.running()) {
-            _raytracer.stop();
-            _thread.join();
+        if (raytracer_.running()) {
+            raytracer_.stop();
+            thread_.join();
         }
-        _raytracer.start();
-        _thread = std::thread([&]() {
-            _durationText->setText("Running...");
+        raytracer_.start();
+        thread_ = std::thread([&]() {
+            duration_text_->setText("Running...");
             using namespace std::chrono;
             const auto t1 = high_resolution_clock::now();
-            this->_raytracer.run(this->width(), this->height());
+            this->raytracer_.run(this->width(), this->height());
             const auto t2 = high_resolution_clock::now();
             const auto duration = duration_cast<milliseconds>(t2 - t1).count();
-            _durationText->setText(QString::number(duration / static_cast<double>(1000)) +
-                                   " seconds");
+            duration_text_->setText(QString::number(duration / static_cast<double>(1000)) +
+                                    " seconds");
         });
     }
 
-    QTimer* _timer;
-    QLabel* _durationText;
-    RayTracer _raytracer;
-    std::thread _thread;
+    QTimer* timer_;
+    QLabel* duration_text_;
+    RayTracer raytracer_;
+    std::thread thread_;
 };
