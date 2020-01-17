@@ -168,6 +168,72 @@ std::vector<std::unique_ptr<Entity>> create_complex_scene()
     return scene;
 }
 
+std::vector<std::unique_ptr<Entity>> create_cornell()
+{
+    using namespace entities;
+
+    std::vector<std::unique_ptr<Entity>> scene;
+    std::unique_ptr<Entity> face;
+
+    auto s = 3.0;
+
+    glm::dvec3 p000 = {-s, -s, -s};
+    glm::dvec3 p001 = {-s, -s, s};
+    glm::dvec3 p010 = {-s, s, -s};
+    glm::dvec3 p011 = {-s, s, s};
+    glm::dvec3 p100 = {s, -s, -s};
+    glm::dvec3 p101 = {s, -s, s};
+    glm::dvec3 p110 = {s, s, -s};
+    glm::dvec3 p111 = {s, s, s};
+
+    const auto mat_red = std::make_shared<SimpleMaterial>(red);
+    const auto mat_green = std::make_shared<SimpleMaterial>(green);
+    const auto mat_white = std::make_shared<SimpleMaterial>(white);
+
+    // left face
+    face = makeQuad(p100, p000, p001, p101);
+    face->setMaterial(mat_red);
+    scene.push_back(std::move(face));
+    // right face
+    face = makeQuad(p110, p111, p011, p010);
+    face->setMaterial(mat_green);
+    scene.push_back(std::move(face));
+    // top face
+    face = makeQuad(p101, p001, p011, p111);
+    face->setMaterial(mat_white);
+    scene.push_back(std::move(face));
+    // bottom face
+    face = makeQuad(p110, p010, p000, p100);
+    face->setMaterial(mat_white);
+    scene.push_back(std::move(face));
+    // back face
+    face = makeQuad(p000, p010, p011, p001);
+    face->setMaterial(mat_white);
+    scene.push_back(std::move(face));
+
+    const auto ls = 2.5;
+    s = 2.99;
+    face = makeQuad({ls, -ls, s}, {-ls, -ls, s}, {-ls, ls, s}, {ls, ls, s});
+    face->setMaterial(std::make_shared<SimpleMaterial>(white));
+    face->material->emittance = {1, 1, 1};
+    scene.push_back(std::move(face));
+
+    face = std::make_unique<ImplicitSphere>(glm::dvec3{-1.5, -1.5, -2}, 1.0);
+    face->setMaterial(std::make_shared<SimpleMaterial>(blue));
+    scene.push_back(std::move(face));
+
+    face = std::make_unique<ImplicitSphere>(glm::dvec3{1, 1.8, -2}, 1.0);
+    face->setMaterial(std::make_shared<SimpleMaterial>(green));
+    face->material->ambient = 0.3;
+    face->material->diffuse = 0.3;
+    face->material->reflective = 0.0;
+    face->material->refractive = 0.7;
+    face->material->refractive_index = 1;
+    scene.push_back(std::move(face));
+
+    return scene;
+}
+
 std::vector<std::unique_ptr<Entity>> create_tex_mapping_scene()
 {
     using namespace entities;
@@ -221,18 +287,13 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    Camera camera(glm::dvec3{10, 0, 0});
-    glm::dvec3 light{10, 10, 15};
+    Camera camera(glm::dvec3{14, 0, 0});
+    glm::dvec3 light{0, 0, 2.95};
 
     RayTracer raytracer(camera, light);
-
     Octree scene({-20, -20, -20}, {20, 20, 20});
 
-    // auto elems = create_sphere_scene();
-    auto elems = create_complex_scene();
-    // auto elems = create_tex_mapping_scene();
-    // auto elems = random_spheres(scene.bounds(), 100);
-    // auto elems = create_material_scene();
+    auto elems = create_cornell();
     for (const auto& entity : elems) scene.pushBack(entity.get());
 
     raytracer.set_scene(&scene);

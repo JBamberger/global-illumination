@@ -80,9 +80,9 @@ glm::dvec2 Triangle::texMapping(const glm::dvec3 I) const
 
     // If the intersection point lies within the triangle and the triangle has valid coordinates the
     // result must be between 0 and 1.
-    assert(0 <= uv.x && uv.x <= 1);
-    assert(0 <= uv.y && uv.y <= 1);
-    return uv;
+    assert(-0.00001 <= uv.x && uv.x <= 1.00001);
+    assert(-0.00001 <= uv.y && uv.y <= 1.00001);
+    return glm::clamp(uv, 0.0, 1.0);
 }
 
 void Triangle::setTexCoords(glm::dvec2 Ca, glm::dvec2 Cb, glm::dvec2 Cc)

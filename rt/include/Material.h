@@ -8,6 +8,8 @@ struct Material {
     constexpr explicit Material() = default;
     virtual ~Material() = default;
 
+    glm::dvec3 emittance = glm::dvec3(0.0, 0.0, 0.0);
+
     double ambient = 0.1;
     double diffuse = 1.0;
     double specular = 1.0;

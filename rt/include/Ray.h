@@ -12,7 +12,7 @@ struct Ray {
     /// Normalized directional vector.
     glm::dvec3 dir;
 
-    /// The number of predecessor rays, i.e. 0 = primary, 1 = secondary, 3 = ternary, ...
+    /// The number of predecessor rays, i.e. 0 = primary, 1 = secondary, 2 = ternary, ...
     size_t child_level;
 
     /// The material density where the ray originates.
