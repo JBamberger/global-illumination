@@ -16,7 +16,7 @@ void RayTracer::run(int w, int h)
     constexpr auto samples = 32;
 
     image_ = std::make_shared<Image>(w, h);
-    camera_.set_window_size(w, h);
+    camera_.setWindowSize(w, h);
     // The structure of the for loop should remain for incremental rendering.
     for (auto s = 1; s <= samples; ++s) {
         std::cout << "Sample " << s << std::endl;
@@ -24,7 +24,7 @@ void RayTracer::run(int w, int h)
         for (auto y = 0; y < h; ++y) {
             for (auto x = 0; x < w; ++x) {
                 if (running_) {
-                    const auto ray = camera_.get_ray(x, y);
+                    const auto ray = camera_.getRay(x, y);
                     const auto color = computePixel(ray);
 #pragma omp critical
                     {
@@ -42,7 +42,7 @@ void RayTracer::run(int w, int h)
 glm::dvec3 RayTracer::computePixel(const int x, const int y)
 {
     constexpr auto max_bounces = 10;
-    auto ray = camera_.get_ray(x, y);
+    auto ray = camera_.getRay(x, y);
 
     auto color = glm::dvec3(0, 0, 0);
     auto throughput = glm::dvec3(1, 1, 1);

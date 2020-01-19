@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ray.h"
+#include "Ray.h"
 #include <glm/glm.hpp>
 
 /// Represents the camera with information about the 'sensor' size.
@@ -8,12 +8,12 @@ class Camera {
     /// Location of the camera focus point.
     glm::dvec3 pos_;
 
-    /// Normalized vector pointing upwards.
-    glm::dvec3 up_;
-    /// Normalized vector pointing to the right.
-    glm::dvec3 right_;
     /// Normalized vector pointing in viewing direction.
-    glm::dvec3 forward_;
+    glm::dvec3 w_;
+    /// Normalized vector pointing to the right.
+    glm::dvec3 u_;
+    /// Normalized vector pointing upwards.
+    glm::dvec3 v_;
 
     /// Diagonal of the sensor
     const double sensor_diag_ = 0.035;
@@ -30,18 +30,14 @@ class Camera {
 
   public:
     explicit Camera(const glm::dvec3 pos) : Camera(pos, {0, 0, 0}) {}
-    Camera(glm::dvec3 pos, glm::dvec3 look_at)
-        : pos_(pos), up_({0, 0, 1.0}), forward_(look_at - pos)
+
+    Camera(glm::dvec3 pos, glm::dvec3 look_at, glm::dvec3 v_up = {0, 0, 1})
+        : pos_(pos), w_(normalize(look_at - pos)), u_(normalize(glm::cross(v_up, w_))),
+          v_(normalize(glm::cross(w_, u_)))
     {
-        forward_ = glm::normalize(forward_);
-        up_ = glm::normalize(up_);
-        // The side direction can be computed from the up and forward vector since it is
-        // perpendicular to both of them. The value is negated, because the sensor points in the
-        // other direction than the viewer sees the image.
-        right_ = -glm::normalize(glm::cross(up_, forward_));
     }
 
-    Ray get_ray(const double x, const double y) const
+    Ray getRay(const double x, const double y) const
     {
         // computes the relative location of the pixel in the sensor, i.e. the middle pixel of the
         // screen is in the middle of the sensor
@@ -52,7 +48,7 @@ class Camera {
 
         // Finally compute the direction of the ray which goes through the given pixel.
         // this requires that forward, up and right are normalized.
-        const auto direction = forward_ * focal_dist_ + up_ * py + right_ * px;
+        const auto direction = w_ * focal_dist_ + v_ * py + u_ * px;
 
         // let rays originate in the camera center
         // TODO: It might be better to originate in the sensor to avoid objects between sensor and
@@ -60,7 +56,7 @@ class Camera {
         return {pos_, direction};
     }
 
-    void set_window_size(const double w, const double h)
+    void setWindowSize(const double w, const double h)
     {
         window_width_ = w;
         windows_height_ = h;
