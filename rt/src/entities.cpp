@@ -62,11 +62,11 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
     /// Projects a point to the given sphere.
     const auto project_to_sphere = [](const ImplicitSphere& s, const glm::dvec3 p) {
         const auto r = Ray{s.center, p - s.center};
-        glm::dvec3 i, n;
-        const auto success = s.intersect(r, i, n);
+        Hit hit;
+        const auto success = s.intersect(r, hit);
 
         assert(success);
-        return i;
+        return hit.pos;
     };
 
     /// Computes the point in the middle between two points.

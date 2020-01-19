@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Entity.h>
-#include <Triangle.h>
 
 #include <memory>
 #include <vector>
@@ -14,13 +13,9 @@ struct ExplicitEntity final : Entity {
 
     void setMaterial(std::shared_ptr<Material> material) override;
 
-    const Entity* intersect(const Ray& ray,
-                            glm::dvec3& intersect,
-                            glm::dvec3& normal) const override;
+    bool intersect(const Ray& ray, Hit& hit) const override;
 
     BoundingBox boundingBox() const override;
-
-    glm::dvec3 getColorAtIntersect(glm::dvec3 intersect) const override;
 
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& writeObj(std::ostream& os);

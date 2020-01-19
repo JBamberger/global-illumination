@@ -2,8 +2,6 @@
 
 #include <Entity.h>
 #include <ExplicitEntity.h>
-#include <ImplicitSphere.h>
-#include <Triangle.h>
 
 namespace entities {
 /// Creates an explicit sphere from a center and radius by iteratively subdividing each triangle

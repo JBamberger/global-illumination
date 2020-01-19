@@ -102,7 +102,9 @@ struct Octree::Node {
         output.insert(output.end(), entities.begin(), entities.end());
 
         if (!isLeaf()) {
-            for (const auto& child : children) { child->intersect(ray, output); }
+            for (const auto& child : children) {
+                child->intersect(ray, output);
+            }
         }
     }
 
@@ -119,7 +121,9 @@ struct Octree::Node {
             o << "(" << n.size() << ")";
         } else {
             o << "(" << n.size() << "\n";
-            for (const auto& child : n.children) { o << *child << "\n"; }
+            for (const auto& child : n.children) {
+                o << *child << "\n";
+            }
             o << ")";
         }
         return o;
@@ -146,12 +150,6 @@ BoundingBox Octree::bounds() const { return root_->bbox; }
 void Octree::pushBack(Entity* object) const
 {
 #ifdef USE_OCTREE
-    /*auto ee = dynamic_cast<ExplicitEntity*>(object);
-    if (ee) {
-        for (auto& face : ee->faces) { root_.insert(face, 0); }
-    } else {
-        root_.insert(object, 0);
-    }*/
     root_->insert(object, 0);
 #else
     root_.entities.push_back(object);
@@ -170,42 +168,34 @@ std::vector<const Entity*> Octree::intersect(const Ray& ray) const
 #endif
 }
 
-const Entity* Octree::closestIntersection(const Ray& ray,
-                                          glm::dvec3& inter,
-                                          glm::dvec3& normal) const
+bool Octree::closestIntersection(const Ray& ray, Hit& hit) const
 {
-    const Entity* min_ent = nullptr;
     auto min = std::numeric_limits<double>::infinity();
-    glm::dvec3 i, n;
+    Hit tmp_hit;
 
     const auto entities = intersect(ray);
     for (auto entity : entities) {
-        const auto e = entity->intersect(ray, i, n);
-        if (e) {
-            const auto dist = glm::distance(ray.origin, i);
+        if (entity->intersect(ray, tmp_hit)) {
+            const auto dist = glm::distance(ray.origin, tmp_hit.pos);
             if (dist < min) {
                 min = dist;
-                normal = n;
-                inter = i;
-                min_ent = e;
+                hit = tmp_hit;
             }
         }
     }
-    return min_ent;
+    return min != std::numeric_limits<double>::infinity();
 }
 
 bool Octree::isBlocked(const Ray& ray, const glm::dvec3& light) const
 {
     auto blocked = false;
-    glm::dvec3 i, n;
-
     const auto light_dist = glm::length(light - ray.origin);
-
     const auto entities = intersect(ray);
     for (auto entity : entities) {
-        if (entity->intersect(ray, i, n)) {
+        Hit hit;
+        if (entity->intersect(ray, hit)) {
             // check that the entity is not behind the light source
-            const auto entity_dist = glm::length(i - ray.origin);
+            const auto entity_dist = glm::length(hit.pos - ray.origin);
             if (light_dist > entity_dist) {
                 blocked = true;
                 break;

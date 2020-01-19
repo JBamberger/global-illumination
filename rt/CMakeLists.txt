@@ -1,16 +1,13 @@
 
 set(SOURCES
 	"include/camera.h"
+	"include/Texture.h"
 	"include/Material.h"
-	"include/Entity.h"
 	"include/image.h"
 	"include/Ray.h"
 	"include/NDChecker.h"
-    "include/CheckerboardMaterial.h"
-    "include/SimpleMaterial.h"       "src/SimpleMaterial.cpp"
+	"include/Entity.h"				 "src/Entity.cpp"
 	"include/ExplicitEntity.h"       "src/ExplicitEntity.cpp"
-	"include/ImplicitSphere.h"       "src/ImplicitSphere.cpp"
-	"include/Triangle.h"             "src/Triangle.cpp"
     "include/RayTracer.h"            "src/RayTracer.cpp"
     "include/BoundingBox.h"          "src/BoundingBox.cpp"
     "include/Octree.h"               "src/Octree.cpp"

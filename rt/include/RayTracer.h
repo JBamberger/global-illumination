@@ -37,6 +37,6 @@ class RayTracer {
 
   private:
     glm::dvec3 computePixel(int x, int y);
-    glm::dvec3 computePixel(const Ray& ray);
+    glm::dvec3 computePixel(const Ray& ray) const;
     glm::dvec3 hemisphere(glm::dvec3 normal, glm::dvec3 direction);
 };
