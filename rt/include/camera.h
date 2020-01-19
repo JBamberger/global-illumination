@@ -53,7 +53,7 @@ class Camera {
         // let rays originate in the camera center
         // TODO: It might be better to originate in the sensor to avoid objects between sensor and
         // eye?
-        return {pos_, direction};
+        return Ray(pos_, direction);
     }
 
     void setWindowSize(const double w, const double h)

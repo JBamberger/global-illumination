@@ -19,10 +19,10 @@ struct Ray {
     double refractive_index;
 
     /// Creates a new ray but adopts the parent rays properties.
-    Ray(const glm::dvec3 origin,
-        const glm::dvec3 dir,
-        const size_t child_level = 0,
-        const double refractive_index = 1)
+    explicit Ray(const glm::dvec3 origin = glm::dvec3(0, 0, 0),
+                 const glm::dvec3 dir = glm::dvec3(1, 0, 0),
+                 const size_t child_level = 0,
+                 const double refractive_index = 1)
         : origin(origin), dir(glm::normalize(dir)), child_level(child_level),
           refractive_index(refractive_index)
     {
@@ -33,6 +33,6 @@ struct Ray {
     /// are adopted.
     Ray getChildRay(const glm::dvec3 origin, const glm::dvec3 dir) const
     {
-        return {origin + dir * offset, dir, child_level + 1, refractive_index};
+        return Ray(origin + dir * offset, dir, child_level + 1, refractive_index);
     }
 };

@@ -35,7 +35,7 @@ class RayTracer {
     std::shared_ptr<Image> get_image() const;
 
   private:
-    glm::dvec3 computePixel(int x, int y);
+    glm::dvec3 computePixel(int x, int y) const;
     glm::dvec3 computePixel(const Ray& ray) const;
     glm::dvec3 hemisphere(glm::dvec3 normal, glm::dvec3 direction);
 };

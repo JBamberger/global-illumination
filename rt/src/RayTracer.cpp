@@ -27,8 +27,7 @@ void RayTracer::run(int w, int h)
         for (auto y = 0; y < h; ++y) {
             for (auto x = 0; x < w; ++x) {
                 if (running_) {
-                    const auto ray = camera_.getRay(x, y);
-                    const auto color = computePixel(ray);
+                    const auto color = computePixel(x, y);
 #pragma omp critical
                     {
 
@@ -42,54 +41,34 @@ void RayTracer::run(int w, int h)
     }
 }
 
-glm::dvec3 RayTracer::computePixel(const int x, const int y)
+glm::dvec3 RayTracer::computePixel(const int x, const int y) const
 {
-    constexpr auto max_bounces = 10;
+    constexpr auto max_bounces = 5;
+
     auto ray = camera_.getRay(x, y);
 
     auto color = glm::dvec3(0, 0, 0);
-    auto throughput = glm::dvec3(1, 1, 1);
+    auto total_attenuation = glm::dvec3(1, 1, 1);
 
     for (auto i = 0; i < max_bounces; i++) {
         Hit hit;
         if (!scene_->closestIntersection(ray, hit)) {
-            // the ray didn't hit anything -> no contribution.
-            break;
+            break; // the ray didn't hit anything -> no contribution.
         }
 
-        const auto light = hit.mat->emission(hit.uv);
-        if (light.x > 0 || light.y > 0 || light.z > 0) {
-            color += throughput * light;
+        // add light reduced by combined attenuation
+        color += total_attenuation * hit.mat->emission(hit.uv);
+
+        glm::dvec3 bounce_attenuation;
+        auto scatter_ray(ray);
+        if (!hit.mat->scatter(ray, hit, bounce_attenuation, scatter_ray)) {
+            break; // the ray did not scatter -> no further contribution
         }
-
-        const auto next_dir = hemisphere(hit.normal, ray.dir);
-        const auto pdf = glm::one_over_two_pi<double>();
-
-        glm::dvec3 attenuation;
-        auto child_ray(ray);
-        if (!hit.mat->scatter(ray, hit, attenuation, child_ray)) {
-            break;
-        }
-
-        const auto mc = attenuation * glm::one_over_pi<double>() * glm::dot(next_dir, hit.normal);
-        throughput = throughput * mc / pdf;
-
-        // RR
-        const auto p = std::max(throughput.x, std::max(throughput.y, throughput.z));
-        if (dist01_(rng_) > p) {
-            break;
-        }
-
-        // the path survived RR -> remove bias
-        throughput *= 1 / p;
-
-        ray = child_ray;
+        ray = scatter_ray;
+        total_attenuation *= bounce_attenuation;
     }
 
-    if (color.x > 1 || color.x < 0 || color.y > 1 || color.y < 0 || color.z > 1 || color.z < 0) {
-        std::cout << color.x << " " << color.y << " " << color.z << std::endl;
-    }
-    return color;
+    return glm::clamp(color, 0.0, 1.0);
 }
 
 glm::dvec3 RayTracer::computePixel(const Ray& ray) const
