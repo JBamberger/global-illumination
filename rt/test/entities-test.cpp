@@ -108,7 +108,7 @@ INSTANTIATE_TEST_SUITE_P(InsideOutside, TriangleIntersectionTest, testing::Value
 //#####################################################################################################################
 
 struct ImplicitSphereIntersectionTest : testing::TestWithParam<ray_spec> {
-    ImplicitSphere sphere;
+    Sphere sphere;
     glm::dvec3 intersect;
     glm::dvec3 normal;
 

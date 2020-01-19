@@ -33,7 +33,7 @@ bool ExplicitEntity::intersect(const Ray& ray, Hit& hit) const
     return min != std::numeric_limits<double>::infinity();
 }
 
-BoundingBox ExplicitEntity::boundingBox() const { return bbox; }
+BoundingBox ExplicitEntity::boundingBox() const { return bbox_; }
 
 std::ostream& ExplicitEntity::writeObj(std::ostream& os)
 {

@@ -7,7 +7,7 @@
 
 struct ExplicitEntity final : Entity {
     explicit ExplicitEntity(std::vector<Triangle> faces)
-        : faces(std::move(faces)), bbox(computeBBox(this->faces))
+        : faces(std::move(faces)), bbox_(computeBBox(this->faces))
     {
     }
 
@@ -23,7 +23,7 @@ struct ExplicitEntity final : Entity {
     std::vector<Triangle> faces;
 
   private:
-    BoundingBox bbox;
+    BoundingBox bbox_;
 
     static BoundingBox computeBBox(const std::vector<Triangle>& faces)
     {

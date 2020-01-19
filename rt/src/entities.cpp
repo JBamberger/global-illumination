@@ -60,7 +60,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
                                                      const bool use_tetrahedron)
 {
     /// Projects a point to the given sphere.
-    const auto project_to_sphere = [](const ImplicitSphere& s, const glm::dvec3 p) {
+    const auto project_to_sphere = [](const Sphere& s, const glm::dvec3 p) {
         const auto r = Ray{s.center, p - s.center};
         Hit hit;
         const auto success = s.intersect(r, hit);
@@ -77,7 +77,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
     /// Subdivision algorithm which splits each triangle side in the middle and projects the new
     /// points to the given sphere. If equilateral the resulting triangles will be equilateral too.
     const auto perform_subdivision =
-        [&project_to_sphere, &find_line_center](std::vector<Triangle> ts, const ImplicitSphere& ref,
+        [&project_to_sphere, &find_line_center](std::vector<Triangle> ts, const Sphere& ref,
                                                 const int sub_divisions) {
             std::vector<Triangle> ts2;
             for (auto d = 0; d < sub_divisions; d++) {
@@ -100,7 +100,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
         };
 
     /// Creates a tetrahedron where all vertices lie on the given sphere.
-    const auto get_tetrahedron = [&project_to_sphere](const ImplicitSphere& ref) {
+    const auto get_tetrahedron = [&project_to_sphere](const Sphere& ref) {
         std::vector<Triangle> faces;
         faces.reserve(4);
 
@@ -118,7 +118,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
     };
 
     /// Creates an icosahedron where all vertices lie on the given sphere.
-    const auto get_icosahedron = [&project_to_sphere](const ImplicitSphere& ref) {
+    const auto get_icosahedron = [&project_to_sphere](const Sphere& ref) {
         std::vector<Triangle> faces;
         faces.reserve(20);
 
@@ -161,7 +161,7 @@ std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,
         return faces;
     };
 
-    const auto ref = ImplicitSphere{center, radius};
+    const auto ref = Sphere{center, radius};
     const auto initial_shape = use_tetrahedron ? get_tetrahedron(ref) : get_icosahedron(ref);
 
     auto faces = perform_subdivision(initial_shape, ref, sub_divisions);
