@@ -1,7 +1,6 @@
 #include "RayTracer.h"
 #include <chrono>
 #include <iostream>
-#include <vector>
 
 RayTracer::RayTracer(const Camera& camera, glm::dvec3 light)
     : scene_(nullptr), camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0)),
@@ -29,6 +28,7 @@ void RayTracer::run(int w, int h)
                     const auto color = computePixel(ray);
 #pragma omp critical
                     {
+
                         const auto pc = image_->getPixel(x, y);
                         const auto pix = pc * (static_cast<double>(s - 1) / s) + color * (1.0 / s);
                         image_->setPixel(x, y, pix);
@@ -37,6 +37,52 @@ void RayTracer::run(int w, int h)
             }
         }
     }
+}
+
+glm::dvec3 RayTracer::computePixel(const int x, const int y)
+{
+    constexpr auto max_bounces = 10;
+    auto ray = camera_.get_ray(x, y);
+
+    auto color = glm::dvec3(0, 0, 0);
+    auto throughput = glm::dvec3(1, 1, 1);
+
+    for (auto i = 0; i < max_bounces; i++) {
+        glm::dvec3 intersect, normal; // values at minimum
+        const auto hit = scene_->closestIntersection(ray, intersect, normal);
+        if (hit == nullptr) {
+            // the ray didn't hit anything -> no contribution.
+            break;
+        }
+
+        const auto light = hit->material->emittance;
+        if (light.x > 0 || light.y > 0 || light.z > 0) {
+            color += throughput * light;
+        }
+
+        const auto next_dir = hemisphere(normal, ray.dir);
+        const auto pdf = glm::one_over_two_pi<double>();
+
+        const auto mc = hit->getColorAtIntersect(intersect) * glm::one_over_pi<double>() *
+                        glm::dot(next_dir, normal);
+        throughput = throughput * mc / pdf;
+
+        // RR
+        const auto p = std::max(throughput.x, std::max(throughput.y, throughput.z));
+        if (dist01_(rng_) > p) {
+            break;
+        }
+
+        // the path survived RR -> remove bias
+        throughput *= 1 / p;
+
+        ray = ray.getChildRay(intersect, next_dir);
+    }
+
+    if (color.x > 1 || color.x < 0 || color.y > 1 || color.y < 0 || color.z > 1 || color.z < 0) {
+        std::cout << color.x << " " << color.y << " " << color.z << std::endl;
+    }
+    return color;
 }
 
 glm::dvec3 RayTracer::computePixel(const Ray& ray)
@@ -58,11 +104,11 @@ glm::dvec3 RayTracer::computePixel(const Ray& ray)
     const auto p = col.x > col.y && col.x > col.z ? col.x : col.y > col.z ? col.y : col.z;
     const auto rr = dist01_(rng_);
 
-    if (ray.child_level > 5) {
+    if (ray.child_level > 0) {
         if (rr < p * 0.9) {
             col = col * (0.9 / p);
         } else {
-            return light;
+            return {1, 0, 1};
         }
     }
 
@@ -75,18 +121,29 @@ glm::dvec3 RayTracer::computePixel(const Ray& ray)
 glm::dvec3 RayTracer::hemisphere(const glm::dvec3 normal, const glm::dvec3 direction)
 {
 
-    const auto r1 = 2 * glm::pi<double>() * dist01_(rng_);
+    const auto r1 = glm::two_pi<double>() * dist01_(rng_);
     const auto r2 = dist01_(rng_);
     const auto sq2 = glm::sqrt(r2);
 
+    const auto x = glm::cos(r1) * sq2;
+    const auto y = glm::sin(r1) * sq2;
+    const auto z = glm::sqrt(1 - r2);
+
     // build basis vectors around normal vector
     const auto w = glm::dot(normal, direction) < 0 ? normal : -normal;
-    const auto c = std::abs(w.x) > 1e-5 ? glm::dvec3(0, 1, 0) : glm::dvec3(1, 0, 0);
+    glm::dvec3 c;
+    if (std::abs(w.x) < 1 / glm::sqrt(3)) {
+        c = glm::dvec3(1, 0, 0);
+    } else if (std::abs(w.y) < 1 / glm::sqrt(3)) {
+        c = glm::dvec3(0, 1, 0);
+    } else {
+        c = glm::dvec3(0, 0, 1);
+    }
     const auto u = glm::cross(c, w);
     const auto v = glm::cross(w, u);
 
     // shirley 14. Sampling p294 short form which avoid trig dup. trig function
-    return glm::normalize(u * glm::cos(r1) * sq2 + v * glm::sin(r1) * sq2 + w * glm::sqrt(1 - r2));
+    return glm::normalize(u * x + v * y + w * z);
 }
 
 // glm::dvec3 RayTracer::compute_pixel(const Ray& ray)

@@ -67,7 +67,7 @@ const Entity* ImplicitSphere::intersect(const Ray& ray,
         if (solution <= 0) {
             solution = glm::max(x1, x2);
             if (solution <= 0) {
-                return false; // both intersections are behind the ray origin
+                return nullptr; // both intersections are behind the ray origin
             }
         }
     }
