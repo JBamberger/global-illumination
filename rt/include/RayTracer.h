@@ -1,6 +1,5 @@
 #pragma once
 
-#include <limits>
 #include <memory>
 #include <random>
 
@@ -9,25 +8,25 @@
 
 #include "Octree.h"
 #include "camera.h"
-#include "entities.h"
 #include "image.h"
 
 class RayTracer {
 
     bool running_ = false;
-    const Octree* scene_;
+
     Camera camera_;
-    glm::dvec3 light_;
+    std::shared_ptr<const Octree> scene_;
     std::shared_ptr<Image> image_;
+
     std::default_random_engine rng_;
     std::uniform_real_distribution<double> dist01_;
     std::uniform_real_distribution<double> dist11_;
 
   public:
     RayTracer() = delete;
-    RayTracer(const Camera& camera, glm::dvec3 light);
+    explicit RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene);
 
-    void set_scene(const Octree* scene);
+    void setScene(std::shared_ptr<const Octree> scene);
     void run(int w, int h);
     bool running() const;
     void stop();

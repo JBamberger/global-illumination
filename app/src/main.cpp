@@ -217,7 +217,7 @@ constexpr glm::dvec3 magenta(1, 0, 1);
 //    return scene;
 //}
 
-std::vector<std::unique_ptr<Entity>> create_cornell()
+std::vector<std::unique_ptr<Entity>> createCornell()
 {
     using namespace entities;
 
@@ -287,18 +287,14 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
 
     Camera camera(glm::dvec3{14, 0, 0});
-    glm::dvec3 light{0, 0, 2.95};
 
-    RayTracer raytracer(camera, light);
-    Octree scene({-20, -20, -20}, {20, 20, 20});
-
-    auto elems = create_cornell();
+    // scene setup
+    const auto scene = std::make_shared<Octree>(glm::dvec3{-20, -20, -20}, glm::dvec3{20, 20, 20});
+    auto elems = createCornell();
     for (const auto& entity : elems)
-        scene.pushBack(entity.get());
+        scene->pushBack(entity.get());
 
-    raytracer.set_scene(&scene);
-
-    std::cout << scene << std::endl;
+    RayTracer raytracer(camera, scene);
 
     Gui window(500, 500, raytracer);
     window.show();

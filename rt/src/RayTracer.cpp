@@ -1,16 +1,18 @@
 #include "RayTracer.h"
 #include "Material.h"
+#include "entities.h"
 #include <chrono>
 #include <iostream>
+#include <limits>
 
-RayTracer::RayTracer(const Camera& camera, glm::dvec3 light)
-    : scene_(nullptr), camera_(camera), light_(light), image_(std::make_shared<Image>(0, 0)),
+RayTracer::RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene)
+    : camera_(camera), scene_(std::move(scene)), image_(std::make_shared<Image>(0, 0)),
       rng_(std::chrono::system_clock::now().time_since_epoch().count()), dist01_(0.0, 1.0),
       dist11_(-1.0, 1.0)
 {
 }
 
-void RayTracer::set_scene(const Octree* scene) { scene_ = scene; }
+void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::move(scene); }
 
 void RayTracer::run(int w, int h)
 {

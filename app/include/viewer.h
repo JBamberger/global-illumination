@@ -13,6 +13,11 @@
 #include "image.h"
 
 class Viewer : public QWidget {
+    QTimer* timer_;
+    QLabel* duration_text_;
+    RayTracer raytracer_;
+    std::thread thread_;
+
   public:
     Viewer(RayTracer raytracer, QLabel* duration_text, QWidget* parent)
         : QWidget(parent), duration_text_(duration_text), raytracer_(std::move(raytracer))
@@ -20,8 +25,8 @@ class Viewer : public QWidget {
         timer_ = new QTimer(this);
         timer_->setInterval(32);
         timer_->start();
-        connect(timer_, &QTimer::timeout, [this]() { this->repaint(); });
-        restartRaytrace();
+        const auto repaint_callback = [this]() { this->repaint(); };
+        connect(timer_, &QTimer::timeout, repaint_callback);
     }
 
     ~Viewer() { stopRaytrace(); }
@@ -63,9 +68,4 @@ class Viewer : public QWidget {
                                     " seconds");
         });
     }
-
-    QTimer* timer_;
-    QLabel* duration_text_;
-    RayTracer raytracer_;
-    std::thread thread_;
 };
