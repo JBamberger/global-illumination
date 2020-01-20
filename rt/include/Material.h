@@ -68,6 +68,34 @@ class DiffuseLight final : public LambertianMaterial {
     glm::dvec3 emission(const glm::dvec2& uv) const override { return tex_->value(uv); }
 };
 
+class MetalLikeMaterial final : public Material {
+    glm::dvec3 attenuation_;
+    double spec_size_;
+
+  public:
+    MetalLikeMaterial(const glm::dvec3& attenuation, const double spec_size)
+        : attenuation_(attenuation), spec_size_(spec_size)
+    {
+        assert(-1.0 <= spec_size_ && spec_size_ <= 1.0);
+    }
+
+    bool scatter(const Ray& in,
+                 const Hit& ir,
+                 glm::dvec3& attenuation,
+                 Ray& scatter_ray) const override
+    {
+        // compute the reflection and then randomly offset the reflection based on the size of the
+        // specular highlight.
+        const auto direction = glm::reflect(in.dir, ir.normal) + spec_size_ * randomOffset();
+
+        scatter_ray = in.getChildRay(ir.pos, direction);
+        attenuation = attenuation_;
+
+        // if the reflection does not point in the same direction as the normal it is not used.
+        return glm::dot(scatter_ray.dir, ir.normal) > 0;
+    }
+};
+
 class Dielectric final : public Material {
     double refractive_index_;
 

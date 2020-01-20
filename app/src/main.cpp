@@ -267,11 +267,11 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     scene.push_back(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{-1.5, -1.5, -2}, 1.0);
-    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(blue, 0.5));
     scene.push_back(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{1, 1.8, -2}, 1.0);
-    face->setMaterial(std::make_shared<LambertianMaterial>(glm::dvec3(0.5, 0.5, 0.5)));
+    face->setMaterial(std::make_shared<LambertianMaterial>(magenta));
     // face->material_->ambient = 0.3;
     // face->material_->diffuse = 0.3;
     // face->material_->reflective = 0.0;
