@@ -22,6 +22,9 @@ void RayTracer::run(int w, int h)
     camera_.setWindowSize(w, h);
     // The structure of the for loop should remain for incremental rendering.
     for (auto s = 1; s <= samples; ++s) {
+        if (!running_) {
+            return;
+        }
         std::cout << "Sample " << s << std::endl;
 #pragma omp parallel for schedule(dynamic, 1)
         for (auto y = 0; y < h; ++y) {
@@ -30,7 +33,6 @@ void RayTracer::run(int w, int h)
                     const auto color = computePixel(x, y);
 #pragma omp critical
                     {
-
                         const auto pc = image_->getPixel(x, y);
                         const auto pix = pc * (static_cast<double>(s - 1) / s) + color * (1.0 / s);
                         image_->setPixel(x, y, pix);

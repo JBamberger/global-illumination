@@ -2,11 +2,11 @@
 set(SOURCES
 	"include/camera.h"
 	"include/Texture.h"
-	"include/Material.h"
 	"include/image.h"
 	"include/Ray.h"
 	"include/NDChecker.h"
 	"include/RandomUtils.h"
+	"include/Material.h"	         "src/Material.cpp"
 	"include/Entity.h"				 "src/Entity.cpp"
 	"include/ExplicitEntity.h"       "src/ExplicitEntity.cpp"
     "include/RayTracer.h"            "src/RayTracer.cpp"

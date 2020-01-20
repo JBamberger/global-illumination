@@ -215,13 +215,13 @@ glm::dvec2 Sphere::texMapping(const glm::dvec3& intersect) const
 #elif AXIAL_PROJECTION
     const auto u = n.z * 0.5 + 0.5;
     const auto v = n.y * 0.5 + 0.5;
-#elseif SPHERICAL_PROJECTION
+#elif SPHERICAL_PROJECTION
     const auto u = 0.5 + atan2(n.x, n.z) / (2 * glm::pi<double>());
     const auto v = 0.5 + atan2(n.x, n.y) / (2 * glm::pi<double>());
 #else
     // from https://en.wikipedia.org/wiki/UV_mapping
-    const auto u = 0.5 + atan2(n.x, n.z) / (2 * glm::pi<double>());
-    const auto v = 0.5 - asin(n.y) / glm::pi<double>();
+    const auto u = 0.5 + atan2(n.x, n.z) * glm::one_over_two_pi<double>();
+    const auto v = 0.5 - asin(n.y) * glm::one_over_pi<double>();
 #endif
     return {u, v};
 }
