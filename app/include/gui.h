@@ -50,4 +50,6 @@ class Gui : public QMainWindow {
 
         this->resize(width, height);
     }
+
+    ~Gui() { viewer_->stopRaytrace(); }
 };
