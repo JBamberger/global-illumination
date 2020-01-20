@@ -6,6 +6,7 @@ set(SOURCES
 	"include/image.h"
 	"include/Ray.h"
 	"include/NDChecker.h"
+	"include/RandomUtils.h"
 	"include/Entity.h"				 "src/Entity.cpp"
 	"include/ExplicitEntity.h"       "src/ExplicitEntity.cpp"
     "include/RayTracer.h"            "src/RayTracer.cpp"

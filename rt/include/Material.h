@@ -1,22 +1,11 @@
 #pragma once
 
 #include "Entity.h"
+#include "RandomUtils.h"
 #include "Ray.h"
 #include "Texture.h"
 #include <glm/glm.hpp>
-#include <random>
 #include <utility>
-
-inline glm::dvec3 randomOffset()
-{
-    static std::default_random_engine rng;
-    static std::uniform_real_distribution<double> dist(0, 1);
-    glm::dvec3 p;
-    do {
-        p = glm::dvec3(dist(rng), dist(rng), dist(rng)) * 2.0 - glm::dvec3(1, 1, 1);
-    } while (glm::dot(p, p) >= 1.0);
-    return p;
-}
 
 class Material {
   public:
@@ -77,4 +66,49 @@ class DiffuseLight final : public LambertianMaterial {
     explicit DiffuseLight(const glm::dvec3& color) : LambertianMaterial(color) {}
     explicit DiffuseLight(std::shared_ptr<Texture> tex) : LambertianMaterial(std::move(tex)) {}
     glm::dvec3 emission(const glm::dvec2& uv) const override { return tex_->value(uv); }
+};
+
+class Dielectric final : public Material {
+    double refractive_index_;
+
+  public:
+    explicit Dielectric(const double refractive_index) : refractive_index_(refractive_index) {}
+    bool scatter(const Ray& in,
+                 const Hit& ir,
+                 glm::dvec3& attenuation,
+                 Ray& scatter_ray) const override
+    {
+        attenuation = glm::dvec3(1, 1, 1); // perfect forwarding
+        const auto reflected = glm::reflect(in.dir, ir.normal);
+        glm::dvec3 n;
+        double eta;
+        double cosine = glm::dot(in.dir, ir.normal) / glm::length(in.dir);
+        if (glm::dot(in.dir, ir.normal) > 0) {
+            n = -ir.normal;
+            eta = refractive_index_;
+            cosine = refractive_index_ * cosine;
+        } else {
+            n = ir.normal;
+            eta = 1 / refractive_index_;
+            cosine = -cosine;
+        }
+
+        const auto dt = glm::dot(in.dir, n);
+        const auto k = 1.0 - eta * eta * (1 - dt * dt);
+        if (k >= 0) { // is refraction possible?
+            const auto refracted = eta * (in.dir - n * dt) - n * glm::sqrt(k);
+
+            // Schlick's approximation for Fresnel effect / angle-dependent reflection/refraction
+            auto r0 = (1 - eta) / (1 + eta);
+            r0 = r0 * r0;
+            const auto ref_prb = r0 + (1 - r0) * glm::pow(1 - cosine, 5);
+
+            // randomly decide if the ray should reflect or refract based on computed probability
+            scatter_ray = in.getChildRay(ir.pos, rng() < ref_prb ? reflected : refracted);
+        } else {
+            scatter_ray = in.getChildRay(ir.pos, reflected);
+        }
+
+        return true;
+    }
 };
