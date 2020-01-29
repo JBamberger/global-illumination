@@ -24,10 +24,10 @@ class Octree {
     BoundingBox bounds() const;
 
     /// Store an entity in the correct position of the octree.
-    void pushBack(Entity* object) const;
+    void pushBack(Hittable* object) const;
 
     /// Returns list of entities that have the possibility to be intersected by the ray.
-    std::vector<const Entity*> intersect(const Ray& ray) const;
+    std::vector<const Hittable*> intersect(const Ray& ray) const;
 
     /// Returns the entity that is intersects the ray closest to the rays origin.
     bool closestIntersection(const Ray& ray, Hit& hit) const;

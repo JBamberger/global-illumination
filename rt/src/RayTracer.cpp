@@ -50,7 +50,7 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
     auto ray = camera_.getRay(x, y);
 
     auto color = glm::dvec3(0, 0, 0);
-    auto total_attenuation = glm::dvec3(1, 1, 1);
+    auto total_attenuation = glm::dvec3(1, 1, 1); // actually more like throughput
 
     for (auto i = 0; i < max_bounces; i++) {
         Hit hit;

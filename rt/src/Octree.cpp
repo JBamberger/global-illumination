@@ -37,7 +37,7 @@ struct Octree::Node {
         // clang-format on
 
         // insert all entities into the children
-        std::vector<Entity*> tmp;
+        std::vector<Hittable*> tmp;
         for (auto entity : entities) {
             const auto bb = entity->boundingBox();
 
@@ -65,7 +65,7 @@ struct Octree::Node {
 
     bool isLeaf() const { return children[0] == nullptr; }
 
-    void insert(Entity* e, const size_t depth)
+    void insert(Hittable* e, const size_t depth)
     {
         if (isLeaf()) {
             entities.push_back(e);
@@ -94,7 +94,7 @@ struct Octree::Node {
         }
     }
 
-    void intersect(const Ray& ray, std::vector<const Entity*>& output) const
+    void intersect(const Ray& ray, std::vector<const Hittable*>& output) const
     {
         if (!bbox.intersect(ray))
             return;
@@ -130,7 +130,7 @@ struct Octree::Node {
     }
 
     BoundingBox bbox;
-    std::vector<Entity*> entities;
+    std::vector<Hittable*> entities;
     std::array<std::unique_ptr<Node>, 8> children;
 
     const size_t split_threshold = 16;
@@ -147,7 +147,7 @@ Octree::~Octree() = default;
 BoundingBox Octree::bounds() const { return root_->bbox; }
 
 /// Store an entity in the correct position of the octree.
-void Octree::pushBack(Entity* object) const
+void Octree::pushBack(Hittable* object) const
 {
 #ifdef USE_OCTREE
     root_->insert(object, 0);
@@ -157,10 +157,10 @@ void Octree::pushBack(Entity* object) const
 }
 
 /// Returns list of entities that have the possibility to be intersected by the ray.
-std::vector<const Entity*> Octree::intersect(const Ray& ray) const
+std::vector<const Hittable*> Octree::intersect(const Ray& ray) const
 {
 #ifdef USE_OCTREE
-    std::vector<const Entity*> output;
+    std::vector<const Hittable*> output;
     root_->intersect(ray, output);
     return output;
 #else

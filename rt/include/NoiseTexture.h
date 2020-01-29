@@ -24,7 +24,9 @@ class PerlinNoise {
     {
         for (size_t i = 0; i < ResX; ++i) {
             for (size_t j = 0; j < ResY; ++j) {
-                for (size_t k = 0; k < ResZ; ++k) { gradients_[i][j][k] = randomGradient(); }
+                for (size_t k = 0; k < ResZ; ++k) {
+                    gradients_[i][j][k] = randomGradient();
+                }
             }
         }
     }
