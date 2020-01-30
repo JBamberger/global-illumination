@@ -17,41 +17,45 @@ std::unique_ptr<ExplicitEntity> entities::makeQuad(glm::dvec3 a,
     return std::make_unique<ExplicitEntity>(std::move(faces));
 }
 
-std::unique_ptr<ExplicitEntity> entities::makeCube(glm::dvec3 center, double side_length)
+std::unique_ptr<ExplicitEntity> entities::makeOctet(std::array<glm::dvec3, 8> corners)
 {
-    const double l = side_length / 2;
-
-    const auto a = center + glm::dvec3{l, l, -l};
-    const auto b = center + glm::dvec3{l, l, l};
-    const auto c = center + glm::dvec3{l, -l, l};
-    const auto d = center + glm::dvec3{l, -l, -l};
-    const auto e = center + glm::dvec3{-l, l, -l};
-    const auto f = center + glm::dvec3{-l, l, l};
-    const auto g = center + glm::dvec3{-l, -l, l};
-    const auto h = center + glm::dvec3{-l, -l, -l};
 
     std::vector<Triangle> faces;
     faces.reserve(12);
-    // front
-    faces.emplace_back(a, b, c);
-    faces.emplace_back(a, c, d);
-    // right
-    faces.emplace_back(e, b, a);
-    faces.emplace_back(e, f, b);
-    // back
-    faces.emplace_back(h, f, e);
-    faces.emplace_back(h, g, f);
-    // left
-    faces.emplace_back(d, g, h);
-    faces.emplace_back(d, c, g);
-    // top
-    faces.emplace_back(b, f, g);
-    faces.emplace_back(b, g, c);
-    // bottom
-    faces.emplace_back(a, h, e);
-    faces.emplace_back(a, d, h);
+
+    faces.emplace_back(corners[0], corners[1], corners[2]);
+    faces.emplace_back(corners[0], corners[2], corners[3]);
+    faces.emplace_back(corners[4], corners[1], corners[0]);
+    faces.emplace_back(corners[4], corners[5], corners[1]);
+    faces.emplace_back(corners[7], corners[5], corners[4]);
+    faces.emplace_back(corners[7], corners[6], corners[5]);
+    faces.emplace_back(corners[3], corners[6], corners[7]);
+    faces.emplace_back(corners[3], corners[2], corners[6]);
+    faces.emplace_back(corners[1], corners[5], corners[6]);
+    faces.emplace_back(corners[1], corners[6], corners[2]);
+    faces.emplace_back(corners[0], corners[7], corners[4]);
+    faces.emplace_back(corners[0], corners[3], corners[7]);
 
     return std::make_unique<ExplicitEntity>(std::move(faces));
+}
+
+std::unique_ptr<ExplicitEntity> entities::makeCube(glm::dvec3 center, double side_length)
+{
+    return makeCuboid(center, glm::dvec3(side_length, side_length, side_length));
+}
+
+std::unique_ptr<ExplicitEntity> entities::makeCuboid(glm::dvec3 center, glm::dvec3 size)
+{
+    const auto s = size / 2.0;
+
+    std::array<glm::dvec3, 8> corners{
+        center + glm::dvec3{s.x, s.y, -s.z},  center + glm::dvec3{s.x, s.y, s.z},
+        center + glm::dvec3{s.x, -s.y, s.z},  center + glm::dvec3{s.x, -s.y, -s.z},
+        center + glm::dvec3{-s.x, s.y, -s.z}, center + glm::dvec3{-s.x, s.y, s.z},
+        center + glm::dvec3{-s.x, -s.y, s.z}, center + glm::dvec3{-s.x, -s.y, -s.z},
+    };
+
+    return makeOctet(corners);
 }
 
 std::unique_ptr<ExplicitEntity> entities::makeSphere(const glm::dvec3 center,

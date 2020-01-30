@@ -56,7 +56,8 @@ bool MetalLikeMaterial::scatter(const Ray& in,
     scatter_ray = in.getChildRay(ir.pos, direction);
     attenuation = attenuation_;
 
-    // if the reflection does not point in the same direction as the normal it is not used.
+    // If the reflection does not point in the same direction as the normal it is not used.
+    // In this case this are rays that are tangential to the surface.
     return glm::dot(scatter_ray.dir, ir.normal) > 0;
 }
 

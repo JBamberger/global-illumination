@@ -16,7 +16,10 @@ void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::mo
 
 void RayTracer::run(int w, int h)
 {
-    constexpr auto samples = 32;
+    constexpr auto samples = 256;
+
+    std::vector<glm::dvec3> buffer;
+    buffer.reserve(w * h);
 
     image_ = std::make_shared<Image>(w, h);
     camera_.setWindowSize(w, h);
@@ -33,9 +36,10 @@ void RayTracer::run(int w, int h)
                     const auto color = computePixel(x, y);
 #pragma omp critical
                     {
-                        const auto pc = image_->getPixel(x, y);
-                        const auto pix = pc * (static_cast<double>(s - 1) / s) + color * (1.0 / s);
-                        image_->setPixel(x, y, pix);
+                        const auto pos = x * h + y;
+                        buffer[pos] += color;
+                        const auto pix = buffer[pos] / static_cast<double>(s);
+                        image_->setPixel(x, y, glm::clamp(pix, 0.0, 1.0));
                     }
                 }
             }
@@ -47,10 +51,12 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
 {
     constexpr auto max_bounces = 5;
 
+    // the currently active ray
     auto ray = camera_.getRay(x, y);
-
-    auto color = glm::dvec3(0, 0, 0);
-    auto total_attenuation = glm::dvec3(1, 1, 1); // actually more like throughput
+    // the total amount of light carried over this path
+    auto light = glm::dvec3(0, 0, 0);
+    // value gives the amount of light that is carried per color channel over the path
+    auto throughput = glm::dvec3(1, 1, 1);
 
     for (auto i = 0; i < max_bounces; i++) {
         Hit hit;
@@ -59,7 +65,7 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
         }
 
         // add light reduced by combined attenuation
-        color += total_attenuation * hit.mat->emission(hit.uv);
+        light += throughput * hit.mat->emission(hit.uv);
 
         glm::dvec3 bounce_attenuation;
         auto scatter_ray(ray);
@@ -67,10 +73,10 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
             break; // the ray did not scatter -> no further contribution
         }
         ray = scatter_ray;
-        total_attenuation *= bounce_attenuation;
+        throughput *= bounce_attenuation;
     }
 
-    return glm::clamp(color, 0.0, 1.0);
+    return light;
 }
 
 glm::dvec3 RayTracer::computePixel(const Ray& ray) const

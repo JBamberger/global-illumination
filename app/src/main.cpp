@@ -261,13 +261,13 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     scene.push_back(std::move(face));
 
     const auto ls = 2.5;
-    s = 2.99;
-    face = makeQuad({ls, -ls, s}, {-ls, -ls, s}, {-ls, ls, s}, {ls, ls, s});
+    s = 2.99999999;
+    face = makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
     face->setMaterial(std::make_shared<DiffuseLight>(white));
     scene.push_back(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{-1.5, -1.5, -2}, 1.0);
-    face->setMaterial(std::make_shared<MetalLikeMaterial>(blue, 0.5));
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.5));
     scene.push_back(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{1, 1.8, -2}, 1.0);
