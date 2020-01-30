@@ -30,4 +30,9 @@ std::unique_ptr<ExplicitEntity> makeCone(glm::dvec3 center,
                                          glm::dvec3 tip,
                                          double radius,
                                          size_t slices);
+
+std::unique_ptr<ExplicitEntity> rotate_z(std::unique_ptr<ExplicitEntity> entity, double angle);
+std::unique_ptr<ExplicitEntity> translate(std::unique_ptr<ExplicitEntity> entity,
+                                          glm::dvec3 offset);
+
 } // namespace entities

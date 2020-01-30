@@ -270,12 +270,13 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.5));
     scene.push_back(std::move(face));
 
-    face = makeCuboid({-1.5, 1.5, -1}, {2, 2, 4});
+    face = translate(rotate_z(makeCuboid({0, 0, 0}, {2, 2, 4}), glm::pi<double>() / 10),
+                     {-1.5, 1.5, -1});
     //    face = std::make_unique<Sphere>(glm::dvec3{1, 1.8, -2}, 1.0);
-    face->setMaterial(std::make_shared<LambertianMaterial>(magenta));
+    face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
-    face = std::make_unique<Sphere>(glm::dvec3{-0.5, -0.5, -1.5}, 1.0);
+    face = std::make_unique<Sphere>(glm::dvec3{1.5, 1.5, -2}, 1.0);
     face->setMaterial(std::make_shared<Dielectric>(1.4));
     scene.push_back(std::move(face));
 

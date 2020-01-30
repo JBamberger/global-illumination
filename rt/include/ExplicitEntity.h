@@ -20,6 +20,8 @@ struct ExplicitEntity final : Entity {
     /// Writes the triangles and vertices in obj format to the output stream.
     std::ostream& writeObj(std::ostream& os);
 
+    void invalidate() { bbox_ = computeBBox(faces); }
+
     std::vector<Triangle> faces;
 
   private:

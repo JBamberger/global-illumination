@@ -2,9 +2,8 @@
 
 #include <glm/glm.hpp>
 
-constexpr auto offset = 1e-7;
-
 struct Ray {
+    constexpr static auto offset = 1e-7;
 
     /// The origination point of the ray.
     glm::dvec3 origin;

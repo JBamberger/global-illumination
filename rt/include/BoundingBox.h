@@ -6,8 +6,8 @@
 /// Represents an axis-aligned bounding box.
 struct BoundingBox {
 
-    const glm::dvec3 min;
-    const glm::dvec3 max;
+    glm::dvec3 min;
+    glm::dvec3 max;
 
     BoundingBox(glm::dvec3 min, glm::dvec3 max);
 
