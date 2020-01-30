@@ -1,20 +1,22 @@
-#include <gtest/gtest.h>
 
-#include <CheckerboardMaterial.h>
+#include "Material.h"
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <gtest/gtest.h>
 #include <ostream>
 #include <string>
 #include <utility>
 
-static const glm::dvec3 black{0, 0, 0};
-static const glm::dvec3 white{1, 1, 1};
+constexpr glm::dvec3 white{1, 1, 1};
+constexpr glm::dvec3 black{0, 0, 0};
 
 struct coord_def {
     const glm::dvec2 uv;
     const glm::dvec3 color;
     const std::string description;
 
-    coord_def(const glm::dvec2 uv, const glm::dvec3 color, const std::string description)
-        : uv(uv), color(color), description(description)
+    coord_def(const glm::dvec2 uv, const glm::dvec3 color, std::string description)
+        : uv(uv), color(color), description(std::move(description))
     {
     }
 
@@ -27,19 +29,20 @@ struct coord_def {
 struct CheckerboardAccessTest : public testing::TestWithParam<coord_def> {
     CheckerboardMaterial material;
 
-    CheckerboardAccessTest() : material(10, black, white) {}
+    CheckerboardAccessTest() : material() {}
 };
 
 TEST_P(CheckerboardAccessTest, testCheckerboarAcces)
 {
     const auto p = GetParam();
-    const auto color = material.getColor(p.uv);
+    const auto color = material.value(p.uv);
 
     ASSERT_EQ(color, p.color);
 }
 
 // clang-format off
 INSTANTIATE_TEST_SUITE_P(Default, CheckerboardAccessTest, testing::Values(
+
 	// TODO: enable border checks
 	//coord_def{{0.0, 0.0}, black, "top right corner"   },
 	//coord_def{{1.0, 0.0}, white, "top left corner"    },

@@ -1,20 +1,19 @@
+#include "Entity.h"
 #include <gtest/gtest.h>
-
-#include <Triangle.h>
 #include <ostream>
 #include <string>
 #include <utility>
 
-static const glm::dvec3 black{0, 0, 0};
-static const glm::dvec3 white{1, 1, 1};
+constexpr glm::dvec3 black{0, 0, 0};
+constexpr glm::dvec3 white{1, 1, 1};
 
 struct mapping_def {
     const glm::dvec3 intersect;
     const glm::dvec2 uv;
     const std::string description;
 
-    mapping_def(const glm::dvec3 intersect, const glm::dvec2 uv, const std::string description)
-        : intersect(intersect), uv(uv), description(description)
+    mapping_def(const glm::dvec3 intersect, const glm::dvec2 uv, std::string description)
+        : intersect(intersect), uv(uv), description(std::move(description))
     {
     }
 

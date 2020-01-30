@@ -46,12 +46,10 @@ struct ray_spec {
 
 struct TriangleIntersectionTest : testing::TestWithParam<ray_spec> {
     Triangle triangle;
-    glm::dvec3 intersect;
-    glm::dvec3 normal;
+    Hit hit;
 
     TriangleIntersectionTest()
-        : triangle(glm::dvec3{0, 0, 0}, glm::dvec3{0, 1, 0}, glm::dvec3{0, 0, 1}), intersect(),
-          normal()
+        : triangle(glm::dvec3{0, 0, 0}, glm::dvec3{0, 1, 0}, glm::dvec3{0, 0, 1})
     {
     }
 };
@@ -60,7 +58,7 @@ TEST_P(TriangleIntersectionTest, testSuccess)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    const auto success = triangle.intersect(ray, intersect, normal) != nullptr;
+    const auto success = triangle.intersect(ray, hit);
     EXPECT_EQ(success, params.success);
 }
 
@@ -68,12 +66,12 @@ TEST_P(TriangleIntersectionTest, testIntersect)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    triangle.intersect(ray, intersect, normal);
+    triangle.intersect(ray, hit);
 
     if (params.success) {
-        EXPECT_NEAR(intersect.x, params.expected_intersect.x, eps);
-        EXPECT_NEAR(intersect.y, params.expected_intersect.y, eps);
-        EXPECT_NEAR(intersect.z, params.expected_intersect.z, eps);
+        EXPECT_NEAR(hit.pos.x, params.expected_intersect.x, eps);
+        EXPECT_NEAR(hit.pos.y, params.expected_intersect.y, eps);
+        EXPECT_NEAR(hit.pos.z, params.expected_intersect.z, eps);
     }
 }
 
@@ -81,12 +79,12 @@ TEST_P(TriangleIntersectionTest, testNormal)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    triangle.intersect(ray, intersect, normal);
+    triangle.intersect(ray, hit);
 
     if (params.success) {
-        EXPECT_NEAR(normal.x, params.expected_normal.x, eps);
-        EXPECT_NEAR(normal.y, params.expected_normal.y, eps);
-        EXPECT_NEAR(normal.z, params.expected_normal.z, eps);
+        EXPECT_NEAR(hit.normal.x, params.expected_normal.x, eps);
+        EXPECT_NEAR(hit.normal.y, params.expected_normal.y, eps);
+        EXPECT_NEAR(hit.normal.z, params.expected_normal.z, eps);
     }
 }
 
@@ -109,8 +107,7 @@ INSTANTIATE_TEST_SUITE_P(InsideOutside, TriangleIntersectionTest, testing::Value
 
 struct ImplicitSphereIntersectionTest : testing::TestWithParam<ray_spec> {
     Sphere sphere;
-    glm::dvec3 intersect;
-    glm::dvec3 normal;
+    Hit hit;
 
     ImplicitSphereIntersectionTest() { sphere.radius = 1; }
 };
@@ -119,7 +116,7 @@ TEST_P(ImplicitSphereIntersectionTest, testSuccess)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    const auto success = sphere.intersect(ray, intersect, normal) != nullptr;
+    const auto success = sphere.intersect(ray, hit);
 
     EXPECT_EQ(success, params.success);
 }
@@ -128,12 +125,12 @@ TEST_P(ImplicitSphereIntersectionTest, testIntersect)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    sphere.intersect(ray, intersect, normal);
+    sphere.intersect(ray, hit);
 
     if (params.success) {
-        EXPECT_NEAR(intersect.x, params.expected_intersect.x, eps);
-        EXPECT_NEAR(intersect.y, params.expected_intersect.y, eps);
-        EXPECT_NEAR(intersect.z, params.expected_intersect.z, eps);
+        EXPECT_NEAR(hit.pos.x, params.expected_intersect.x, eps);
+        EXPECT_NEAR(hit.pos.y, params.expected_intersect.y, eps);
+        EXPECT_NEAR(hit.pos.z, params.expected_intersect.z, eps);
     }
 }
 
@@ -141,12 +138,12 @@ TEST_P(ImplicitSphereIntersectionTest, testNormal)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    sphere.intersect(ray, intersect, normal);
+    sphere.intersect(ray, hit);
 
     if (params.success) {
-        EXPECT_NEAR(normal.x, params.expected_normal.x, eps);
-        EXPECT_NEAR(normal.y, params.expected_normal.y, eps);
-        EXPECT_NEAR(normal.z, params.expected_normal.z, eps);
+        EXPECT_NEAR(hit.normal.x, params.expected_normal.x, eps);
+        EXPECT_NEAR(hit.normal.y, params.expected_normal.y, eps);
+        EXPECT_NEAR(hit.normal.z, params.expected_normal.z, eps);
     }
 }
 
