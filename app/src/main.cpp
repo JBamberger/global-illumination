@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Material.h"
+#include <ObjReader.h>
 #include <camera.h>
 #include <entities.h>
 #include <fstream>
@@ -269,8 +270,10 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
     scene.push_back(std::move(face));
 
-    face = translate(rotate_z(makeCuboid({0, 0, 0}, {2, 2, 4}), -glm::pi<double>() / 10),
-                     {-1.5, -1.5, -1});
+    auto c = obj::makeCuboid({0, 0, 0}, {2, 2, 4});
+    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
+    c = obj::translate(std::move(c), {-1.5, -1.5, -1});
+    face = std::make_unique<ExplicitEntity>(c);
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 

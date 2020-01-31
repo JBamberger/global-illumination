@@ -15,16 +15,8 @@ struct ExplicitEntity final : Entity {
 
     BoundingBox boundingBox() const override;
 
-    void invalidate();
-
     std::vector<Triangle> faces;
-
-    friend std::ostream& operator<<(std::ostream& os, const ExplicitEntity& entity);
-
-    friend std::istream& operator>>(std::istream& is, ExplicitEntity& entity);
 
   private:
     BoundingBox bbox_;
-
-    static BoundingBox computeBBox(const std::vector<Triangle>& faces);
 };

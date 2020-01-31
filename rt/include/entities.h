@@ -31,11 +31,4 @@ std::unique_ptr<ExplicitEntity> makeCone(glm::dvec3 center,
                                          double radius,
                                          size_t slices);
 
-std::unique_ptr<ExplicitEntity> rotate_x(std::unique_ptr<ExplicitEntity> entity, double angle);
-std::unique_ptr<ExplicitEntity> rotate_y(std::unique_ptr<ExplicitEntity> entity, double angle);
-std::unique_ptr<ExplicitEntity> rotate_z(std::unique_ptr<ExplicitEntity> entity, double angle);
-std::unique_ptr<ExplicitEntity> translate(std::unique_ptr<ExplicitEntity> entity, glm::dvec3 delta);
-std::unique_ptr<ExplicitEntity> scale(std::unique_ptr<ExplicitEntity> entity, double scale);
-std::unique_ptr<ExplicitEntity> scale(std::unique_ptr<ExplicitEntity> entity, glm::dvec3 scale);
-
 } // namespace entities

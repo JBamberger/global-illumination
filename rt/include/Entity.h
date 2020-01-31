@@ -15,10 +15,11 @@
 class Material;
 
 struct Hit {
-    glm::dvec3 normal;
-    glm::dvec3 pos; // hit position
-    glm::dvec2 uv;  // uv coordinates of the hit
+    glm::dvec3 normal{};
+    glm::dvec3 pos{}; // hit position
+    glm::dvec2 uv{};  // uv coordinates of the hit
     std::shared_ptr<Material> mat;
+    Hit();
 };
 
 class Hittable {

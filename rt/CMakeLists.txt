@@ -6,6 +6,7 @@ set(SOURCES
 	"include/Ray.h"
 	"include/NDChecker.h"
 	"include/RandomUtils.h"
+    "include/BVH.h"
 	"include/Material.h"	         "src/Material.cpp"
 	"include/Entity.h"				 "src/Entity.cpp"
 	"include/ExplicitEntity.h"       "src/ExplicitEntity.cpp"
@@ -13,7 +14,7 @@ set(SOURCES
     "include/BoundingBox.h"          "src/BoundingBox.cpp"
     "include/Octree.h"               "src/Octree.cpp"
     "include/entities.h"             "src/entities.cpp"
-)
+		include/ObjReader.h src/ObjReader.cpp)
 
 add_library(rt_lib ${SOURCES})
 target_include_directories(rt_lib PUBLIC "include")
