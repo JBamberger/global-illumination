@@ -16,7 +16,7 @@ void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::mo
 
 void RayTracer::run(int w, int h)
 {
-    constexpr auto samples = 256;
+    constexpr auto samples = 2048;
 
     std::vector<glm::dvec3> buffer;
     buffer.reserve(w * h);

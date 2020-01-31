@@ -211,31 +211,103 @@ std::unique_ptr<ExplicitEntity> entities::makeCone(const glm::dvec3 center,
 
     return std::make_unique<ExplicitEntity>(faces);
 }
+
+std::unique_ptr<ExplicitEntity> entities::rotate_x(std::unique_ptr<ExplicitEntity> entity,
+                                                   double angle)
+{
+    const auto sin_theta = glm::sin(angle);
+    const auto cos_theta = glm::cos(angle);
+
+    // clang-format off
+    const auto r = glm::transpose(glm::mat3{
+        {1, 0, 0},
+        {0, cos_theta, sin_theta},
+        {0,-sin_theta, cos_theta}
+    });
+    // clang-format on
+    for (auto& face : entity->faces) {
+        face.A = r * face.A;
+        face.B = r * face.B;
+        face.C = r * face.C;
+    }
+    entity->invalidate();
+    return entity;
+}
+
+std::unique_ptr<ExplicitEntity> entities::rotate_y(std::unique_ptr<ExplicitEntity> entity,
+                                                   double angle)
+{
+    const auto sin_theta = glm::sin(angle);
+    const auto cos_theta = glm::cos(angle);
+    // clang-format off
+    const auto r = glm::transpose(glm::mat3{
+        { cos_theta, 0, sin_theta},
+        {     0, 1,     0},
+        {-sin_theta, 0, cos_theta}
+    });
+    // clang-format on
+    for (auto& face : entity->faces) {
+        face.A = r * face.A;
+        face.B = r * face.B;
+        face.C = r * face.C;
+    }
+    entity->invalidate();
+    return entity;
+}
+
 std::unique_ptr<ExplicitEntity> entities::rotate_z(std::unique_ptr<ExplicitEntity> entity,
                                                    double angle)
 {
     const auto sin_theta = glm::sin(angle);
     const auto cos_theta = glm::cos(angle);
 
+    // clang-format off
+    const auto r = glm::transpose(glm::mat3{
+        { cos_theta, sin_theta, 0},
+        {-sin_theta, cos_theta, 0},
+        {     0,     0, 1}
+    });
+    // clang-format on
     for (auto& face : entity->faces) {
-        face.A = glm::dvec3(cos_theta * face.A.x + sin_theta * face.A.y,
-                            -sin_theta * face.A.x + cos_theta * face.A.y, face.A.z);
-        face.B = glm::dvec3(cos_theta * face.B.x + sin_theta * face.B.y,
-                            -sin_theta * face.B.x + cos_theta * face.B.y, face.B.z);
-        face.C = glm::dvec3(cos_theta * face.C.x + sin_theta * face.C.y,
-                            -sin_theta * face.C.x + cos_theta * face.C.y, face.C.z);
+        face.A = r * face.A;
+        face.B = r * face.B;
+        face.C = r * face.C;
     }
     entity->invalidate();
     return entity;
 }
 
 std::unique_ptr<ExplicitEntity> entities::translate(std::unique_ptr<ExplicitEntity> entity,
-                                                    glm::dvec3 offset)
+                                                    glm::dvec3 delta)
 {
     for (auto& face : entity->faces) {
-        face.A += offset;
-        face.B += offset;
-        face.C += offset;
+        face.A += delta;
+        face.B += delta;
+        face.C += delta;
+    }
+    entity->invalidate();
+    return entity;
+}
+
+std::unique_ptr<ExplicitEntity> entities::scale(std::unique_ptr<ExplicitEntity> entity,
+                                                double scale)
+{
+    for (auto& face : entity->faces) {
+        face.A *= scale;
+        face.B *= scale;
+        face.C *= scale;
+    }
+    entity->invalidate();
+    return entity;
+}
+
+std::unique_ptr<ExplicitEntity> entities::scale(std::unique_ptr<ExplicitEntity> entity,
+                                                glm::dvec3 scale)
+{
+    for (auto& face : entity->faces) {
+        face.A *= scale;
+        face.B *= scale;
+        face.C *= scale;
     }
     entity->invalidate();
     return entity;

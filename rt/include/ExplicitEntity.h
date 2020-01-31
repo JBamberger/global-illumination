@@ -3,13 +3,11 @@
 #include <Entity.h>
 
 #include <memory>
+#include <ostream>
 #include <vector>
 
 struct ExplicitEntity final : Entity {
-    explicit ExplicitEntity(std::vector<Triangle> faces)
-        : faces(std::move(faces)), bbox_(computeBBox(this->faces))
-    {
-    }
+    explicit ExplicitEntity(std::vector<Triangle> faces);
 
     void setMaterial(std::shared_ptr<Material> material) override;
 
@@ -17,30 +15,16 @@ struct ExplicitEntity final : Entity {
 
     BoundingBox boundingBox() const override;
 
-    /// Writes the triangles and vertices in obj format to the output stream.
-    std::ostream& writeObj(std::ostream& os);
-
-    void invalidate() { bbox_ = computeBBox(faces); }
+    void invalidate();
 
     std::vector<Triangle> faces;
+
+    friend std::ostream& operator<<(std::ostream& os, const ExplicitEntity& entity);
+
+    friend std::istream& operator>>(std::istream& is, ExplicitEntity& entity);
 
   private:
     BoundingBox bbox_;
 
-    static BoundingBox computeBBox(const std::vector<Triangle>& faces)
-    {
-        assert(!faces.empty());
-
-        const auto b1 = faces[0].boundingBox();
-        auto min = b1.min;
-        auto max = b1.max;
-
-        for (const auto& t : faces) {
-            const auto bbox = t.boundingBox();
-            min = glm::min(min, bbox.min);
-            max = glm::max(max, bbox.max);
-        }
-
-        return BoundingBox{min, max};
-    }
+    static BoundingBox computeBBox(const std::vector<Triangle>& faces);
 };

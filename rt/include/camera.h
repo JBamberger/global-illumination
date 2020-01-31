@@ -8,7 +8,7 @@ class Camera {
     /// Location of the camera focus point.
     glm::dvec3 pos_;
 
-    /// Normalized vector pointing in viewing direction.
+    /// Normalized vector pointing from sensor to focus point.
     glm::dvec3 w_;
     /// Normalized vector pointing to the right.
     glm::dvec3 u_;
@@ -32,7 +32,7 @@ class Camera {
     explicit Camera(const glm::dvec3 pos) : Camera(pos, {0, 0, 0}) {}
 
     Camera(glm::dvec3 pos, glm::dvec3 look_at, glm::dvec3 v_up = {0, 0, 1})
-        : pos_(pos), w_(normalize(look_at - pos)), u_(normalize(glm::cross(v_up, w_))),
+        : pos_(pos), w_(normalize(pos - look_at)), u_(normalize(glm::cross(v_up, w_))),
           v_(normalize(glm::cross(w_, u_)))
     {
     }
@@ -48,7 +48,7 @@ class Camera {
 
         // Finally compute the direction of the ray which goes through the given pixel.
         // this requires that forward, up and right are normalized.
-        const auto direction = w_ * focal_dist_ + v_ * py + u_ * px;
+        const auto direction = -w_ * focal_dist_ + v_ * py + u_ * px;
 
         // let rays originate in the camera center
         // TODO: It might be better to originate in the sensor to avoid objects between sensor and

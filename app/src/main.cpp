@@ -5,6 +5,7 @@
 #include "Material.h"
 #include <camera.h>
 #include <entities.h>
+#include <fstream>
 #include <gui.h>
 #include <iostream>
 #include <random>
@@ -224,7 +225,7 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     std::vector<std::unique_ptr<Entity>> scene;
     std::unique_ptr<Entity> face;
 
-    auto s = 3.0;
+    const auto s = 3.0;
 
     glm::dvec3 p000 = {-s, -s, -s};
     glm::dvec3 p001 = {-s, -s, s};
@@ -260,25 +261,51 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face->setMaterial(mat_white);
     scene.push_back(std::move(face));
 
-    const auto ls = 2.5;
-    s = 2.99999999;
     face = makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
     face->setMaterial(std::make_shared<DiffuseLight>(white));
     scene.push_back(std::move(face));
 
-    face = std::make_unique<Sphere>(glm::dvec3{-1.5, -1.5, -2}, 1.0);
-    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.5));
+    face = std::make_unique<Sphere>(glm::dvec3{-1.5, 1.5, -2}, 1.0);
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
     scene.push_back(std::move(face));
 
     face = translate(rotate_z(makeCuboid({0, 0, 0}, {2, 2, 4}), glm::pi<double>() / 10),
-                     {-1.5, 1.5, -1});
-    //    face = std::make_unique<Sphere>(glm::dvec3{1, 1.8, -2}, 1.0);
+                     {-1.5, -1.5, -1});
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
-    face = std::make_unique<Sphere>(glm::dvec3{1.5, 1.5, -2}, 1.0);
-    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    face = std::make_unique<Sphere>(glm::dvec3{1.5, -1.0, -2}, 1.0);
+    face->setMaterial(std::make_shared<Dielectric>(1.1));
     scene.push_back(std::move(face));
+
+    // Defines x,y and z axis indicators
+    //    const auto tip = glm::dvec3{0, 0, 0};
+    //    const auto id_len = 2;
+    //    auto x_axis = makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
+    //    x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
+    //    scene.push_back(std::move(x_axis));
+    //
+    //    auto y_axis = makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
+    //    y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
+    //    scene.push_back(std::move(y_axis));
+    //
+    //    auto z_axis = makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
+    //    z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
+    //    scene.push_back(std::move(z_axis));
+
+    //    auto pig = std::make_unique<ExplicitEntity>(std::vector<Triangle>());
+    //    std::ifstream pigstream("D:/dev/global-illumination/share/pig_triangulated.obj");
+    //    if (pigstream.is_open()) {
+    //        pigstream >> *pig;
+    //        pigstream.close();
+    //    }
+    //    pig = translate(std::move(pig), {-1, -1, -1});
+    //    pig = rotate_x(std::move(pig), -glm::pi<double>() / 2);
+    //    pig = rotate_z(std::move(pig), glm::pi<double>() / 3);
+    //    pig = scale(std::move(pig), 3);
+
+    //    pig->setMaterial(std::make_shared<LambertianMaterial>(glm::dvec3(0.9, 0.6, 0.9)));
+    //    scene.push_back(std::move(pig));
 
     return scene;
 }
