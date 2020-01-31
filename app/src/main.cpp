@@ -269,43 +269,60 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
     scene.push_back(std::move(face));
 
-    face = translate(rotate_z(makeCuboid({0, 0, 0}, {2, 2, 4}), glm::pi<double>() / 10),
+    face = translate(rotate_z(makeCuboid({0, 0, 0}, {2, 2, 4}), -glm::pi<double>() / 10),
                      {-1.5, -1.5, -1});
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{1.5, -1.0, -2}, 1.0);
-    face->setMaterial(std::make_shared<Dielectric>(1.1));
+    face->setMaterial(std::make_shared<Dielectric>(1.4));
     scene.push_back(std::move(face));
 
     // Defines x,y and z axis indicators
-    //    const auto tip = glm::dvec3{0, 0, 0};
-    //    const auto id_len = 2;
-    //    auto x_axis = makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
-    //    x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
-    //    scene.push_back(std::move(x_axis));
+    //        const auto tip = glm::dvec3{0, 0, 0};
+    //        const auto id_len = 2;
+    //        auto x_axis = makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
+    //        x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
+    //        scene.push_back(std::move(x_axis));
     //
-    //    auto y_axis = makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
-    //    y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
-    //    scene.push_back(std::move(y_axis));
+    //        auto y_axis = makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
+    //        y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
+    //        scene.push_back(std::move(y_axis));
     //
-    //    auto z_axis = makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
-    //    z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
-    //    scene.push_back(std::move(z_axis));
+    //        auto z_axis = makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
+    //        z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
+    //        scene.push_back(std::move(z_axis));
 
-    //    auto pig = std::make_unique<ExplicitEntity>(std::vector<Triangle>());
-    //    std::ifstream pigstream("D:/dev/global-illumination/share/pig_triangulated.obj");
-    //    if (pigstream.is_open()) {
-    //        pigstream >> *pig;
-    //        pigstream.close();
-    //    }
-    //    pig = translate(std::move(pig), {-1, -1, -1});
-    //    pig = rotate_x(std::move(pig), -glm::pi<double>() / 2);
-    //    pig = rotate_z(std::move(pig), glm::pi<double>() / 3);
-    //    pig = scale(std::move(pig), 3);
-
-    //    pig->setMaterial(std::make_shared<LambertianMaterial>(glm::dvec3(0.9, 0.6, 0.9)));
-    //    scene.push_back(std::move(pig));
+    //    const auto load_pig_part = [](const std::string& file) {
+    //        auto part = std::make_unique<ExplicitEntity>(std::vector<Triangle>());
+    //        std::ifstream pigstream(file);
+    //        if (pigstream.is_open()) {
+    //            pigstream >> *part;
+    //            pigstream.close();
+    //        }
+    //        part = translate(std::move(part), {1, -0.5, 2});
+    //        part = rotate_x(std::move(part), -glm::pi<double>() / 2);
+    //        part = rotate_z(std::move(part), -glm::pi<double>() / 3);
+    //        part = scale(std::move(part), 3);
+    //        part = translate(std::move(part), {0, 0, -1});
+    //        return part;
+    //    };
+    //
+    //    face = load_pig_part("D:/dev/global-illumination/share/pig_body.obj");
+    //    face->setMaterial(std::make_shared<LambertianMaterial>(glm::dvec3(0.9, 0.6, 0.9)));
+    //    scene.push_back(std::move(face));
+    //
+    //    face = load_pig_part("D:/dev/global-illumination/share/pig_eyes.obj");
+    //    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.5));
+    //    scene.push_back(std::move(face));
+    //
+    //    face = load_pig_part("D:/dev/global-illumination/share/pig_pupils.obj");
+    //    face->setMaterial(std::make_shared<LambertianMaterial>(red));
+    //    scene.push_back(std::move(face));
+    //
+    //    face = load_pig_part("D:/dev/global-illumination/share/pig_tongue.obj");
+    //    face->setMaterial(std::make_shared<DiffuseLight>(0.5 * red));
+    //    scene.push_back(std::move(face));
 
     return scene;
 }

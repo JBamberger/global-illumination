@@ -36,7 +36,7 @@ class Entity : public Hittable {
   public:
     explicit Entity();
     explicit Entity(std::shared_ptr<Material> material);
-    virtual ~Entity() = default;
+    ~Entity() override = default;
     virtual void setMaterial(std::shared_ptr<Material> material);
 };
 

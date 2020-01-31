@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RandomUtils.h"
 #include "Ray.h"
 #include <glm/glm.hpp>
 
@@ -39,12 +40,16 @@ class Camera {
 
     Ray getRay(const double x, const double y) const
     {
+        // apply some jitter to the input pixel position
+        const auto dx = rng();
+        const auto dy = rng();
+
         // computes the relative location of the pixel in the sensor, i.e. the middle pixel of the
         // screen is in the middle of the sensor
-        const auto px = window_scale_ * (x + 0.5 - window_width_ / 2);
+        const auto px = window_scale_ * (x + dx - window_width_ / 2);
         // for the y location we also need to invert the input axis, as the qt image points y
         // downwards and we point y upwards
-        const auto py = window_scale_ * (windows_height_ / 2 - y + 0.5);
+        const auto py = window_scale_ * (windows_height_ / 2 - y + dy);
 
         // Finally compute the direction of the ray which goes through the given pixel.
         // this requires that forward, up and right are normalized.

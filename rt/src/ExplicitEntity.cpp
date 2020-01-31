@@ -77,7 +77,7 @@ std::ostream& operator<<(std::ostream& os, const ExplicitEntity& entity)
     return os;
 }
 
-std::istream& operator>>(std::istream& is, glm::ivec3& vertex)
+static std::istream& operator>>(std::istream& is, glm::ivec3& vertex)
 {
     is >> vertex.x;
     is >> vertex.y;
@@ -85,7 +85,7 @@ std::istream& operator>>(std::istream& is, glm::ivec3& vertex)
     return is;
 }
 
-std::istream& operator>>(std::istream& is, glm::dvec3& vertex)
+static std::istream& operator>>(std::istream& is, glm::dvec3& vertex)
 {
     is >> vertex.x;
     is >> vertex.y;
