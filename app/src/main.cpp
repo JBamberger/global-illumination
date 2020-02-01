@@ -280,7 +280,7 @@ void addCornellContent(std::vector<std::unique_ptr<Entity>>& scene)
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
-    face = std::make_unique<Sphere>(glm::dvec3{1.5, -1.0, -2}, 1.0);
+    face = std::make_unique<Sphere>(glm::dvec3{1.5, 0.0, -2}, 1.0);
     face->setMaterial(std::make_shared<Dielectric>(1.4));
     scene.push_back(std::move(face));
 }
@@ -355,6 +355,8 @@ void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
 
 void addCow(std::vector<std::unique_ptr<Entity>>& scene)
 {
+    const auto cow_tex =
+        std::make_shared<ImageBackedTexture>("D:/dev/global-illumination/share/spot_texture.png");
     auto face = obj::Transform()
                     .center()
                     .rotate_x(-glm::pi<double>() / 2)
@@ -363,7 +365,7 @@ void addCow(std::vector<std::unique_ptr<Entity>>& scene)
                     .translate({0, 0, -1.4})
                     .to_bvh("D:/dev/global-illumination/share/spot_triangulated.obj");
 
-    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    face->setMaterial(std::make_shared<LambertianMaterial>(cow_tex));
     scene.push_back(std::move(face));
 }
 

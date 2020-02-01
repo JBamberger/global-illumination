@@ -305,7 +305,9 @@ void readObjStream(std::istream& is, ObjContent& content)
 
     content.clear();
     for (const auto& f : faces) {
-        content.emplace_back(vertices[f.v.x - 1], vertices[f.v.y - 1], vertices[f.v.z - 1]);
+        Triangle t(vertices[f.v.x - 1], vertices[f.v.y - 1], vertices[f.v.z - 1]);
+        t.setTexCoords(tex_coords[f.vt.x - 1], tex_coords[f.vt.y - 1], tex_coords[f.vt.z - 1]);
+        content.push_back(std::move(t));
     }
     std::cout << "Loaded " << faces.size() << " primitives." << std::endl;
 }
