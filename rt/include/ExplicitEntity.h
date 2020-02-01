@@ -15,8 +15,7 @@ struct ExplicitEntity final : Entity {
 
     BoundingBox boundingBox() const override;
 
-    std::vector<Triangle> faces;
-
   private:
+    std::vector<Triangle> faces_;
     BoundingBox bbox_;
 };

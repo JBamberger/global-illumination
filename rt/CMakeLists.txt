@@ -1,28 +1,29 @@
 
 set(SOURCES
-	"include/camera.h"
-	"include/Texture.h"
-	"include/image.h"
-	"include/Ray.h"
-	"include/NDChecker.h"
-	"include/RandomUtils.h"
-    "include/BVH.h"
-	"include/Material.h"	         "src/Material.cpp"
-	"include/Entity.h"				 "src/Entity.cpp"
-	"include/ExplicitEntity.h"       "src/ExplicitEntity.cpp"
-    "include/RayTracer.h"            "src/RayTracer.cpp"
-    "include/BoundingBox.h"          "src/BoundingBox.cpp"
-    "include/Octree.h"               "src/Octree.cpp"
-    "include/entities.h"             "src/entities.cpp"
-		include/ObjReader.h src/ObjReader.cpp)
+        "include/camera.h"
+        "include/Texture.h"
+        "include/image.h"
+        "include/Ray.h"
+        "include/NDChecker.h"
+        "include/RandomUtils.h"
+        "include/BVH.h"
+        "include/Material.h" "src/Material.cpp"
+        "include/Entity.h" "src/Entity.cpp"
+        "include/ExplicitEntity.h" "src/ExplicitEntity.cpp"
+        "include/RayTracer.h" "src/RayTracer.cpp"
+        "include/BoundingBox.h" "src/BoundingBox.cpp"
+        "include/Octree.h" "src/Octree.cpp"
+        "include/entities.h" "src/entities.cpp"
+        "include/ObjReader.h" "src/ObjReader.cpp"
+		)
 
 add_library(rt_lib ${SOURCES})
 target_include_directories(rt_lib PUBLIC "include")
 target_link_libraries(rt_lib PUBLIC Qt5::Widgets glm)
 
 find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
+if (OpenMP_CXX_FOUND)
     target_link_libraries(rt_lib PUBLIC OpenMP::OpenMP_CXX)
-endif()
+endif ()
 
 add_subdirectory(test)

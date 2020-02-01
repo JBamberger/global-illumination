@@ -3,9 +3,10 @@
 #include "Entity.h"
 #include <algorithm>
 #include <vector>
-class BVH : public Hittable {
 
-    class Node : public Hittable {
+class BVH : public Entity {
+
+    class Node : public Entity {
         BoundingBox bbox_;
 
       public:
@@ -41,7 +42,7 @@ class BVH : public Hittable {
                 if (!c.intersect(ray, tmp_hit)) {
                     continue;
                 }
-                const auto tmp_dist = glm::distance(hit.pos, ray.origin);
+                const auto tmp_dist = glm::distance(tmp_hit.pos, ray.origin);
                 if (tmp_dist < min_dist) {
                     hit = tmp_hit;
                     min_dist = tmp_dist;
@@ -49,6 +50,14 @@ class BVH : public Hittable {
             }
 
             return min_dist < std::numeric_limits<double>::max();
+        }
+
+        void setMaterial(std::shared_ptr<Material> material) override
+        {
+            this->material_ = material;
+            for (auto& face : content_) {
+                face.setMaterial(material);
+            }
         }
 
       private:
@@ -89,16 +98,28 @@ class BVH : public Hittable {
             auto min_dist = std::numeric_limits<double>::max();
             for (const auto& c : children_) {
                 Hit tmp_hit;
-                if (c->intersect(ray, tmp_hit)) {
-                    const auto tmp_dist = glm::distance(hit.pos, ray.origin);
-                    if (tmp_dist < min_dist) {
-                        hit = tmp_hit;
-                        min_dist = tmp_dist;
-                    }
+                if (!c->boundingBox().intersect(ray)) {
+                    continue;
+                }
+                if (!c->intersect(ray, tmp_hit)) {
+                    continue;
+                }
+                const auto tmp_dist = glm::distance(tmp_hit.pos, ray.origin);
+                if (tmp_dist < min_dist) {
+                    hit = tmp_hit;
+                    min_dist = tmp_dist;
                 }
             }
 
             return min_dist < std::numeric_limits<double>::max();
+        }
+
+        void setMaterial(std::shared_ptr<Material> material) override
+        {
+            this->material_ = material;
+            for (auto& n : children_) {
+                n->setMaterial(material);
+            }
         }
     };
 
@@ -110,7 +131,19 @@ class BVH : public Hittable {
 
     BoundingBox boundingBox() const override { return root_->boundingBox(); }
 
-    bool intersect(const Ray& ray, Hit& hit) const override { return root_->intersect(ray, hit); }
+    bool intersect(const Ray& ray, Hit& hit) const override
+    {
+        if (!root_->boundingBox().intersect(ray)) {
+            return false;
+        }
+        return root_->intersect(ray, hit);
+    }
+
+    void setMaterial(std::shared_ptr<Material> material) override
+    {
+        this->material_ = material;
+        root_->setMaterial(material);
+    }
 
   private:
     std::unique_ptr<Node> construct(size_t depth, std::vector<Triangle> faces)

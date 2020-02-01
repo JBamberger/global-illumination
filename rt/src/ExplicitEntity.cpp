@@ -1,17 +1,18 @@
-#include "ObjReader.h"
 #include <ExplicitEntity.h>
+#include <ObjReader.h>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 ExplicitEntity::ExplicitEntity(std::vector<Triangle> faces)
-    : faces(std::move(faces)), bbox_(obj::computeBBox(this->faces))
+    : faces_(std::move(faces)), bbox_(obj::computeBBox(this->faces_))
 {
 }
 
 void ExplicitEntity::setMaterial(std::shared_ptr<Material> material)
 {
     this->material_ = material;
-    for (auto& face : faces) {
+    for (auto& face : faces_) {
         face.setMaterial(material);
     }
 }
@@ -28,7 +29,7 @@ bool ExplicitEntity::intersect(const Ray& ray, Hit& hit) const
 
     auto min = std::numeric_limits<double>::infinity();
     Hit tmp_hit;
-    for (const auto& t : faces) {
+    for (const auto& t : faces_) {
         if (t.intersect(ray, tmp_hit)) {
             const auto d = glm::distance(tmp_hit.pos, ray.origin);
             if (d < min) {

@@ -20,6 +20,9 @@ void RayTracer::run(int w, int h)
 
     std::vector<glm::dvec3> buffer;
     buffer.reserve(w * h);
+    for (size_t i = 0; i < w * h; i++) {
+        buffer.push_back(glm::dvec3(0, 0, 0));
+    }
 
     image_ = std::make_shared<Image>(w, h);
     camera_.setWindowSize(w, h);
