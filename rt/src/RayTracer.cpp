@@ -21,7 +21,7 @@ void RayTracer::run(int w, int h)
     std::vector<glm::dvec3> buffer;
     buffer.reserve(w * h);
     for (size_t i = 0; i < w * h; i++) {
-        buffer.push_back(glm::dvec3(0, 0, 0));
+        buffer.emplace_back(0, 0, 0);
     }
 
     image_ = std::make_shared<Image>(w, h);
@@ -63,7 +63,7 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
 
     for (auto i = 0; i < max_bounces; i++) {
         Hit hit;
-        if (!scene_->closestIntersection(ray, hit)) {
+        if (!scene_->intersect(ray, hit)) {
             break; // the ray didn't hit anything -> no contribution.
         }
 
@@ -85,7 +85,7 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
 glm::dvec3 RayTracer::computePixel(const Ray& ray) const
 {
     Hit hit;
-    if (!scene_->closestIntersection(ray, hit)) {
+    if (!scene_->intersect(ray, hit)) {
         return {0, 0, 0};
     }
 

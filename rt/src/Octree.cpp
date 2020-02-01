@@ -1,7 +1,7 @@
 #include <Octree.h>
 
-struct Octree::Node {
-    explicit Node(BoundingBox bbox) : bbox(std::move(bbox)) {}
+struct Octree::Node : Hittable {
+    explicit Node(BoundingBox bbox) : bbox(bbox) {}
 
     /// Subdivides the current node into 8 children.
     void partition()
@@ -115,6 +115,46 @@ struct Octree::Node {
         return entities.size();
     }
 
+    bool intersect(const Ray& ray, Hit& hit) const override
+    {
+        auto min_dist = std::numeric_limits<double>::max();
+        for (const auto& e : entities) {
+            Hit tmp_hit;
+            if (!e->boundingBox().intersect(ray)) {
+                continue;
+            }
+            if (!e->intersect(ray, tmp_hit)) {
+                continue;
+            }
+            const auto tmp_dist = glm::distance(tmp_hit.pos, ray.origin);
+            if (tmp_dist < min_dist) {
+                hit = tmp_hit;
+                min_dist = tmp_dist;
+            }
+        }
+
+        if (!isLeaf()) {
+            for (const auto& c : children) {
+                if (!c->bbox.intersect(ray)) {
+                    continue;
+                }
+                Hit tmp_hit;
+                if (!c->intersect(ray, tmp_hit)) {
+                    continue;
+                }
+                const auto tmp_dist = glm::distance(tmp_hit.pos, ray.origin);
+                if (tmp_dist < min_dist) {
+                    hit = tmp_hit;
+                    min_dist = tmp_dist;
+                }
+            }
+        }
+
+        return min_dist < std::numeric_limits<double>::max();
+    }
+
+    BoundingBox boundingBox() const override { return bbox; }
+
     friend std::ostream& operator<<(std::ostream& o, const Node& n)
     {
         if (n.isLeaf()) {
@@ -142,30 +182,17 @@ Octree::Octree(const glm::dvec3 min, const glm::dvec3 max)
 {
 }
 
-Octree::~Octree() = default;
-
 BoundingBox Octree::bounds() const { return root_->bbox; }
 
 /// Store an entity in the correct position of the octree.
-void Octree::pushBack(Hittable* object) const
-{
-#ifdef USE_OCTREE
-    root_->insert(object, 0);
-#else
-    root_.entities.push_back(object);
-#endif
-}
+void Octree::pushBack(Hittable* object) const { root_->insert(object, 0); }
 
 /// Returns list of entities that have the possibility to be intersected by the ray.
 std::vector<const Hittable*> Octree::intersect(const Ray& ray) const
 {
-#ifdef USE_OCTREE
     std::vector<const Hittable*> output;
     root_->intersect(ray, output);
     return output;
-#else
-    return root_.entities;
-#endif
 }
 
 bool Octree::closestIntersection(const Ray& ray, Hit& hit) const
@@ -206,3 +233,7 @@ bool Octree::isBlocked(const Ray& ray, const glm::dvec3& light) const
 }
 
 std::ostream& operator<<(std::ostream& o, const Octree& t) { return o << "{" << *t.root_ << "}"; }
+
+bool Octree::intersect(const Ray& ray, Hit& hit) const { return root_->intersect(ray, hit); }
+
+BoundingBox Octree::boundingBox() const { return root_->bbox; }

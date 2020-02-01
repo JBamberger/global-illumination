@@ -329,12 +329,12 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face->setMaterial(std::make_shared<DiffuseLight>(0.5 * red));
     scene.push_back(std::move(face));
 
-        auto c = obj::makeCuboid({0, 0, 0}, {4, 4, 0.5});
-        c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
-        c = obj::translate(std::move(c), {0, 0, -2.75});
-        face = std::make_unique<BVH>(c);
-        face->setMaterial(std::make_shared<LambertianMaterial>(white));
-        scene.push_back(std::move(face));
+    auto c = obj::makeCuboid({0, 0, 0}, {4, 4, 0.5});
+    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
+    c = obj::translate(std::move(c), {0, 0, -2.75});
+    face = std::make_unique<BVH>(c);
+    face->setMaterial(std::make_shared<LambertianMaterial>(white));
+    scene.push_back(std::move(face));
 
     return scene;
 }
