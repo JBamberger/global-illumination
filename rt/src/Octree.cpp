@@ -1,49 +1,60 @@
 #include <Octree.h>
 
-struct Octree::Node : Hittable {
-    explicit Node(BoundingBox bbox) : bbox(bbox) {}
+class Octree::Node : public Hittable {
+    BoundingBox bbox_;
+    std::vector<Hittable*> entities_;
+    std::array<std::unique_ptr<Node>, 8> children_;
+
+    const size_t max_depth_;
+    const size_t split_threshold_;
+
+  public:
+    explicit Node(BoundingBox bbox, size_t max_depth = 10, size_t split_thresh = 16)
+        : bbox_(bbox), max_depth_(max_depth), split_threshold_(split_thresh)
+    {
+    }
 
     /// Subdivides the current node into 8 children.
     void partition()
     {
-        const auto min = bbox.min;
-        const auto c = (bbox.max + bbox.min) / 2.0;
-        const auto d = (bbox.max - bbox.min) / 2.0;
+        const auto min = bbox_.min;
+        const auto c = (bbox_.max + bbox_.min) / 2.0;
+        const auto d = (bbox_.max - bbox_.min) / 2.0;
         // clang-format off
-            children[0] = std::make_unique<Node>(
+            children_[0] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y, min.z},
 					        glm::dvec3{c.x, c.y, c.z}});
-            children[1] = std::make_unique<Node>(
+            children_[1] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y, min.z + d.z},
                             glm::dvec3{c.x, c.y, c.z + d.z}});
-            children[2] = std::make_unique<Node>(
+            children_[2] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x, min.y + d.y, min.z},
                             glm::dvec3{c.x, c.y + d.y, c.z}});
-            children[3] = std::make_unique<Node>(
+            children_[3] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x, min.y + d.y, min.z + d.z},
                             glm::dvec3{c.x, c.y + d.y, c.z + d.z}});
-            children[4] = std::make_unique<Node>(
+            children_[4] = std::make_unique<Node>(
 				BoundingBox{glm::dvec3{min.x + d.x, min.y, min.z},
                             glm::dvec3{c.x + d.x, c.y, c.z}});
-            children[5] = std::make_unique<Node>(
+            children_[5] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + d.x, min.y, min.z + d.z},
                             glm::dvec3{c.x + d.x, c.y, c.z + d.z}});
-            children[6] = std::make_unique<Node>(
+            children_[6] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + d.x, min.y + d.y, min.z},
                             glm::dvec3{c.x + d.x, c.y + d.y, c.z}});
-            children[7] = std::make_unique<Node>(
+            children_[7] = std::make_unique<Node>(
                 BoundingBox{glm::dvec3{min.x + d.x, min.y + d.y, min.z + d.z},
                             glm::dvec3{c.x + d.x, c.y + d.y, c.z + d.z}});
         // clang-format on
 
         // insert all entities into the children
         std::vector<Hittable*> tmp;
-        for (auto entity : entities) {
+        for (auto entity : entities_) {
             const auto bb = entity->boundingBox();
 
             Node* receiver = nullptr;
-            for (auto& i : children) {
-                if (i->bbox.intersect(bb)) {
+            for (auto& i : children_) {
+                if (i->bbox_.intersect(bb)) {
                     if (receiver != nullptr) {
                         receiver = nullptr;
                         break;
@@ -52,33 +63,33 @@ struct Octree::Node : Hittable {
                 }
             }
             if (receiver != nullptr) {
-                receiver->entities.push_back(entity);
+                receiver->entities_.push_back(entity);
             } else {
                 tmp.push_back(entity);
             }
         }
         // clear and shrink the own entities vector because it is no longer needed.
-        entities.clear();
-        entities.insert(entities.end(), tmp.begin(), tmp.end());
-        entities.shrink_to_fit();
+        entities_.clear();
+        entities_.insert(entities_.end(), tmp.begin(), tmp.end());
+        entities_.shrink_to_fit();
     }
 
-    bool isLeaf() const { return children[0] == nullptr; }
+    bool isLeaf() const { return children_[0] == nullptr; }
 
     void insert(Hittable* e, const size_t depth)
     {
         if (isLeaf()) {
-            entities.push_back(e);
+            entities_.push_back(e);
 
-            if (depth < split_threshold && entities.size() > split_threshold) {
+            if (depth < max_depth_ && entities_.size() > split_threshold_) {
                 partition();
             }
         } else {
             const auto bb = e->boundingBox();
 
             Node* receiver = nullptr;
-            for (auto& i : children) {
-                if (i->bbox.intersect(bb)) {
+            for (auto& i : children_) {
+                if (i->bbox_.intersect(bb)) {
                     if (receiver != nullptr) {
                         receiver = nullptr;
                         break;
@@ -87,22 +98,22 @@ struct Octree::Node : Hittable {
                 }
             }
             if (receiver != nullptr) {
-                receiver->entities.push_back(e);
+                receiver->entities_.push_back(e);
             } else {
-                entities.push_back(e);
+                entities_.push_back(e);
             }
         }
     }
 
     void intersect(const Ray& ray, std::vector<const Hittable*>& output) const
     {
-        if (!bbox.intersect(ray))
+        if (!bbox_.intersect(ray))
             return;
 
-        output.insert(output.end(), entities.begin(), entities.end());
+        output.insert(output.end(), entities_.begin(), entities_.end());
 
         if (!isLeaf()) {
-            for (const auto& child : children) {
+            for (const auto& child : children_) {
                 child->intersect(ray, output);
             }
         }
@@ -112,13 +123,13 @@ struct Octree::Node : Hittable {
     {
         assert(isLeaf());
 
-        return entities.size();
+        return entities_.size();
     }
 
     bool intersect(const Ray& ray, Hit& hit) const override
     {
         auto min_dist = std::numeric_limits<double>::max();
-        for (const auto& e : entities) {
+        for (const auto& e : entities_) {
             Hit tmp_hit;
             if (!e->boundingBox().intersect(ray)) {
                 continue;
@@ -134,8 +145,8 @@ struct Octree::Node : Hittable {
         }
 
         if (!isLeaf()) {
-            for (const auto& c : children) {
-                if (!c->bbox.intersect(ray)) {
+            for (const auto& c : children_) {
+                if (!c->bbox_.intersect(ray)) {
                     continue;
                 }
                 Hit tmp_hit;
@@ -153,7 +164,7 @@ struct Octree::Node : Hittable {
         return min_dist < std::numeric_limits<double>::max();
     }
 
-    BoundingBox boundingBox() const override { return bbox; }
+    BoundingBox boundingBox() const override { return bbox_; }
 
     friend std::ostream& operator<<(std::ostream& o, const Node& n)
     {
@@ -161,20 +172,13 @@ struct Octree::Node : Hittable {
             o << "(" << n.size() << ")";
         } else {
             o << "(" << n.size() << "\n";
-            for (const auto& child : n.children) {
+            for (const auto& child : n.children_) {
                 o << *child << "\n";
             }
             o << ")";
         }
         return o;
     }
-
-    BoundingBox bbox;
-    std::vector<Hittable*> entities;
-    std::array<std::unique_ptr<Node>, 8> children;
-
-    const size_t split_threshold = 16;
-    const size_t max_depth = 10;
 };
 
 Octree::Octree(const glm::dvec3 min, const glm::dvec3 max)
@@ -182,58 +186,10 @@ Octree::Octree(const glm::dvec3 min, const glm::dvec3 max)
 {
 }
 
-BoundingBox Octree::bounds() const { return root_->bbox; }
-
-/// Store an entity in the correct position of the octree.
-void Octree::pushBack(Hittable* object) const { root_->insert(object, 0); }
-
-/// Returns list of entities that have the possibility to be intersected by the ray.
-std::vector<const Hittable*> Octree::intersect(const Ray& ray) const
-{
-    std::vector<const Hittable*> output;
-    root_->intersect(ray, output);
-    return output;
-}
-
-bool Octree::closestIntersection(const Ray& ray, Hit& hit) const
-{
-    auto min = std::numeric_limits<double>::infinity();
-    Hit tmp_hit;
-
-    const auto entities = intersect(ray);
-    for (auto entity : entities) {
-        if (entity->intersect(ray, tmp_hit)) {
-            const auto dist = glm::distance(ray.origin, tmp_hit.pos);
-            if (dist < min) {
-                min = dist;
-                hit = tmp_hit;
-            }
-        }
-    }
-    return min != std::numeric_limits<double>::infinity();
-}
-
-bool Octree::isBlocked(const Ray& ray, const glm::dvec3& light) const
-{
-    auto blocked = false;
-    const auto light_dist = glm::length(light - ray.origin);
-    const auto entities = intersect(ray);
-    for (auto entity : entities) {
-        Hit hit;
-        if (entity->intersect(ray, hit)) {
-            // check that the entity is not behind the light source
-            const auto entity_dist = glm::length(hit.pos - ray.origin);
-            if (light_dist > entity_dist) {
-                blocked = true;
-                break;
-            }
-        }
-    }
-    return blocked;
-}
-
-std::ostream& operator<<(std::ostream& o, const Octree& t) { return o << "{" << *t.root_ << "}"; }
+void Octree::insert(Hittable* object) const { root_->insert(object, 0); }
 
 bool Octree::intersect(const Ray& ray, Hit& hit) const { return root_->intersect(ray, hit); }
 
-BoundingBox Octree::boundingBox() const { return root_->bbox; }
+BoundingBox Octree::boundingBox() const { return root_->boundingBox(); }
+
+std::ostream& operator<<(std::ostream& o, const Octree& t) { return o << "{" << *t.root_ << "}"; }

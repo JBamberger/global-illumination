@@ -11,16 +11,10 @@
 #include "image.h"
 
 class RayTracer {
-
     bool running_ = false;
-
     Camera camera_;
     std::shared_ptr<const Octree> scene_;
     std::shared_ptr<Image> image_;
-
-    std::default_random_engine rng_;
-    std::uniform_real_distribution<double> dist01_;
-    std::uniform_real_distribution<double> dist11_;
 
   public:
     RayTracer() = delete;
@@ -32,10 +26,23 @@ class RayTracer {
     void stop();
     void start();
 
-    std::shared_ptr<Image> get_image() const;
+    std::shared_ptr<Image> getImage() const;
 
   private:
+    /**
+     * Iterative implementation of the path tracing.
+     *
+     * @param x x coordinate of the current pixel
+     * @param y y coordinate of the current pixel
+     * @return the light intensity transported on the traced path
+     */
     glm::dvec3 computePixel(int x, int y) const;
+
+    /**
+     * Recursive implementation of the path tracing.
+     *
+     * @param ray input ray
+     * @return The light intensity transported on the traced path
+     */
     glm::dvec3 computePixel(const Ray& ray) const;
-    glm::dvec3 hemisphere(glm::dvec3 normal, glm::dvec3 direction);
 };

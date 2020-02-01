@@ -3,24 +3,21 @@
 #include "entities.h"
 #include <chrono>
 #include <iostream>
-#include <limits>
 
 RayTracer::RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene)
-    : camera_(camera), scene_(std::move(scene)), image_(std::make_shared<Image>(0, 0)),
-      rng_(std::chrono::system_clock::now().time_since_epoch().count()), dist01_(0.0, 1.0),
-      dist11_(-1.0, 1.0)
+    : camera_(camera), scene_(std::move(scene)), image_(std::make_shared<Image>(0, 0))
 {
 }
 
 void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::move(scene); }
 
-void RayTracer::run(int w, int h)
+void RayTracer::run(const int w, const int h)
 {
     constexpr auto samples = 2048;
 
     std::vector<glm::dvec3> buffer;
     buffer.reserve(w * h);
-    for (size_t i = 0; i < w * h; i++) {
+    for (auto i = 0; i < w * h; i++) {
         buffer.emplace_back(0, 0, 0);
     }
 
@@ -102,38 +99,10 @@ glm::dvec3 RayTracer::computePixel(const Ray& ray) const
     return light;
 }
 
-glm::dvec3 RayTracer::hemisphere(const glm::dvec3 normal, const glm::dvec3 direction)
-{
-
-    const auto r1 = glm::two_pi<double>() * dist01_(rng_);
-    const auto r2 = dist01_(rng_);
-    const auto sq2 = glm::sqrt(r2);
-
-    const auto x = glm::cos(r1) * sq2;
-    const auto y = glm::sin(r1) * sq2;
-    const auto z = glm::sqrt(1 - r2);
-
-    // build basis vectors around normal vector
-    const auto w = glm::dot(normal, direction) < 0 ? normal : -normal;
-    glm::dvec3 c;
-    if (std::abs(w.x) < 1 / glm::sqrt(3)) {
-        c = glm::dvec3(1, 0, 0);
-    } else if (std::abs(w.y) < 1 / glm::sqrt(3)) {
-        c = glm::dvec3(0, 1, 0);
-    } else {
-        c = glm::dvec3(0, 0, 1);
-    }
-    const auto u = glm::cross(c, w);
-    const auto v = glm::cross(w, u);
-
-    // shirley 14. Sampling p294 short form which avoid trig dup. trig function
-    return glm::normalize(u * x + v * y + w * z);
-}
-
 bool RayTracer::running() const { return running_; }
 
 void RayTracer::stop() { running_ = false; }
 
 void RayTracer::start() { running_ = true; }
 
-std::shared_ptr<Image> RayTracer::get_image() const { return image_; }
+std::shared_ptr<Image> RayTracer::getImage() const { return image_; }

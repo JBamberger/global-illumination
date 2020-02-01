@@ -349,7 +349,7 @@ int main(int argc, char** argv)
     const auto scene = std::make_shared<Octree>(glm::dvec3{-20, -20, -20}, glm::dvec3{20, 20, 20});
     auto elems = createCornell();
     for (const auto& entity : elems)
-        scene->pushBack(entity.get());
+        scene->insert(entity.get());
 
     RayTracer raytracer(camera, scene);
 
