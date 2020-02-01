@@ -9,7 +9,7 @@
 #include <vector>
 
 class Octree : public Hittable {
-    struct Node;
+    class Node;
     std::unique_ptr<Node> root_;
 
   public:

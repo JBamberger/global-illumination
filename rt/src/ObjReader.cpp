@@ -228,26 +228,19 @@ std::ostream& operator<<(std::ostream& os, const ObjContent& content)
     return os;
 }
 
-static std::istream& operator>>(std::istream& is, glm::ivec3& vertex)
-{
-    is >> vertex.x;
-    is >> vertex.y;
-    is >> vertex.z;
-    return is;
-}
-
-static std::istream& operator>>(std::istream& is, glm::dvec3& vertex)
-{
-    is >> vertex.x;
-    is >> vertex.y;
-    is >> vertex.z;
-    return is;
-}
-
 std::istream& operator>>(std::istream& is, ObjContent& content)
 {
+    struct Face {
+        glm::ivec3 v;
+        glm::ivec3 vt;
+        glm::ivec3 vn;
+    };
+
     std::vector<glm::dvec3> vertices;
-    std::vector<glm::ivec3> faces;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> tex_coords;
+    std::vector<Face> faces;
+
     std::string line;
     while (std::getline(is, line)) {
         std::stringstream ls(line);
@@ -255,13 +248,47 @@ std::istream& operator>>(std::istream& is, ObjContent& content)
         ls >> kind;
         if (kind == "v") {
             glm::dvec3 v;
-            ls >> v;
+            ls >> v.x >> v.y >> v.z;
             vertices.push_back(v);
+        } else if (kind == "vn") {
+            glm::dvec3 vn;
+            ls >> vn.x >> vn.y >> vn.z;
+            normals.push_back(vn);
+        } else if (kind == "vt") {
+            glm::dvec2 vt;
+            ls >> vt.x >> vt.y;
+            tex_coords.push_back(vt);
         } else if (kind == "f") {
-            glm::ivec3 f;
-            ls >> f;
+            const auto read_one = [&ls](int& v, int& vt, int& vn) {
+                ls >> v;
+                if (ls.peek() == '/') {
+                    static_cast<void>(ls.get());
+                    if (ls.peek() == '/') {
+                        static_cast<void>(ls.get());
+                        ls >> vn;
+                    } else {
+                        ls >> vt;
+                        if (ls.peek() == '/') {
+                            static_cast<void>(ls.get());
+                            ls >> vn;
+                        }
+                    }
+                }
+            };
+
+            Face f{};
+            read_one(f.v.x, f.vt.x, f.vn.x);
+            read_one(f.v.y, f.vt.y, f.vn.y);
+            read_one(f.v.z, f.vt.z, f.vn.z);
             faces.push_back(f);
         } else {
+            // s <integer>       -> smoothing 1 - 32
+            // s off             -> disable smoothing
+            // # <something>     -> comment
+            // mtllib <filename> -> material definitions
+            // o <string>        -> define object
+            // g <string>        -> define group
+            // usemtl <string>   -> use material
             // skip line
             continue;
         }
@@ -269,7 +296,7 @@ std::istream& operator>>(std::istream& is, ObjContent& content)
 
     content.clear();
     for (const auto& f : faces) {
-        content.emplace_back(vertices[f.x - 1], vertices[f.y - 1], vertices[f.z - 1]);
+        content.emplace_back(vertices[f.v.x - 1], vertices[f.v.y - 1], vertices[f.v.z - 1]);
     }
 
     return is;
@@ -351,6 +378,17 @@ ObjContent rotate_z(ObjContent entity, double angle)
         face.C = r * face.C;
     }
     return entity;
+}
+
+ObjContent center(ObjContent content)
+{
+    glm::dvec3 sum(0, 0, 0);
+    for (const auto& t : content) {
+        sum += (t.A + t.B + t.C) / 3.0;
+    }
+    sum /= static_cast<double>(content.size());
+
+    return translate(std::move(content), -sum);
 }
 
 ObjContent translate(ObjContent entity, glm::dvec3 delta)

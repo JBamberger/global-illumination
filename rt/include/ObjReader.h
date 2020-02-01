@@ -24,6 +24,7 @@ ObjContent rotate_x(ObjContent content, double angle);
 ObjContent rotate_y(ObjContent content, double angle);
 ObjContent rotate_z(ObjContent content, double angle);
 ObjContent translate(ObjContent content, glm::dvec3 delta);
+ObjContent center(ObjContent content);
 ObjContent scale(ObjContent content, double scale);
 ObjContent scale(ObjContent content, glm::dvec3 scale);
 

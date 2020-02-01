@@ -139,7 +139,8 @@ std::unique_ptr<BVH::Node> BVH::construct(size_t depth, std::vector<Triangle> fa
         return std::make_unique<LeafNode>(std::move(faces));
     }
 
-    const auto cc = depth % 3; // determine if x, y or z is used for sorting -> round robin
+    const glm::dvec3::length_type cc =
+        depth % 3; // determine if x, y or z is used for sorting -> round robin
     const auto comp = [cc](const Triangle& a, const Triangle& b) {
         // compare by center of mass
         return a.A[cc] + a.B[cc] + a.C[cc] < b.A[cc] + b.B[cc] + b.C[cc];

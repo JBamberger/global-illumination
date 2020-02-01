@@ -11,7 +11,7 @@
 inline double rng()
 {
     static thread_local std::default_random_engine engine(
-        std::chrono::system_clock::now().time_since_epoch().count());
+        static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
 
     std::uniform_real_distribution<double> dist(0, 1);
     return dist(engine);

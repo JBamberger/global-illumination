@@ -220,11 +220,8 @@ constexpr glm::dvec3 magenta(1, 0, 1);
 //    return scene;
 //}
 
-std::vector<std::unique_ptr<Entity>> createCornell()
+void addCornell(std::vector<std::unique_ptr<Entity>>& scene)
 {
-    using namespace entities;
-
-    std::vector<std::unique_ptr<Entity>> scene;
     std::unique_ptr<Entity> face;
 
     const auto s = 3.0;
@@ -243,59 +240,73 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     const auto mat_white = std::make_shared<LambertianMaterial>(white);
 
     // left face
-    face = makeQuad(p100, p000, p001, p101);
+    face = entities::makeQuad(p100, p000, p001, p101);
     face->setMaterial(mat_red);
     scene.push_back(std::move(face));
     // right face
-    face = makeQuad(p110, p111, p011, p010);
+    face = entities::makeQuad(p110, p111, p011, p010);
     face->setMaterial(mat_green);
     scene.push_back(std::move(face));
     // top face
-    face = makeQuad(p101, p001, p011, p111);
+    face = entities::makeQuad(p101, p001, p011, p111);
     face->setMaterial(mat_white);
     scene.push_back(std::move(face));
     // bottom face
-    face = makeQuad(p110, p010, p000, p100);
+    face = entities::makeQuad(p110, p010, p000, p100);
     face->setMaterial(mat_white);
     scene.push_back(std::move(face));
     // back face
-    face = makeQuad(p000, p010, p011, p001);
+    face = entities::makeQuad(p000, p010, p011, p001);
     face->setMaterial(mat_white);
     scene.push_back(std::move(face));
 
-    face = makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
-    face->setMaterial(std::make_shared<DiffuseLight>(white));
+    face = entities::makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
+    face->setMaterial(std::make_shared<DiffuseLight>(2.0 * white));
+    scene.push_back(std::move(face));
+}
+
+void addCornellContent(std::vector<std::unique_ptr<Entity>>& scene)
+{
+    std::unique_ptr<Entity> face;
+
+    face = std::make_unique<Sphere>(glm::dvec3{-1.5, 1.5, -2}, 1.0);
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
     scene.push_back(std::move(face));
 
-    //    face = std::make_unique<Sphere>(glm::dvec3{-1.5, 1.5, -2}, 1.0);
-    //    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
-    //    scene.push_back(std::move(face));
-    //
-    //    auto c = obj::makeCuboid({0, 0, 0}, {2, 2, 4});
-    //    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
-    //    c = obj::translate(std::move(c), {-1.5, -1.5, -1});
-    //    face = std::make_unique<BVH>(c);
-    //    face->setMaterial(std::make_shared<LambertianMaterial>(white));
-    //    scene.push_back(std::move(face));
-    //
-    //    face = std::make_unique<Sphere>(glm::dvec3{1.5, -1.0, -2}, 1.0);
-    //    face->setMaterial(std::make_shared<Dielectric>(1.4));
-    //    scene.push_back(std::move(face));
+    auto c = obj::makeCuboid({0, 0, 0}, {2, 2, 4});
+    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
+    c = obj::translate(std::move(c), {-1.5, -1.5, -1});
+    face = std::make_unique<BVH>(c);
+    face->setMaterial(std::make_shared<LambertianMaterial>(white));
+    scene.push_back(std::move(face));
 
+    face = std::make_unique<Sphere>(glm::dvec3{1.5, -1.0, -2}, 1.0);
+    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    scene.push_back(std::move(face));
+}
+
+void addAxisIndicator(std::vector<std::unique_ptr<Entity>>& scene)
+{
+    std::unique_ptr<Entity> face;
     // Defines x,y and z axis indicators
-    //        const auto tip = glm::dvec3{0, 0, 0};
-    //        const auto id_len = 2;
-    //        auto x_axis = makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
-    //        x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
-    //        scene.push_back(std::move(x_axis));
-    //
-    //        auto y_axis = makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
-    //        y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
-    //        scene.push_back(std::move(y_axis));
-    //
-    //        auto z_axis = makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
-    //        z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
-    //        scene.push_back(std::move(z_axis));
+    const auto tip = glm::dvec3{0, 0, 0};
+    const auto id_len = 2;
+    auto x_axis = entities::makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
+    x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
+    scene.push_back(std::move(x_axis));
+
+    auto y_axis = entities::makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
+    y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
+    scene.push_back(std::move(y_axis));
+
+    auto z_axis = entities::makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
+    z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
+    scene.push_back(std::move(z_axis));
+}
+
+void addPig(std::vector<std::unique_ptr<Entity>>& scene)
+{
+    std::unique_ptr<Entity> face;
 
     const auto load_pig_part = [](const std::string& file) {
         obj::ObjContent part;
@@ -335,6 +346,37 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     face = std::make_unique<BVH>(c);
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
+}
+
+void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
+{
+
+    obj::ObjContent triangles;
+    std::ifstream is("D:/dev/global-illumination/share/dragon-3.obj");
+    if (is.is_open()) {
+        using namespace obj;
+        is >> triangles;
+        is.close();
+    }
+
+    triangles = obj::center(std::move(triangles));
+    triangles = obj::rotate_x(std::move(triangles), -glm::pi<double>() / 2);
+    triangles = obj::rotate_z(std::move(triangles), -glm::pi<double>() / 3);
+    triangles = obj::scale(std::move(triangles), 25);
+    auto face = std::make_unique<BVH>(triangles);
+
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(glm::dvec3(1, 1, 1), 0.5));
+    scene.push_back(std::move(face));
+}
+
+std::vector<std::unique_ptr<Entity>> createCornell()
+{
+    std::vector<std::unique_ptr<Entity>> scene;
+    addCornell(scene);
+    addCornellContent(scene);
+    //    addAxisIndicator(scene);
+    //    addPig(scene);
+    //    addDragon(scene);
 
     return scene;
 }
