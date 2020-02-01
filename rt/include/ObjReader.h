@@ -18,6 +18,9 @@ ObjContent makeCuboid(glm::dvec3 center, glm::dvec3 size);
 ObjContent makeOctet(std::array<glm::dvec3, 8> corners);
 ObjContent makeCone(glm::dvec3 center, glm::dvec3 tip, double radius, size_t slices);
 
+ObjContent readObjFile(const std::string& file);
+ObjContent readObjStream(std::istream& is);
+void readObjStream(std::istream& is, ObjContent& content);
 std::ostream& operator<<(std::ostream& os, const ObjContent& content);
 std::istream& operator>>(std::istream& is, ObjContent& content);
 
@@ -42,6 +45,7 @@ class Transform {
 
     ObjContent apply(ObjContent content) const;
     std::unique_ptr<BVH> to_bvh(ObjContent content) const;
+    std::unique_ptr<BVH> to_bvh(std::string file) const;
 
   private:
     class Step {

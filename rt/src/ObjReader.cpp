@@ -1,8 +1,10 @@
 #include "ObjReader.h"
 #include <array>
+#include <fstream>
 #include <glm/gtx/rotate_vector.hpp>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace obj {
 
@@ -214,21 +216,28 @@ ObjContent makeCone(const glm::dvec3 center,
     return faces;
 }
 
-std::ostream& operator<<(std::ostream& os, const ObjContent& content)
+ObjContent readObjFile(const std::string& file)
 {
-    auto vertex = 1;
-    for (const auto& face : content) {
-        os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
-        os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
-        os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
-
-        os << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
-        vertex += 3;
+    obj::ObjContent part;
+    std::ifstream is(file);
+    if (is.is_open()) {
+        is >> part;
+        is.close();
+    } else {
+        std::cout << "Could not open file " << file << "." << std::endl;
+        throw std::runtime_error("Could not read file.");
     }
-    return os;
+    return std::move(part);
 }
 
-std::istream& operator>>(std::istream& is, ObjContent& content)
+ObjContent readObjStream(std::istream& is)
+{
+    ObjContent content;
+    readObjStream(is, content);
+    return content;
+}
+
+void readObjStream(std::istream& is, ObjContent& content)
 {
     struct Face {
         glm::ivec3 v;
@@ -299,6 +308,25 @@ std::istream& operator>>(std::istream& is, ObjContent& content)
         content.emplace_back(vertices[f.v.x - 1], vertices[f.v.y - 1], vertices[f.v.z - 1]);
     }
     std::cout << "Loaded " << faces.size() << " primitives." << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& os, const ObjContent& content)
+{
+    auto vertex = 1;
+    for (const auto& face : content) {
+        os << "v " << face.A.x << " " << face.A.y << " " << face.A.z << "\n";
+        os << "v " << face.B.x << " " << face.B.y << " " << face.B.z << "\n";
+        os << "v " << face.C.x << " " << face.C.y << " " << face.C.z << "\n";
+
+        os << "f " << vertex << " " << vertex + 1 << " " << vertex + 2 << std::endl;
+        vertex += 3;
+    }
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, ObjContent& content)
+{
+    readObjStream(is, content);
     return is;
 }
 
@@ -484,6 +512,11 @@ ObjContent Transform::apply(ObjContent content) const
 std::unique_ptr<BVH> Transform::to_bvh(ObjContent content) const
 {
     return std::make_unique<BVH>(std::move(apply(std::move(content))));
+}
+
+std::unique_ptr<BVH> Transform::to_bvh(std::string file) const
+{
+    return to_bvh(readObjFile(std::move(file)));
 }
 
 } // namespace obj

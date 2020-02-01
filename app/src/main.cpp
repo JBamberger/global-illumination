@@ -308,20 +308,13 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
 {
     std::unique_ptr<Entity> face;
     const auto load_pig_part = [](const std::string& file) {
-        obj::ObjContent part;
-        std::ifstream pigstream(file);
-        if (pigstream.is_open()) {
-            using namespace obj;
-            pigstream >> part;
-            pigstream.close();
-        }
         return obj::Transform()
             .translate({1, -0.5, 2})
             .rotate_x(-glm::pi<double>() / 2)
             .rotate_z(-glm::pi<double>() / 3)
             .scale(3)
             .translate({0, 0, -1})
-            .to_bvh(std::move(part));
+            .to_bvh(file);
     };
 
     face = load_pig_part("D:/dev/global-illumination/share/pig_body.obj");
@@ -350,47 +343,28 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
 
 void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
 {
-
-    obj::ObjContent triangles;
-    std::ifstream is("D:/dev/global-illumination/share/dragon-3.obj");
-    if (is.is_open()) {
-        using namespace obj;
-        is >> triangles;
-        is.close();
-    }
     auto face = obj::Transform()
                     .center()
                     .rotate_x(-glm::pi<double>() / 2)
                     .rotate_z(-glm::pi<double>() / 3)
                     .scale(25)
-                    .to_bvh(std::move(triangles));
+                    .to_bvh("D:/dev/global-illumination/share/dragon-3.obj");
     face->setMaterial(std::make_shared<MetalLikeMaterial>(glm::dvec3(1, 1, 1), 0.5));
     scene.push_back(std::move(face));
 }
 
 void addCow(std::vector<std::unique_ptr<Entity>>& scene)
 {
-    obj::ObjContent triangles;
-    std::ifstream is("D:/dev/global-illumination/share/spot_triangulated.obj");
-    if (is.is_open()) {
-        using namespace obj;
-        is >> triangles;
-        is.close();
-    }
     auto face = obj::Transform()
                     .center()
                     .rotate_x(-glm::pi<double>() / 2)
                     .rotate_z(glm::pi<double>() / 4)
                     .scale(2)
                     .translate({0, 0, -1.4})
-                    .to_bvh(std::move(triangles));
+                    .to_bvh("D:/dev/global-illumination/share/spot_triangulated.obj");
 
     face->setMaterial(std::make_shared<Dielectric>(1.4));
     scene.push_back(std::move(face));
-
-    //    auto face2 = entities::makeCuboid({0, 0, -2.3}, {5, 5, 1.4});
-    //    face2->setMaterial(std::make_shared<LambertianMaterial>(blue));
-    //    scene.push_back(std::move(face2));
 }
 
 std::vector<std::unique_ptr<Entity>> createCornell()
@@ -399,8 +373,8 @@ std::vector<std::unique_ptr<Entity>> createCornell()
     addCornell(scene);
     //    addCornellContent(scene);
     //    addAxisIndicator(scene);
-    addPig(scene);
-    //        addCow(scene);
+    //    addPig(scene);
+    addCow(scene);
     //    addDragon(scene);
 
     return scene;
