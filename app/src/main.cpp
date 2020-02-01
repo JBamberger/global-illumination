@@ -273,10 +273,10 @@ void addCornellContent(std::vector<std::unique_ptr<Entity>>& scene)
     face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
     scene.push_back(std::move(face));
 
-    auto c = obj::makeCuboid({0, 0, 0}, {2, 2, 4});
-    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
-    c = obj::translate(std::move(c), {-1.5, -1.5, -1});
-    face = std::make_unique<BVH>(c);
+    face = obj::Transform()
+               .rotate_z(-glm::pi<double>() / 10)
+               .translate({-1.5, -1.5, -1})
+               .to_bvh(obj::makeCuboid({0, 0, 0}, {2, 2, 4}));
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
@@ -307,7 +307,6 @@ void addAxisIndicator(std::vector<std::unique_ptr<Entity>>& scene)
 void addPig(std::vector<std::unique_ptr<Entity>>& scene)
 {
     std::unique_ptr<Entity> face;
-
     const auto load_pig_part = [](const std::string& file) {
         obj::ObjContent part;
         std::ifstream pigstream(file);
@@ -316,13 +315,13 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
             pigstream >> part;
             pigstream.close();
         }
-        part = obj::translate(std::move(part), {1, -0.5, 2});
-        part = obj::rotate_x(std::move(part), -glm::pi<double>() / 2);
-        part = obj::rotate_z(std::move(part), -glm::pi<double>() / 3);
-        part = obj::scale(std::move(part), 3);
-        part = obj::translate(std::move(part), {0, 0, -1});
-        part = obj::invalidate(std::move(part));
-        return std::make_unique<BVH>(part);
+        return obj::Transform()
+            .translate({1, -0.5, 2})
+            .rotate_x(-glm::pi<double>() / 2)
+            .rotate_z(-glm::pi<double>() / 3)
+            .scale(3)
+            .translate({0, 0, -1})
+            .to_bvh(std::move(part));
     };
 
     face = load_pig_part("D:/dev/global-illumination/share/pig_body.obj");
@@ -341,10 +340,10 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
     face->setMaterial(std::make_shared<DiffuseLight>(0.5 * red));
     scene.push_back(std::move(face));
 
-    auto c = obj::makeCuboid({0, 0, 0}, {4, 4, 0.5});
-    c = obj::rotate_z(std::move(c), -glm::pi<double>() / 10);
-    c = obj::translate(std::move(c), {0, 0, -2.75});
-    face = std::make_unique<BVH>(c);
+    face = obj::Transform()
+               .rotate_z(-glm::pi<double>() / 10)
+               .translate({0, 0, -2.75})
+               .to_bvh(obj::makeCuboid({0, 0, 0}, {4, 4, 0.5}));
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 }
@@ -359,13 +358,12 @@ void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
         is >> triangles;
         is.close();
     }
-
-    triangles = obj::center(std::move(triangles));
-    triangles = obj::rotate_x(std::move(triangles), -glm::pi<double>() / 2);
-    triangles = obj::rotate_z(std::move(triangles), -glm::pi<double>() / 3);
-    triangles = obj::scale(std::move(triangles), 25);
-    auto face = std::make_unique<BVH>(triangles);
-
+    auto face = obj::Transform()
+                    .center()
+                    .rotate_x(-glm::pi<double>() / 2)
+                    .rotate_z(-glm::pi<double>() / 3)
+                    .scale(25)
+                    .to_bvh(std::move(triangles));
     face->setMaterial(std::make_shared<MetalLikeMaterial>(glm::dvec3(1, 1, 1), 0.5));
     scene.push_back(std::move(face));
 }
@@ -379,13 +377,13 @@ void addCow(std::vector<std::unique_ptr<Entity>>& scene)
         is >> triangles;
         is.close();
     }
-
-    triangles = obj::center(std::move(triangles));
-    triangles = obj::rotate_x(std::move(triangles), -glm::pi<double>() / 2);
-    triangles = obj::rotate_z(std::move(triangles), glm::pi<double>() / 4);
-    triangles = obj::scale(std::move(triangles), 2);
-    triangles = obj::translate(std::move(triangles), {0, 0, -1.4});
-    auto face = std::make_unique<BVH>(triangles);
+    auto face = obj::Transform()
+                    .center()
+                    .rotate_x(-glm::pi<double>() / 2)
+                    .rotate_z(glm::pi<double>() / 4)
+                    .scale(2)
+                    .translate({0, 0, -1.4})
+                    .to_bvh(std::move(triangles));
 
     face->setMaterial(std::make_shared<Dielectric>(1.4));
     scene.push_back(std::move(face));

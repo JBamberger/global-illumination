@@ -321,7 +321,77 @@ BoundingBox computeBBox(const ObjContent& faces)
     return BoundingBox{min, max};
 }
 
-ObjContent rotate_x(ObjContent entity, double angle)
+class Transform::Rotate : public Transform::Step {
+    glm::mat3 r_;
+
+  public:
+    explicit Rotate(glm::mat3 r) : r_(r) {}
+
+  private:
+    void process(Triangle& t) override
+    {
+        t.A = r_ * t.A;
+        t.B = r_ * t.B;
+        t.C = r_ * t.C;
+    }
+};
+
+class Transform::Translate : public Transform::Step {
+    glm::dvec3 delta_;
+
+  public:
+    explicit Translate(glm::dvec3 delta) : delta_(delta) {}
+
+  private:
+    void process(Triangle& t) override
+    {
+        t.A += delta_;
+        t.B += delta_;
+        t.C += delta_;
+    }
+};
+
+class Transform::Scale : public Transform::Step {
+    glm::dvec3 scale_;
+
+  public:
+    explicit Scale(glm::dvec3 scale) : scale_(scale) {}
+
+  private:
+    void process(Triangle& t) override
+    {
+        t.A *= scale_;
+        t.B *= scale_;
+        t.C *= scale_;
+    }
+};
+
+class Transform::Center : public Transform::Step {
+    glm::dvec3 mean_;
+
+  public:
+    explicit Center() : mean_(0) {}
+
+  private:
+    void pre(const ObjContent& content) override
+    {
+        glm::dvec3 sum(0, 0, 0);
+        for (const auto& t : content) {
+            sum += (t.A + t.B + t.C) / 3.0;
+        }
+        sum /= static_cast<double>(content.size());
+        mean_ = sum;
+    }
+
+    void process(Triangle& t) override
+    {
+        t.A -= mean_;
+        t.B -= mean_;
+        t.C -= mean_;
+    }
+};
+
+Transform& Transform::rotate_x(double angle)
 {
     const auto sin_theta = glm::sin(angle);
     const auto cos_theta = glm::cos(angle);
@@ -333,15 +403,11 @@ ObjContent rotate_x(ObjContent entity, double angle)
         {0,-sin_theta, cos_theta}
     });
     // clang-format on
-    for (auto& face : entity) {
-        face.A = r * face.A;
-        face.B = r * face.B;
-        face.C = r * face.C;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Rotate(r)));
+    return *this;
 }
 
-ObjContent rotate_y(ObjContent entity, double angle)
+Transform& Transform::rotate_y(double angle)
 {
     const auto sin_theta = glm::sin(angle);
     const auto cos_theta = glm::cos(angle);
@@ -352,19 +418,14 @@ ObjContent rotate_y(ObjContent entity, double angle)
         {-sin_theta, 0, cos_theta}
     });
     // clang-format on
-    for (auto& face : entity) {
-        face.A = r * face.A;
-        face.B = r * face.B;
-        face.C = r * face.C;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Rotate(r)));
+    return *this;
 }
 
-ObjContent rotate_z(ObjContent entity, double angle)
+Transform& Transform::rotate_z(double angle)
 {
     const auto sin_theta = glm::sin(angle);
     const auto cos_theta = glm::cos(angle);
-
     // clang-format off
     const auto r = glm::transpose(glm::mat3{
         { cos_theta, sin_theta, 0},
@@ -372,61 +433,57 @@ ObjContent rotate_z(ObjContent entity, double angle)
         {     0,     0, 1}
     });
     // clang-format on
-    for (auto& face : entity) {
-        face.A = r * face.A;
-        face.B = r * face.B;
-        face.C = r * face.C;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Rotate(r)));
+    return *this;
 }
 
-ObjContent center(ObjContent content)
+Transform& Transform::center()
 {
-    glm::dvec3 sum(0, 0, 0);
-    for (const auto& t : content) {
-        sum += (t.A + t.B + t.C) / 3.0;
-    }
-    sum /= static_cast<double>(content.size());
-
-    return translate(std::move(content), -sum);
+    transforms_.push_back(std::unique_ptr<Step>(new Center()));
+    return *this;
 }
 
-ObjContent translate(ObjContent entity, glm::dvec3 delta)
+Transform& Transform::translate(glm::dvec3 delta)
 {
-    for (auto& face : entity) {
-        face.A += delta;
-        face.B += delta;
-        face.C += delta;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Translate(delta)));
+    return *this;
 }
 
-ObjContent scale(ObjContent entity, double scale)
+Transform& Transform::scale(double scale)
 {
-    for (auto& face : entity) {
-        face.A *= scale;
-        face.B *= scale;
-        face.C *= scale;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Scale(glm::dvec3(scale))));
+    return *this;
 }
 
-ObjContent scale(ObjContent entity, glm::dvec3 scale)
+Transform& Transform::scale(glm::dvec3 scale)
 {
-    for (auto& face : entity) {
-        face.A *= scale;
-        face.B *= scale;
-        face.C *= scale;
-    }
-    return entity;
+    transforms_.push_back(std::unique_ptr<Step>(new Scale(scale)));
+    return *this;
 }
-ObjContent invalidate(ObjContent content)
-{
 
+ObjContent Transform::apply(ObjContent content) const
+{
+    for (const auto& t : transforms_) {
+        t->pre(content);
+    }
+
+    for (auto& triangle : content) {
+        for (const auto& t : transforms_) {
+            t->process(triangle);
+        }
+    }
+
+    // finally invalidate all computed properties
     for (auto& face : content) {
         face.invalidate();
     }
+
     return content;
+}
+
+std::unique_ptr<BVH> Transform::to_bvh(ObjContent content) const
+{
+    return std::make_unique<BVH>(std::move(apply(std::move(content))));
 }
 
 } // namespace obj

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BVH.h"
 #include "Entity.h"
 #include <vector>
 
@@ -20,15 +21,35 @@ ObjContent makeCone(glm::dvec3 center, glm::dvec3 tip, double radius, size_t sli
 std::ostream& operator<<(std::ostream& os, const ObjContent& content);
 std::istream& operator>>(std::istream& is, ObjContent& content);
 
-ObjContent rotate_x(ObjContent content, double angle);
-ObjContent rotate_y(ObjContent content, double angle);
-ObjContent rotate_z(ObjContent content, double angle);
-ObjContent translate(ObjContent content, glm::dvec3 delta);
-ObjContent center(ObjContent content);
-ObjContent scale(ObjContent content, double scale);
-ObjContent scale(ObjContent content, glm::dvec3 scale);
-ObjContent invalidate(ObjContent content);
-
 BoundingBox computeBBox(const ObjContent& content);
+
+class Transform {
+    class Step;
+    class Translate;
+    class Scale;
+    class Center;
+    class Rotate;
+    std::vector<std::unique_ptr<Step>> transforms_;
+
+  public:
+    Transform& rotate_x(double angle);
+    Transform& rotate_y(double angle);
+    Transform& rotate_z(double angle);
+    Transform& center();
+    Transform& translate(glm::dvec3 delta);
+    Transform& scale(double scale);
+    Transform& scale(glm::dvec3 scale);
+
+    ObjContent apply(ObjContent content) const;
+    std::unique_ptr<BVH> to_bvh(ObjContent content) const;
+
+  private:
+    class Step {
+        virtual void pre(const ObjContent& content) {}
+        virtual void process(Triangle& t) = 0;
+
+        friend ObjContent Transform::apply(ObjContent content) const;
+    };
+};
 
 } // namespace obj
