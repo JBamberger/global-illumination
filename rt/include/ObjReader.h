@@ -27,6 +27,7 @@ ObjContent translate(ObjContent content, glm::dvec3 delta);
 ObjContent center(ObjContent content);
 ObjContent scale(ObjContent content, double scale);
 ObjContent scale(ObjContent content, glm::dvec3 scale);
+ObjContent invalidate(ObjContent content);
 
 BoundingBox computeBBox(const ObjContent& content);
 

@@ -48,6 +48,7 @@ class Triangle final : public Entity {
     glm::dvec2 tAC = {0, 0};
 
     glm::dmat2x3 to_tex_map;
+    //    BoundingBox bbox_;
 
   public:
     /// corner points (ccw)
@@ -61,10 +62,7 @@ class Triangle final : public Entity {
     glm::dvec3 normal() const;
     glm::dvec2 texMapping(const glm::dvec3& intersect) const;
     void setTexCoords(glm::dvec2 ca, glm::dvec2 cb, glm::dvec2 cc);
-    void setCoords(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c);
-
-  private:
-    void updateCaches();
+    void invalidate();
 };
 
 class Sphere final : public Entity {

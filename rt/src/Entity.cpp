@@ -24,10 +24,11 @@ void Entity::setMaterial(std::shared_ptr<Material> material)
 /// Triangle
 ///************************************************************************************************
 
-Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c) : A(a), B(b), C(c)
+Triangle::Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c)
+    : A(a), B(b), C(c) //, bbox_(glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C)))
 {
     assert(glm::abs(glm::dot(glm::normalize(b - a), glm::normalize(c - a))) != 1);
-    updateCaches();
+    invalidate();
 }
 
 bool Triangle::intersect(const Ray& ray, Hit& hit) const
@@ -69,7 +70,7 @@ bool Triangle::intersect(const Ray& ray, Hit& hit) const
 
 BoundingBox Triangle::boundingBox() const
 {
-    return BoundingBox{glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
+    return BoundingBox(glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C)));
 }
 
 glm::dvec3 Triangle::normal() const { return glm::normalize(glm::cross(B - A, C - A)); }
@@ -111,17 +112,11 @@ void Triangle::setTexCoords(const glm::dvec2 ca, const glm::dvec2 cb, const glm:
     tAC = cc - ca;
 }
 
-void Triangle::setCoords(const glm::dvec3 a, const glm::dvec3 b, const glm::dvec3 c)
+void Triangle::invalidate()
 {
-    A = a;
-    B = b;
-    C = c;
+    // recompute the bbox
+    //    bbox_ = {glm::min(A, glm::min(B, C)), glm::max(A, glm::max(B, C))};
 
-    updateCaches();
-}
-
-void Triangle::updateCaches()
-{
     // recomputes the matrix which computes the coordinates of a point in the triangle plane
     const auto xt = glm::dmat2x3(B - A, C - A);
     to_tex_map = xt * glm::inverse(glm::transpose(xt) * xt);

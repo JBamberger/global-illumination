@@ -321,6 +321,7 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
         part = obj::rotate_z(std::move(part), -glm::pi<double>() / 3);
         part = obj::scale(std::move(part), 3);
         part = obj::translate(std::move(part), {0, 0, -1});
+        part = obj::invalidate(std::move(part));
         return std::make_unique<BVH>(part);
     };
 
@@ -329,11 +330,11 @@ void addPig(std::vector<std::unique_ptr<Entity>>& scene)
     scene.push_back(std::move(face));
 
     face = load_pig_part("D:/dev/global-illumination/share/pig_eyes.obj");
-    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.5));
+    face->setMaterial(std::make_shared<LambertianMaterial>(white));
     scene.push_back(std::move(face));
 
     face = load_pig_part("D:/dev/global-illumination/share/pig_pupils.obj");
-    face->setMaterial(std::make_shared<DiffuseLight>(0.5 * green));
+    face->setMaterial(std::make_shared<LambertianMaterial>(black));
     scene.push_back(std::move(face));
 
     face = load_pig_part("D:/dev/global-illumination/share/pig_tongue.obj");
@@ -369,13 +370,39 @@ void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
     scene.push_back(std::move(face));
 }
 
+void addCow(std::vector<std::unique_ptr<Entity>>& scene)
+{
+    obj::ObjContent triangles;
+    std::ifstream is("D:/dev/global-illumination/share/spot_triangulated.obj");
+    if (is.is_open()) {
+        using namespace obj;
+        is >> triangles;
+        is.close();
+    }
+
+    triangles = obj::center(std::move(triangles));
+    triangles = obj::rotate_x(std::move(triangles), -glm::pi<double>() / 2);
+    triangles = obj::rotate_z(std::move(triangles), glm::pi<double>() / 4);
+    triangles = obj::scale(std::move(triangles), 2);
+    triangles = obj::translate(std::move(triangles), {0, 0, -1.4});
+    auto face = std::make_unique<BVH>(triangles);
+
+    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    scene.push_back(std::move(face));
+
+    //    auto face2 = entities::makeCuboid({0, 0, -2.3}, {5, 5, 1.4});
+    //    face2->setMaterial(std::make_shared<LambertianMaterial>(blue));
+    //    scene.push_back(std::move(face2));
+}
+
 std::vector<std::unique_ptr<Entity>> createCornell()
 {
     std::vector<std::unique_ptr<Entity>> scene;
     addCornell(scene);
-    addCornellContent(scene);
+    //    addCornellContent(scene);
     //    addAxisIndicator(scene);
-    //    addPig(scene);
+    addPig(scene);
+    //        addCow(scene);
     //    addDragon(scene);
 
     return scene;

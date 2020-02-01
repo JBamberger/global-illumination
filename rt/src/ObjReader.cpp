@@ -298,7 +298,7 @@ std::istream& operator>>(std::istream& is, ObjContent& content)
     for (const auto& f : faces) {
         content.emplace_back(vertices[f.v.x - 1], vertices[f.v.y - 1], vertices[f.v.z - 1]);
     }
-
+    std::cout << "Loaded " << faces.size() << " primitives." << std::endl;
     return is;
 }
 
@@ -419,6 +419,14 @@ ObjContent scale(ObjContent entity, glm::dvec3 scale)
         face.C *= scale;
     }
     return entity;
+}
+ObjContent invalidate(ObjContent content)
+{
+
+    for (auto& face : content) {
+        face.invalidate();
+    }
+    return content;
 }
 
 } // namespace obj
