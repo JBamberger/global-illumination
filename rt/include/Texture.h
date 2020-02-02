@@ -68,8 +68,8 @@ class ImageBackedTexture final : public Texture {
     }
     glm::dvec3 value(glm::dvec2 uv) const override
     {
-        const auto x = lround(uv.x * width);
-        const auto y = lround(uv.y * height);
+        const auto x = lround(uv.x * (static_cast<double>(width) - 1.0));
+        const auto y = lround(uv.y * (static_cast<double>(height) - 1.0));
         return image[y * width + x];
     }
 };

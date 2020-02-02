@@ -98,6 +98,9 @@ glm::dvec2 Triangle::texMapping(const glm::dvec3& intersect) const
     // basis.
     auto uv = tA + coords.x * tAB + coords.y * tAC;
 
+    // Wrap coordinates around, i.e. similar to tiling the space with the coordinates
+    uv -= glm::floor(uv);
+
     // If the intersection point lies within the triangle and the triangle has valid coordinates
     // the result must be between 0 and 1.
     assert(-0.00001 <= uv.x && uv.x <= 1.00001);
