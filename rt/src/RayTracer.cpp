@@ -5,15 +5,18 @@
 #include <iostream>
 
 RayTracer::RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene)
-    : camera_(camera), scene_(std::move(scene)), image_(std::make_shared<Image>(0, 0))
+    : samples_(2048), camera_(camera), scene_(std::move(scene)),
+      image_(std::make_shared<Image>(0, 0))
 {
 }
 
 void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::move(scene); }
 
+void RayTracer::setSampleCount(const size_t samples) { samples_ = samples; }
+
 void RayTracer::run(const int w, const int h)
 {
-    constexpr auto samples = 2048;
+    const auto samples = samples_;
 
     std::vector<glm::dvec3> buffer;
     buffer.reserve(w * h);

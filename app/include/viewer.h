@@ -29,7 +29,42 @@ class Viewer : public QWidget {
         connect(timer_, &QTimer::timeout, repaint_callback);
     }
 
-    ~Viewer() { stopRaytrace(); }
+    ~Viewer() override { stopRaytrace(); }
+
+    void setSampleCount(size_t samples)
+    {
+        stopRaytrace();
+        raytracer_.setSampleCount(samples);
+        startRaytrace();
+    }
+
+    void setScene(const std::shared_ptr<Octree>& scene)
+    {
+        stopRaytrace();
+        raytracer_.setScene(scene);
+        startRaytrace();
+    }
+
+    void startRaytrace()
+    {
+        if (raytracer_.running()) {
+            std::cerr << "Tried to start raytracer that is running already." << std::endl;
+            throw std::runtime_error("Raytracer is already running.");
+        }
+
+        raytracer_.start();
+        thread_ = std::thread([&]() {
+            using namespace std::chrono;
+
+            duration_text_->setText("Running...");
+            const auto t1 = high_resolution_clock::now();
+            raytracer_.run(this->width(), this->height());
+            const auto t2 = high_resolution_clock::now();
+            const auto duration = duration_cast<milliseconds>(t2 - t1).count();
+            duration_text_->setText(QString::number(duration / static_cast<double>(1000)) +
+                                    " seconds");
+        });
+    }
 
     void stopRaytrace()
     {
@@ -52,20 +87,7 @@ class Viewer : public QWidget {
   private:
     void restartRaytrace()
     {
-        if (raytracer_.running()) {
-            raytracer_.stop();
-            thread_.join();
-        }
-        raytracer_.start();
-        thread_ = std::thread([&]() {
-            duration_text_->setText("Running...");
-            using namespace std::chrono;
-            const auto t1 = high_resolution_clock::now();
-            this->raytracer_.run(this->width(), this->height());
-            const auto t2 = high_resolution_clock::now();
-            const auto duration = duration_cast<milliseconds>(t2 - t1).count();
-            duration_text_->setText(QString::number(duration / static_cast<double>(1000)) +
-                                    " seconds");
-        });
+        stopRaytrace();
+        startRaytrace();
     }
 };

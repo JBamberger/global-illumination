@@ -12,6 +12,7 @@
 
 class RayTracer {
     bool running_ = false;
+    size_t samples_;
     Camera camera_;
     std::shared_ptr<const Octree> scene_;
     std::shared_ptr<Image> image_;
@@ -21,6 +22,7 @@ class RayTracer {
     explicit RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene);
 
     void setScene(std::shared_ptr<const Octree> scene);
+    void setSampleCount(size_t samples);
     void run(int w, int h);
     bool running() const;
     void stop();
