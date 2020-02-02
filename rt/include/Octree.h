@@ -45,6 +45,11 @@ class Octree : public Hittable {
     BoundingBox boundingBox() const override;
 
     /**
+     * Deletes the content of the tree.
+     */
+    void clear();
+
+    /**
      * Prints the tree in a lisp-like bracked style.
      *
      * @param o output stream

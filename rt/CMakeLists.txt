@@ -15,7 +15,7 @@ set(SOURCES
         "include/Octree.h" "src/Octree.cpp"
         "include/entities.h" "src/entities.cpp"
         "include/ObjReader.h" "src/ObjReader.cpp"
-        )
+        include/Scene.h)
 
 add_library(rt_lib ${SOURCES})
 target_include_directories(rt_lib PUBLIC "include")

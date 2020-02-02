@@ -95,7 +95,7 @@ glm::dvec3 RayTracer::computePixel(const Ray& ray) const
         glm::dvec3 attenuation;
         auto scatter_ray(ray);
         if (hit.mat->scatter(ray, hit, attenuation, scatter_ray)) {
-            return glm::clamp(light + attenuation * computePixel(scatter_ray), 0.0, 1.0);
+            return light + attenuation * computePixel(scatter_ray);
         }
     }
 

@@ -1,27 +1,18 @@
 #include <QApplication>
 
-#include <memory>
-
 #include "Material.h"
 #include <BVH.h>
 #include <ObjReader.h>
+#include <QCommandLineParser>
+#include <Scene.h>
 #include <camera.h>
 #include <entities.h>
+#include <filesystem>
 #include <fstream>
 #include <gui.h>
 #include <iostream>
+#include <memory>
 #include <random>
-
-constexpr glm::dvec3 black(0, 0, 0);
-constexpr glm::dvec3 white(1, 1, 1);
-
-constexpr glm::dvec3 red(1, 0, 0);
-constexpr glm::dvec3 green(0, 1, 0);
-constexpr glm::dvec3 blue(0, 0, 1);
-
-constexpr glm::dvec3 yellow(1, 1, 0);
-constexpr glm::dvec3 cyan(0, 1, 1);
-constexpr glm::dvec3 magenta(1, 0, 1);
 
 // dark blue glm::dvec3 { 0.3, 0.3, 1 }
 
@@ -220,181 +211,51 @@ constexpr glm::dvec3 magenta(1, 0, 1);
 //    return scene;
 //}
 
-void addCornell(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    std::unique_ptr<Entity> face;
-
-    const auto s = 3.0;
-
-    glm::dvec3 p000 = {-s, -s, -s};
-    glm::dvec3 p001 = {-s, -s, s};
-    glm::dvec3 p010 = {-s, s, -s};
-    glm::dvec3 p011 = {-s, s, s};
-    glm::dvec3 p100 = {s, -s, -s};
-    glm::dvec3 p101 = {s, -s, s};
-    glm::dvec3 p110 = {s, s, -s};
-    glm::dvec3 p111 = {s, s, s};
-
-    const auto mat_red = std::make_shared<LambertianMaterial>(red);
-    const auto mat_green = std::make_shared<LambertianMaterial>(green);
-    const auto mat_white = std::make_shared<LambertianMaterial>(white);
-
-    // left face
-    face = entities::makeQuad(p100, p000, p001, p101);
-    face->setMaterial(mat_red);
-    scene.push_back(std::move(face));
-    // right face
-    face = entities::makeQuad(p110, p111, p011, p010);
-    face->setMaterial(mat_green);
-    scene.push_back(std::move(face));
-    // top face
-    face = entities::makeQuad(p101, p001, p011, p111);
-    face->setMaterial(mat_white);
-    scene.push_back(std::move(face));
-    // bottom face
-    face = entities::makeQuad(p110, p010, p000, p100);
-    face->setMaterial(mat_white);
-    scene.push_back(std::move(face));
-    // back face
-    face = entities::makeQuad(p000, p010, p011, p001);
-    face->setMaterial(mat_white);
-    scene.push_back(std::move(face));
-
-    face = entities::makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
-    face->setMaterial(std::make_shared<DiffuseLight>(2.0 * white));
-    scene.push_back(std::move(face));
-}
-
-void addCornellContent(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    std::unique_ptr<Entity> face;
-
-    face = std::make_unique<Sphere>(glm::dvec3{-1.5, 1.5, -2}, 1.0);
-    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
-    scene.push_back(std::move(face));
-
-    face = obj::Transform()
-               .rotate_z(-glm::pi<double>() / 10)
-               .translate({-1.5, -1.5, -1})
-               .to_bvh(obj::makeCuboid({0, 0, 0}, {2, 2, 4}));
-    face->setMaterial(std::make_shared<LambertianMaterial>(white));
-    scene.push_back(std::move(face));
-
-    face = std::make_unique<Sphere>(glm::dvec3{1.5, 0.0, -2}, 1.0);
-    face->setMaterial(std::make_shared<Dielectric>(1.4));
-    scene.push_back(std::move(face));
-}
-
-void addAxisIndicator(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    std::unique_ptr<Entity> face;
-    // Defines x,y and z axis indicators
-    const auto tip = glm::dvec3{0, 0, 0};
-    const auto id_len = 2;
-    auto x_axis = entities::makeCone(tip + glm::dvec3{id_len, 0, 0}, tip, 0.1, 10);
-    x_axis->setMaterial(std::make_shared<LambertianMaterial>(red));
-    scene.push_back(std::move(x_axis));
-
-    auto y_axis = entities::makeCone(tip + glm::dvec3{0, id_len, 0}, tip, 0.1, 10);
-    y_axis->setMaterial(std::make_shared<LambertianMaterial>(green));
-    scene.push_back(std::move(y_axis));
-
-    auto z_axis = entities::makeCone(tip + glm::dvec3{0, 0, id_len}, tip, 0.1, 10);
-    z_axis->setMaterial(std::make_shared<LambertianMaterial>(blue));
-    scene.push_back(std::move(z_axis));
-}
-
-void addPig(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    std::unique_ptr<Entity> face;
-    const auto load_pig_part = [](const std::string& file) {
-        return obj::Transform()
-            .translate({1, -0.5, 2})
-            .rotate_x(-glm::pi<double>() / 2)
-            .rotate_z(-glm::pi<double>() / 3)
-            .scale(3)
-            .translate({0, 0, -1})
-            .to_bvh(file);
-    };
-
-    face = load_pig_part("D:/dev/global-illumination/share/pig_body.obj");
-    face->setMaterial(std::make_shared<LambertianMaterial>(glm::dvec3(0.9, 0.6, 0.9)));
-    scene.push_back(std::move(face));
-
-    face = load_pig_part("D:/dev/global-illumination/share/pig_eyes.obj");
-    face->setMaterial(std::make_shared<LambertianMaterial>(white));
-    scene.push_back(std::move(face));
-
-    face = load_pig_part("D:/dev/global-illumination/share/pig_pupils.obj");
-    face->setMaterial(std::make_shared<LambertianMaterial>(black));
-    scene.push_back(std::move(face));
-
-    face = load_pig_part("D:/dev/global-illumination/share/pig_tongue.obj");
-    face->setMaterial(std::make_shared<DiffuseLight>(0.5 * red));
-    scene.push_back(std::move(face));
-
-    face = obj::Transform()
-               .rotate_z(-glm::pi<double>() / 10)
-               .translate({0, 0, -2.75})
-               .to_bvh(obj::makeCuboid({0, 0, 0}, {4, 4, 0.5}));
-    face->setMaterial(std::make_shared<LambertianMaterial>(white));
-    scene.push_back(std::move(face));
-}
-
-void addDragon(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    auto face = obj::Transform()
-                    .center()
-                    .rotate_x(-glm::pi<double>() / 2)
-                    .rotate_z(-glm::pi<double>() / 3)
-                    .scale(25)
-                    .to_bvh("D:/dev/global-illumination/share/dragon-3.obj");
-    face->setMaterial(std::make_shared<MetalLikeMaterial>(glm::dvec3(1, 1, 1), 0.5));
-    scene.push_back(std::move(face));
-}
-
-void addCow(std::vector<std::unique_ptr<Entity>>& scene)
-{
-    const auto cow_tex =
-        std::make_shared<ImageBackedTexture>("D:/dev/global-illumination/share/spot_texture.png");
-    auto face = obj::Transform()
-                    .center()
-                    .rotate_x(-glm::pi<double>() / 2)
-                    .rotate_z(glm::pi<double>() / 4)
-                    .scale(2)
-                    .translate({0, 0, -1.4})
-                    .to_bvh("D:/dev/global-illumination/share/spot_triangulated.obj");
-
-    face->setMaterial(std::make_shared<LambertianMaterial>(cow_tex));
-    scene.push_back(std::move(face));
-}
-
-std::vector<std::unique_ptr<Entity>> createCornell()
-{
-    std::vector<std::unique_ptr<Entity>> scene;
-    addCornell(scene);
-    //    addCornellContent(scene);
-    //    addAxisIndicator(scene);
-    //    addPig(scene);
-    addCow(scene);
-    //    addDragon(scene);
-
-    return scene;
-}
+constexpr const char* app_name = "PathTracer";
+constexpr const char* app_version = "v1.0.0";
+constexpr const char* app_description = "PathTracer written for Global Illumination Methods WS1920";
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
+    QApplication::setApplicationName(app_name);
+    QApplication::setApplicationVersion(app_version);
+
+    // QCommandLineParser to read cli args
+    QCommandLineParser parser;
+    parser.setApplicationDescription(app_description);
+    const auto help_option = parser.addHelpOption();
+    const auto version_option = parser.addVersionOption();
+    parser.addPositionalArgument("share_dir",
+                                 "Directory containing the share files (objects, textures, ...).");
+    parser.process(app);
+
+    if (parser.isSet(help_option)) {
+        parser.showHelp();
+    }
+    if (parser.isSet(version_option)) {
+        parser.showVersion();
+    }
+
+    std::filesystem::path share_dir = "./share";
+    const auto pa = parser.positionalArguments();
+    if (!pa.isEmpty()) {
+        share_dir = parser.positionalArguments()[0].toStdString();
+    }
+    if (!std::filesystem::exists(share_dir)) {
+        std::cerr << "Share directory does not exist." << std::endl;
+        parser.showHelp(EXIT_FAILURE);
+    }
+
+    std::cout << "ShareDir: " << share_dir << std::endl;
 
     Camera camera(glm::dvec3{14, 0, 0});
 
     // scene setup
-    const auto scene = std::make_shared<Octree>(glm::dvec3{-20, -20, -20}, glm::dvec3{20, 20, 20});
-    auto elems = createCornell();
-    for (const auto& entity : elems)
-        scene->insert(entity.get());
+    auto scene = Scene(share_dir, {-20, -20, -20}, {20, 20, 20});
+    scene.addCornellBox().addCow();
 
-    RayTracer raytracer(camera, scene);
+    RayTracer raytracer(camera, scene.getTree());
 
     Gui window(500, 500, raytracer);
     window.show();

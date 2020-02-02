@@ -193,3 +193,5 @@ bool Octree::intersect(const Ray& ray, Hit& hit) const { return root_->intersect
 BoundingBox Octree::boundingBox() const { return root_->boundingBox(); }
 
 std::ostream& operator<<(std::ostream& o, const Octree& t) { return o << "{" << *t.root_ << "}"; }
+
+void Octree::clear() { root_ = std::make_unique<Node>(root_->boundingBox()); }
