@@ -5,6 +5,28 @@ Scene::Scene(std::filesystem::path shareDir, glm::dvec3 min, glm::dvec3 max)
 {
 }
 
+void Scene::useSceneSetting(SceneSetting setting)
+{
+    clear();
+    addCornellBox();
+    switch (setting) {
+    case SceneSetting::Cornell:
+        addCornellContent();
+        break;
+    case SceneSetting::Pig:
+        addPig();
+        break;
+    case SceneSetting::Cow:
+        addCow();
+        break;
+    case SceneSetting::Dragon:
+        addDragon();
+        break;
+    default:
+        return;
+    }
+}
+
 Scene& Scene::addCornellBox()
 {
     std::unique_ptr<Entity> face;

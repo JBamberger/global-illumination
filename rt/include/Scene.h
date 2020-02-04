@@ -8,6 +8,8 @@
 #include <memory>
 #include <utility>
 
+enum class SceneSetting { Empty, Cornell, Pig, Cow, Dragon };
+
 class Scene {
     constexpr static glm::dvec3 black = glm::dvec3(0, 0, 0);
     constexpr static glm::dvec3 white = glm::dvec3(1, 1, 1);
@@ -38,6 +40,12 @@ class Scene {
      * @param max the maximal coordinates of the scene
      */
     Scene(std::filesystem::path shareDir, glm::dvec3 min, glm::dvec3 max);
+
+    /**
+     * Sets the scene to a predefined setting.
+     * @param setting setting specification
+     */
+    void useSceneSetting(SceneSetting setting);
 
     /**
      * Adds a Cornell box to the scene.

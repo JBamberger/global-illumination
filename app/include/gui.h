@@ -11,37 +11,29 @@
 #include <utility>
 
 #include "RayTracer.h"
+#include "Scene.h"
 #include "viewer.h"
 
 class Gui : public QMainWindow {
+
     QLabel* duration_text_;
-    //    QPushButton* save_button_;
     Viewer* viewer_;
     QMenu* fileMenu_;
     QMenu* samplesMenu_;
+    QMenu* sceneMenu_;
     QAction* saveAction_;
 
   public:
     Gui() = delete;
 
-    Gui(const int width, const int height, RayTracer raytracer, QWindow* = nullptr)
+    Gui(const int width,
+        const int height,
+        std::shared_ptr<RayTracer> raytracer,
+        std::shared_ptr<Scene> scene,
+        QWindow* = nullptr)
     {
-
-        //        auto toolbar = new QToolBar(this);
-        //        toolbar->setMovable(false);
-        //
-        //        save_button_ = new QPushButton("Save as ...", this);
-        //        toolbar->addWidget(save_button_);
-        //
-        //        auto spacer = new QWidget();
-        //        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        //        toolbar->addWidget(spacer);
-
         duration_text_ = new QLabel(this);
-        //        toolbar->addWidget(duration_text_);
-        //        this->addToolBar(toolbar);
-
-        viewer_ = new Viewer(std::move(raytracer), duration_text_, this);
+        viewer_ = new Viewer(std::move(raytracer), std::move(scene), duration_text_, this);
         this->setCentralWidget(viewer_);
 
         statusBar()->insertPermanentWidget(0, duration_text_);
@@ -66,8 +58,9 @@ class Gui : public QMainWindow {
         fileMenu_ = menuBar()->addMenu(tr("&File"));
         fileMenu_->addAction(saveAction_);
 
-        samplesMenu_ = menuBar()->addMenu(tr("&Sample count"));
-        std::array<size_t, 12> sizes = {8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
+        samplesMenu_ = menuBar()->addMenu(tr("Sample &count"));
+        std::array<size_t, 12> sizes = {8,   16,   32,   64,   128,  256,
+                                        512, 1024, 2048, 4096, 8192, 16384};
         for (auto size : sizes) {
             std::string num = std::to_string(size);
             const auto action = new QAction(tr(num.c_str()), this);
@@ -78,7 +71,29 @@ class Gui : public QMainWindow {
             samplesMenu_->addAction(action);
         }
 
-        //        connect(save_button_, &QPushButton::clicked, save_callback);
+        struct SceneMenuEntry {
+            const char* title;
+            const char* status_tip;
+            SceneSetting scene;
+        };
+
+        std::array<SceneMenuEntry, 5> scenes = {
+            SceneMenuEntry{"Empty Box", "Empty Cornell box.", SceneSetting::Empty},
+            SceneMenuEntry{"Cornell Box", "Cornell box with one cube and two spheres.",
+                           SceneSetting::Cornell},
+            SceneMenuEntry{"Pig", "Pig model consisting of multiple parts.", SceneSetting::Pig},
+            SceneMenuEntry{"Spot (cow)", "Cow model with image texture.", SceneSetting::Cow},
+            SceneMenuEntry{"Stanford dragon", "Stanford dragon model with many primitives.",
+                           SceneSetting::Dragon}};
+
+        sceneMenu_ = menuBar()->addMenu(tr("&Scene"));
+        for (const auto& s : scenes) {
+            const auto action = new QAction(tr(s.title), this);
+            action->setStatusTip(tr(s.status_tip));
+            connect(action, &QAction::triggered, this,
+                    std::bind(&Viewer::setScene, viewer_, s.scene));
+            sceneMenu_->addAction(action);
+        }
 
         this->resize(width, height);
     }

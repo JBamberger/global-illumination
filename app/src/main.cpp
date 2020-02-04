@@ -49,12 +49,13 @@ int main(int argc, char** argv)
     Camera camera(glm::dvec3{14, 0, 0});
 
     // scene setup
-    auto scene = Scene(share_dir, {-20, -20, -20}, {20, 20, 20});
-    scene.addCornellBox().addCow();
+    auto scene =
+        std::make_shared<Scene>(share_dir, glm::dvec3{-20, -20, -20}, glm::dvec3{20, 20, 20});
+    scene->addCornellBox().addCornellContent();
 
-    RayTracer raytracer(camera, scene.getTree());
+    auto raytracer = std::make_shared<RayTracer>(camera, scene->getTree());
 
-    Gui window(500, 500, raytracer);
+    Gui window(500, 500, std::move(raytracer), std::move(scene));
     window.show();
     return QApplication::exec();
 }
