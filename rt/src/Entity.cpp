@@ -98,14 +98,17 @@ glm::dvec2 Triangle::texMapping(const glm::dvec3& intersect) const
     // basis.
     auto uv = tA + coords.x * tAB + coords.y * tAC;
 
-    // Wrap coordinates around, i.e. similar to tiling the space with the coordinates
-    uv -= glm::floor(uv);
+    if (0.0 > uv.x || uv.x > 1.0 || 0.0 > uv.y || uv.y > 1.0) {
+        // Wrap coordinates around, i.e. similar to tiling the space with the texture
+        uv -= glm::floor(uv);
+    }
 
     // If the intersection point lies within the triangle and the triangle has valid coordinates
     // the result must be between 0 and 1.
-    assert(-0.00001 <= uv.x && uv.x <= 1.00001);
-    assert(-0.00001 <= uv.y && uv.y <= 1.00001);
-    return glm::clamp(uv, 0.0, 1.0);
+    assert(0.0 <= uv.x && uv.x <= 1.0);
+    assert(0.0 <= uv.y && uv.y <= 1.0);
+    //    return glm::clamp(uv, 0.0, 1.0);
+    return uv;
 }
 
 void Triangle::setTexCoords(const glm::dvec2 ca, const glm::dvec2 cb, const glm::dvec2 cc)
