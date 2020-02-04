@@ -1,8 +1,8 @@
 
 set(SOURCES
-        "include/camera.h"
+        "include/Camera.h"
         "include/Texture.h"
-        "include/image.h"
+        "include/Image.h"
         "include/Ray.h"
         "include/NDChecker.h"
         "include/RandomUtils.h"
@@ -15,7 +15,7 @@ set(SOURCES
         "include/Octree.h" "src/Octree.cpp"
         "include/entities.h" "src/entities.cpp"
         "include/ObjReader.h" "src/ObjReader.cpp"
-        include/Scene.h)
+        include/Scene.h src/Scene.cpp)
 
 add_library(rt_lib ${SOURCES})
 target_include_directories(rt_lib PUBLIC "include")

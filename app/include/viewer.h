@@ -9,8 +9,8 @@
 #include <QWidget>
 #include <utility>
 
+#include "Image.h"
 #include "RayTracer.h"
-#include "image.h"
 
 class Viewer : public QWidget {
     QTimer* timer_;

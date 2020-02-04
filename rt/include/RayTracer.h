@@ -6,9 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "Camera.h"
+#include "Image.h"
 #include "Octree.h"
-#include "camera.h"
-#include "image.h"
 
 class RayTracer {
     bool running_ = false;

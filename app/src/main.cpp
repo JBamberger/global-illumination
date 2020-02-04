@@ -1,15 +1,15 @@
 #include <QApplication>
 
+#include "BVH.h"
+#include "Camera.h"
 #include "Material.h"
-#include <BVH.h>
+#include "Scene.h"
+#include "entities.h"
+#include "gui.h"
 #include <ObjReader.h>
 #include <QCommandLineParser>
-#include <Scene.h>
-#include <camera.h>
-#include <entities.h>
 #include <filesystem>
 #include <fstream>
-#include <gui.h>
 #include <iostream>
 #include <memory>
 #include <random>
