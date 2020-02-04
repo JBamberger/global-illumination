@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <BoundingBox.h>
-
-#include <ostream>
+#include "BoundingBox.h"
 #include <string>
 #include <utility>
 

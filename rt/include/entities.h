@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Entity.h>
-#include <ExplicitEntity.h>
+#include "Entity.h"
+#include "ExplicitEntity.h"
 #include <array>
 
 namespace entities {

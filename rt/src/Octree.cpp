@@ -1,4 +1,4 @@
-#include <Octree.h>
+#include "Octree.h"
 
 class Octree::Node : public Hittable {
     BoundingBox bbox_;

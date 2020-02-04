@@ -1,8 +1,7 @@
 #pragma once
 
-#include <BoundingBox.h>
-#include <Ray.h>
-
+#include "BoundingBox.h"
+#include "Ray.h"
 #include <cassert>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>

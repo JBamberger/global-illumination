@@ -1,5 +1,6 @@
+#include "entities.h"
+
 #include "ObjReader.h"
-#include <entities.h>
 
 std::unique_ptr<ExplicitEntity> entities::makeQuad(glm::dvec3 a,
                                                    glm::dvec3 b,

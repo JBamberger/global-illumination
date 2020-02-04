@@ -1,7 +1,7 @@
-#include <ExplicitEntity.h>
-#include <ObjReader.h>
+#include "ExplicitEntity.h"
+
+#include "ObjReader.h"
 #include <ostream>
-#include <sstream>
 #include <string>
 
 ExplicitEntity::ExplicitEntity(std::vector<Triangle> faces)
