@@ -170,10 +170,12 @@ class Scene {
         auto face = obj::Transform()
                         .center()
                         .rotate_x(-glm::pi<double>() / 2)
-                        .rotate_z(-glm::pi<double>() / 3)
+                        .rotate_z(- 2 * glm::pi<double>() / 3)
                         .scale(25)
+                        .translate({0,0,-1.6})
                         .to_bvh(resolveFile(dragon_obj_).string());
-        face->setMaterial(std::make_shared<MetalLikeMaterial>(glm::dvec3(1, 1, 1), 0.5));
+//        face->setMaterial(std::make_shared<LambertianMaterial>(white));
+        face->setMaterial(std::make_shared<Dielectric>(1.4));
         insert(std::move(face));
 
         return *this;
