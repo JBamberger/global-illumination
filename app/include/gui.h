@@ -67,7 +67,7 @@ class Gui : public QMainWindow {
         fileMenu_->addAction(saveAction_);
 
         samplesMenu_ = menuBar()->addMenu(tr("&Sample count"));
-        std::array<size_t, 10> sizes = {8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
+        std::array<size_t, 12> sizes = {8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
         for (auto size : sizes) {
             std::string num = std::to_string(size);
             const auto action = new QAction(tr(num.c_str()), this);
