@@ -117,7 +117,10 @@ class BVH::InnerNode : public BVH::Node {
     }
 };
 
-BVH::BVH(std::vector<Triangle> faces) { root_ = construct(0, std::move(faces)); }
+BVH::BVH(std::vector<Triangle> faces, size_t cutoffSize) : cutoff_size_(cutoffSize)
+{
+    root_ = construct(0, std::move(faces));
+}
 
 BoundingBox BVH::boundingBox() const { return root_->boundingBox(); }
 
@@ -128,11 +131,13 @@ bool BVH::intersect(const Ray& ray, Hit& hit) const
     }
     return root_->intersect(ray, hit);
 }
+
 void BVH::setMaterial(std::shared_ptr<Material> material)
 {
     this->material_ = material;
     root_->setMaterial(material);
 }
+
 std::unique_ptr<BVH::Node> BVH::construct(size_t depth, std::vector<Triangle> faces)
 {
     if (faces.size() < cutoff_size_) {

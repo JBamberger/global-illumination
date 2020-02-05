@@ -24,8 +24,8 @@ struct Hit {
 class Hittable {
   public:
     virtual ~Hittable() = default;
-    virtual bool intersect(const Ray& ray, Hit& hit) const = 0;
-    virtual BoundingBox boundingBox() const = 0;
+    [[nodiscard]] virtual bool intersect(const Ray& ray, Hit& hit) const = 0;
+    [[nodiscard]] virtual BoundingBox boundingBox() const = 0;
 };
 
 /// A base class for all entities in the scene.
@@ -56,10 +56,10 @@ class Triangle final : public Entity {
     glm::dvec3 C = {0, 0, 0};
 
     Triangle(glm::dvec3 a, glm::dvec3 b, glm::dvec3 c);
-    bool intersect(const Ray& ray, Hit& hit) const override;
-    BoundingBox boundingBox() const override;
-    glm::dvec3 normal() const;
-    glm::dvec2 texMapping(const glm::dvec3& intersect) const;
+    [[nodiscard]] bool intersect(const Ray& ray, Hit& hit) const override;
+    [[nodiscard]] BoundingBox boundingBox() const override;
+    [[nodiscard]] glm::dvec3 normal() const;
+    [[nodiscard]] glm::dvec2 texMapping(const glm::dvec3& intersect) const;
     void setTexCoords(glm::dvec2 ca, glm::dvec2 cb, glm::dvec2 cc);
     void invalidate();
 };
@@ -71,9 +71,9 @@ class Sphere final : public Entity {
 
     Sphere();
     Sphere(glm::dvec3 center, double radius);
-    bool intersect(const Ray& ray, Hit& hit) const override;
-    BoundingBox boundingBox() const override;
+    [[nodiscard]] bool intersect(const Ray& ray, Hit& hit) const override;
+    [[nodiscard]] BoundingBox boundingBox() const override;
 
   private:
-    glm::dvec2 texMapping(const glm::dvec3& intersect) const;
+    [[nodiscard]] glm::dvec2 texMapping(const glm::dvec3& intersect) const;
 };

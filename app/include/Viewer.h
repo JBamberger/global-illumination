@@ -40,7 +40,7 @@ class Viewer : public QWidget {
 
     void resizeEvent(QResizeEvent*) override;
 
-    QImage getImage() const;
+    [[nodiscard]] QImage getImage() const;
 
   private:
     void restartRaytrace();
