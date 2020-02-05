@@ -26,8 +26,8 @@ class Gui : public QMainWindow {
   public:
     Gui() = delete;
 
-    Gui(const int width,
-        const int height,
+    Gui(int width,
+        int height,
         std::shared_ptr<RayTracer> raytracer,
         std::shared_ptr<Scene> scene,
         QWindow* = nullptr);

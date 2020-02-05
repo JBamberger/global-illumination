@@ -3,14 +3,15 @@
 #include <chrono>
 #include <thread>
 
+#include "Image.h"
+#include "RayTracer.h"
+#include "Scene.h"
 #include <QCloseEvent>
 #include <QPainter>
 #include <QTimer>
 #include <QWidget>
+#include <QtWidgets/QLabel>
 #include <utility>
-
-#include "Image.h"
-#include "RayTracer.h"
 
 class Viewer : public QWidget {
     QTimer* timer_;
@@ -29,7 +30,7 @@ class Viewer : public QWidget {
 
     void setSampleCount(size_t samples);
 
-    void setScene(const SceneSetting setting);
+    void setScene(SceneSetting setting);
 
     void startRaytrace();
 
