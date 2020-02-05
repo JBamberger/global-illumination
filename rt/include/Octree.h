@@ -35,14 +35,14 @@ class Octree : public Hittable {
      * @param hit this record is filled with hit info, otherwise the data is invalid
      * @return true if a hit occurred
      */
-    bool intersect(const Ray& ray, Hit& hit) const override;
+    [[nodiscard]] bool intersect(const Ray& ray, Hit& hit) const override;
 
     /**
      * Returns the bounding box spanning the entire tree.
      *
      * @return bbox of the tree
      */
-    BoundingBox boundingBox() const override;
+    [[nodiscard]] BoundingBox boundingBox() const override;
 
     /**
      * Deletes the content of the tree.

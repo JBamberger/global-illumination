@@ -30,8 +30,8 @@ struct Ray {
     /// Creates a new ray which is offset a tiny bit in the direction of the ray. This avoids
     /// self-intersections of objects due to numeric instabilities. The properties of the parent ray
     /// are adopted.
-    Ray getChildRay(const glm::dvec3 origin, const glm::dvec3 dir) const
+    [[nodiscard]] Ray getChildRay(const glm::dvec3 o, const glm::dvec3 d) const
     {
-        return Ray(origin + dir * offset, dir, child_level + 1, refractive_index);
+        return Ray(o + d * offset, d, child_level + 1, refractive_index);
     }
 };
