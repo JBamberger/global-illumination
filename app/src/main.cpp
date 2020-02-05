@@ -1,7 +1,7 @@
 #include "Camera.h"
+#include "Gui.h"
 #include "Material.h"
 #include "Scene.h"
-#include "gui.h"
 #include <QApplication>
 #include <QCommandLineParser>
 #include <filesystem>
