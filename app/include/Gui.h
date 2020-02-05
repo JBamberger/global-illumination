@@ -10,7 +10,7 @@
 #include <QToolBar>
 #include <utility>
 
-#include "RayTracer.h"
+#include "PathTracer.h"
 #include "Scene.h"
 #include "Viewer.h"
 
@@ -28,7 +28,7 @@ class Gui : public QMainWindow {
 
     Gui(int width,
         int height,
-        std::shared_ptr<RayTracer> raytracer,
+        std::shared_ptr<PathTracer> raytracer,
         std::shared_ptr<Scene> scene,
         QWindow* = nullptr);
 

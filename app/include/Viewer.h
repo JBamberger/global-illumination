@@ -4,7 +4,7 @@
 #include <thread>
 
 #include "Image.h"
-#include "RayTracer.h"
+#include "PathTracer.h"
 #include "Scene.h"
 #include <QCloseEvent>
 #include <QPainter>
@@ -16,12 +16,12 @@
 class Viewer : public QWidget {
     QTimer* timer_;
     QLabel* duration_text_;
-    std::shared_ptr<RayTracer> raytracer_;
+    std::shared_ptr<PathTracer> raytracer_;
     std::shared_ptr<Scene> scene_;
     std::thread thread_;
 
   public:
-    Viewer(std::shared_ptr<RayTracer> raytracer,
+    Viewer(std::shared_ptr<PathTracer> raytracer,
            std::shared_ptr<Scene> scene,
            QLabel* duration_text,
            QWidget* parent);

@@ -1,20 +1,20 @@
-#include "RayTracer.h"
+#include "PathTracer.h"
 #include "Material.h"
 #include "entities.h"
 #include <chrono>
 #include <iostream>
 
-RayTracer::RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene)
+PathTracer::PathTracer(const Camera& camera, std::shared_ptr<const Octree> scene)
     : samples_(2048), camera_(camera), scene_(std::move(scene)),
       image_(std::make_shared<Image>(0, 0))
 {
 }
 
-void RayTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::move(scene); }
+void PathTracer::setScene(std::shared_ptr<const Octree> scene) { scene_ = std::move(scene); }
 
-void RayTracer::setSampleCount(const size_t samples) { samples_ = samples; }
+void PathTracer::setSampleCount(const size_t samples) { samples_ = samples; }
 
-void RayTracer::run(const int w, const int h)
+void PathTracer::run(const int w, const int h)
 {
     const auto samples = samples_;
 
@@ -50,7 +50,7 @@ void RayTracer::run(const int w, const int h)
     }
 }
 
-glm::dvec3 RayTracer::computePixel(const int x, const int y) const
+glm::dvec3 PathTracer::computePixel(const int x, const int y) const
 {
     constexpr auto max_bounces = 5;
 
@@ -82,7 +82,7 @@ glm::dvec3 RayTracer::computePixel(const int x, const int y) const
     return light;
 }
 
-glm::dvec3 RayTracer::computePixel(const Ray& ray) const
+glm::dvec3 PathTracer::computePixel(const Ray& ray) const
 {
     Hit hit;
     if (!scene_->intersect(ray, hit)) {
@@ -102,10 +102,10 @@ glm::dvec3 RayTracer::computePixel(const Ray& ray) const
     return light;
 }
 
-bool RayTracer::running() const { return running_; }
+bool PathTracer::running() const { return running_; }
 
-void RayTracer::stop() { running_ = false; }
+void PathTracer::stop() { running_ = false; }
 
-void RayTracer::start() { running_ = true; }
+void PathTracer::start() { running_ = true; }
 
-std::shared_ptr<Image> RayTracer::getImage() const { return image_; }
+std::shared_ptr<Image> PathTracer::getImage() const { return image_; }

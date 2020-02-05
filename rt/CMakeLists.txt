@@ -10,7 +10,7 @@ set(SOURCES
         "include/Material.h" "src/Material.cpp"
         "include/Entity.h" "src/Entity.cpp"
         "include/ExplicitEntity.h" "src/ExplicitEntity.cpp"
-        "include/RayTracer.h" "src/RayTracer.cpp"
+        "include/PathTracer.h" "src/PathTracer.cpp"
         "include/BoundingBox.h" "src/BoundingBox.cpp"
         "include/Octree.h" "src/Octree.cpp"
         "include/entities.h" "src/entities.cpp"

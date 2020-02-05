@@ -1,6 +1,6 @@
 #include "Viewer.h"
 
-Viewer::Viewer(std::shared_ptr<RayTracer> raytracer,
+Viewer::Viewer(std::shared_ptr<PathTracer> raytracer,
                std::shared_ptr<Scene> scene,
                QLabel* duration_text,
                QWidget* parent)

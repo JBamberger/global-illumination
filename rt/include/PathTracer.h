@@ -10,7 +10,7 @@
 #include "Image.h"
 #include "Octree.h"
 
-class RayTracer {
+class PathTracer {
     bool running_ = false;
     size_t samples_;
     Camera camera_;
@@ -18,17 +18,17 @@ class RayTracer {
     std::shared_ptr<Image> image_;
 
   public:
-    RayTracer() = delete;
-    explicit RayTracer(const Camera& camera, std::shared_ptr<const Octree> scene);
+    PathTracer() = delete;
+    explicit PathTracer(const Camera& camera, std::shared_ptr<const Octree> scene);
 
     void setScene(std::shared_ptr<const Octree> scene);
     void setSampleCount(size_t samples);
     void run(int w, int h);
-    bool running() const;
+    [[nodiscard]] bool running() const;
     void stop();
     void start();
 
-    std::shared_ptr<Image> getImage() const;
+    [[nodiscard]] std::shared_ptr<Image> getImage() const;
 
   private:
     /**
@@ -38,7 +38,7 @@ class RayTracer {
      * @param y y coordinate of the current pixel
      * @return the light intensity transported on the traced path
      */
-    glm::dvec3 computePixel(int x, int y) const;
+    [[nodiscard]] glm::dvec3 computePixel(int x, int y) const;
 
     /**
      * Recursive implementation of the path tracing.
@@ -46,5 +46,5 @@ class RayTracer {
      * @param ray input ray
      * @return The light intensity transported on the traced path
      */
-    glm::dvec3 computePixel(const Ray& ray) const;
+    [[nodiscard]] glm::dvec3 computePixel(const Ray& ray) const;
 };

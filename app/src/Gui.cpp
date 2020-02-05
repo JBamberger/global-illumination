@@ -2,7 +2,7 @@
 
 Gui::Gui(const int width,
          const int height,
-         std::shared_ptr<RayTracer> raytracer,
+         std::shared_ptr<PathTracer> raytracer,
          std::shared_ptr<Scene> scene,
          QWindow*)
 {

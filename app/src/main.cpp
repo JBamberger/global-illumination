@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         std::make_shared<Scene>(share_dir, glm::dvec3{-20, -20, -20}, glm::dvec3{20, 20, 20});
     scene->addCornellBox().addCornellContent();
 
-    auto raytracer = std::make_shared<RayTracer>(camera, scene->getTree());
+    auto raytracer = std::make_shared<PathTracer>(camera, scene->getTree());
 
     Gui window(500, 500, std::move(raytracer), std::move(scene));
     window.show();
