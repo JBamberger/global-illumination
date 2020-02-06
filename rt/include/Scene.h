@@ -51,7 +51,9 @@ class Scene {
      * Adds a Cornell box to the scene.
      * @return this scene
      */
-    Scene& addCornellBox();
+    Scene& addCornellBox(double side_len = 6.0,
+                         double light_size = 5.0,
+                         double light_intensity = 2.5);
 
     /**
      * Adds a diffuse cube and a glass and metal sphere.

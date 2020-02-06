@@ -31,7 +31,10 @@ class Material {
      * \param uv uv coordinates of of the emission position
      * \return a color vector describing the emission per channel
      */
-    virtual glm::dvec3 emission(const glm::dvec2& uv) const { return glm::dvec3(0, 0, 0); }
+    [[nodiscard]] virtual glm::dvec3 emission(const glm::dvec2& uv) const
+    {
+        return glm::dvec3(0, 0, 0);
+    }
 };
 
 /**
@@ -60,7 +63,7 @@ class DiffuseLight final : public LambertianMaterial {
   public:
     explicit DiffuseLight(const glm::dvec3& color);
     explicit DiffuseLight(std::shared_ptr<Texture> tex);
-    glm::dvec3 emission(const glm::dvec2& uv) const override;
+    [[nodiscard]] glm::dvec3 emission(const glm::dvec2& uv) const override;
 };
 
 /**

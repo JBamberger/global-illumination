@@ -27,20 +27,22 @@ void Scene::useSceneSetting(SceneSetting setting)
     }
 }
 
-Scene& Scene::addCornellBox()
+Scene& Scene::addCornellBox(const double side_len,
+                            const double light_size,
+                            const double light_intensity)
 {
     std::unique_ptr<Entity> face;
 
-    const auto s = 3.0;
+    const auto half_side = side_len / 2.0;
 
-    glm::dvec3 p000 = {-s, -s, -s};
-    glm::dvec3 p001 = {-s, -s, s};
-    glm::dvec3 p010 = {-s, s, -s};
-    glm::dvec3 p011 = {-s, s, s};
-    glm::dvec3 p100 = {s, -s, -s};
-    glm::dvec3 p101 = {s, -s, s};
-    glm::dvec3 p110 = {s, s, -s};
-    glm::dvec3 p111 = {s, s, s};
+    glm::dvec3 p000 = {-half_side, -half_side, -half_side};
+    glm::dvec3 p001 = {-half_side, -half_side, half_side};
+    glm::dvec3 p010 = {-half_side, half_side, -half_side};
+    glm::dvec3 p011 = {-half_side, half_side, half_side};
+    glm::dvec3 p100 = {half_side, -half_side, -half_side};
+    glm::dvec3 p101 = {half_side, -half_side, half_side};
+    glm::dvec3 p110 = {half_side, half_side, -half_side};
+    glm::dvec3 p111 = {half_side, half_side, half_side};
 
     const auto mat_red = std::make_shared<LambertianMaterial>(red);
     const auto mat_green = std::make_shared<LambertianMaterial>(green);
@@ -67,8 +69,15 @@ Scene& Scene::addCornellBox()
     face->setMaterial(mat_white);
     insert(std::move(face));
 
-    face = entities::makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(5, 5, 0.1));
-    face->setMaterial(std::make_shared<DiffuseLight>(2.0 * white));
+    //    face = entities::makeCuboid(glm::dvec3(0, 0, 3), glm::dvec3(light_size, light_size, 0.1));
+    const auto half_light = light_size / 2.0;
+    const auto light_height = 2.999999;
+    glm::dvec3 a(-half_light, -half_light, light_height);
+    glm::dvec3 b(-half_light, half_light, light_height);
+    glm::dvec3 c(half_light, half_light, light_height);
+    glm::dvec3 d(half_light, -half_light, light_height);
+    face = entities::makeQuad(a, b, c, d);
+    face->setMaterial(std::make_shared<DiffuseLight>(light_intensity * white));
     insert(std::move(face));
 
     return *this;
@@ -88,6 +97,13 @@ Scene& Scene::addCornellContent()
                .to_bvh(obj::makeCuboid({0, 0, 0}, {2, 2, 4}));
     face->setMaterial(std::make_shared<LambertianMaterial>(white));
     insert(std::move(face));
+
+    //    face = obj::Transform()
+    //               .rotate_z(glm::pi<double>() / 10)
+    //               .translate({2, 2, -2.5})
+    //               .to_bvh(obj::makeCuboid({0, 0, 0}, {1, 1, 1}));
+    //    face->setMaterial(std::make_shared<DiffuseLight>(7.0 * glm::dvec3(1,1,1)));
+    //    insert(std::move(face));
 
     face = std::make_unique<Sphere>(glm::dvec3{1.5, 0.0, -2}, 1.0);
     face->setMaterial(std::make_shared<Dielectric>(1.4));
