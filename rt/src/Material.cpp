@@ -65,6 +65,21 @@ bool MetalLikeMaterial::scatter(const Ray& in,
 /// Dielectric material
 ///************************************************************************************************
 
+double Dielectric::reflectance_schlick(double n1, double n2, double cosI)
+{
+    auto r0 = (n1 - n2) / (n1 + n2);
+    r0 = r0 * r0;
+    const auto a = 1.0 - cosI;
+    return r0 + (1.0 - r0) * a * a * a * a * a;
+}
+
+double Dielectric::reflectance_fresnel(double n1, double n2, double cosI, double cosT)
+{
+    const auto r_orth = (n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT);
+    const auto r_par = (n2 * cosI - n1 * cosT) / (n2 * cosI + n1 * cosT);
+    return (r_orth * r_orth + r_par * r_par) / 2.0;
+}
+
 Dielectric::Dielectric(const double refractive_index) : refractive_index_(refractive_index) {}
 
 bool Dielectric::scatter(const Ray& in,
@@ -72,36 +87,53 @@ bool Dielectric::scatter(const Ray& in,
                          glm::dvec3& attenuation,
                          Ray& scatter_ray) const
 {
-    attenuation = glm::dvec3(1, 1, 1); // perfect forwarding
-    const auto reflected = glm::reflect(in.dir, ir.normal);
+
     glm::dvec3 n;
-    double eta;
-    double cosine = glm::dot(in.dir, ir.normal) / glm::length(in.dir);
+    double n1, n2;
+    // decide if the ray is entering or leaving the object.
     if (glm::dot(in.dir, ir.normal) > 0) {
+        // The ray exits the ray -> flip normal to point towards the ray
         n = -ir.normal;
-        eta = refractive_index_;
-        cosine = refractive_index_ * cosine;
+        n1 = refractive_index_;
+        n2 = 1.0;
     } else {
+        // The ray exits the object -> the normal is oriented correctly
         n = ir.normal;
-        eta = 1 / refractive_index_;
-        cosine = -cosine;
+        n1 = 1.0;
+        n2 = refractive_index_;
     }
 
+    const auto eta = n1 / n2;
     const auto dt = glm::dot(in.dir, n);
-    const auto k = 1.0 - eta * eta * (1 - dt * dt);
-    if (k >= 0) { // is refraction possible?
-        const auto refracted = eta * (in.dir - n * dt) - n * glm::sqrt(k);
 
-        // Schlick's approximation for Fresnel effect / angle-dependent reflection/refraction
-        auto r0 = (1 - eta) / (1 + eta);
-        r0 = r0 * r0;
-        const auto ref_prb = r0 + (1 - r0) * glm::pow(1 - cosine, 5);
+    // this direction decides if the ray is reflected or refracted.
+    auto out_direction = glm::reflect(in.dir, ir.normal);
+
+    // the refraction is conditioned on this value which is located below the square root later on.
+    // Hence the value must be geq 0 or no refraction is possible.
+    const auto k = 1.0 - eta * eta * (1 - dt * dt);
+
+    // If k < 0 then we cannot compute a refraction ray. This can be seen easily when looking at
+    // Snell's law sin(theta1) = n1 / n2 * sin(theta2). If sin(theta1) is larger than n1/n2 then the
+    // other sine value would need to be larger than one. Since this is impossible we cannot compute
+    // a refraction in such cases. This is known as total internal reflection.
+    if (k >= 0) { // otherwise total internal reflection -> ref_prb = 1;
+        const auto cosI = -glm::dot(in.dir, n);
+        const auto cosT = glm::sqrt(k);
+
+        const auto ref_prb = reflectance_schlick(n1, n2, cosI);
+        // const auto ref_prb = reflectance_fresnel(n1, n2, cosI, cosT);
 
         // randomly decide if the ray should reflect or refract based on computed probability
-        scatter_ray = in.getChildRay(ir.pos, rng() < ref_prb ? reflected : refracted);
-    } else {
-        scatter_ray = in.getChildRay(ir.pos, reflected);
+        if (rng() >= ref_prb) {
+            // the ray is refracted, compute the refraction direction
+            out_direction = eta * (in.dir - n * dt) - n * cosT;
+        }
     }
 
-    return true;
+    // All light is either reflected or refracted, no attenuation takes place.
+    attenuation = glm::dvec3(1, 1, 1);
+    scatter_ray = in.getChildRay(ir.pos, out_direction);
+
+    return true; // The ray is never absorbed in a dielectric material.
 }

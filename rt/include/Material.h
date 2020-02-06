@@ -96,4 +96,20 @@ class Dielectric final : public Material {
                  const Hit& ir,
                  glm::dvec3& attenuation,
                  Ray& scatter_ray) const override;
+
+  private:
+    /**
+     * Computes the probability of a ray reflecting instead of refracting. The computation is done
+     * with Schlick's approximation.
+     * @return probability of a ray reflecting
+     */
+    static double reflectance_schlick(double n1, double n2, double cosI);
+
+    /**
+     * Computes the probability of a ray reflecting instead of refracting. The computation is done
+     * with Fresnel's equation. The light is seen a unpolarized and hence the two horizontal and
+     * vertical components are averaged.
+     * @return probability of a ray reflecting
+     */
+    static double reflectance_fresnel(double n1, double n2, double cosI, double cosT);
 };
