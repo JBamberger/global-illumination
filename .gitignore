@@ -4,6 +4,9 @@
 .vs/
 *.code-workspace
 
+# Visual Studio CMake settings
+CMakeSettings.json
+
 # build data
 cmake-build-*/
 build/
