@@ -8,7 +8,7 @@
 #include <memory>
 #include <utility>
 
-enum class SceneSetting { Empty, Cornell, Pig, Cow, Dragon };
+enum class SceneSetting { Empty, Cornell, Exam, Pig, Cow, Dragon };
 
 class Scene {
     constexpr static glm::dvec3 black = glm::dvec3(0, 0, 0);
@@ -62,6 +62,12 @@ class Scene {
     Scene& addCornellContent();
 
     /**
+     * Adds the scene used for the final examination.
+     * @return this scene
+     */
+    Scene& addExamRender();
+
+    /**
      * Adds colored indicators for the three axis and their directions.
      * @return this scene
      */
@@ -71,7 +77,10 @@ class Scene {
      * Adds a pig to the scene.
      * @return this scene
      */
-    Scene& addPig();
+    Scene& addPig(glm::dvec3 rotate = {-glm::pi<double>() / 2, 0.0, -glm::pi<double>() / 3},
+                  double scale = 3,
+                  glm::dvec3 translation = {0, 0, -1},
+                  bool add_box = true);
 
     /**
      * Adds the Stanford dragon to the scene.

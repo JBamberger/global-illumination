@@ -13,6 +13,9 @@ void Scene::useSceneSetting(SceneSetting setting)
     case SceneSetting::Cornell:
         addCornellContent();
         break;
+    case SceneSetting::Exam:
+        addExamRender();
+        break;
     case SceneSetting::Pig:
         addPig();
         break;
@@ -112,6 +115,48 @@ Scene& Scene::addCornellContent()
     return *this;
 }
 
+Scene& Scene::addExamRender()
+{
+
+    std::unique_ptr<Entity> face;
+
+    face = std::make_unique<Sphere>(glm::dvec3{-1.5, 1.5, -2}, 1.0);
+    face->setMaterial(std::make_shared<MetalLikeMaterial>(white, 0.0)); // 0.5
+    insert(std::move(face));
+
+    face = obj::Transform()
+               .rotate_z(-glm::pi<double>() / 10)
+               .translate({-1.5, -1.5, -1})
+               .to_bvh(obj::makeCuboid({0, 0, 0}, {2, 2, 4}));
+    face->setMaterial(std::make_shared<LambertianMaterial>(white));
+    insert(std::move(face));
+
+    //    face = obj::Transform()
+    //               .rotate_z(glm::pi<double>() / 10)
+    //               .translate({2, 2, -2.5})
+    //               .to_bvh(obj::makeCuboid({0, 0, 0}, {1, 1, 1}));
+    //    face->setMaterial(std::make_shared<DiffuseLight>(7.0 * glm::dvec3(1,1,1)));
+    //    insert(std::move(face));
+
+    face = std::make_unique<Sphere>(glm::dvec3{1.5, -2.0, -2.5}, 0.5);
+    face->setMaterial(std::make_shared<Dielectric>(1.4));
+    insert(std::move(face));
+
+    const auto cow_tex = std::make_shared<ImageBackedTexture>(resolveFile(cow_tex_).string());
+    face = obj::Transform()
+               .center()
+               .rotate_x(-glm::pi<double>() / 2)
+               .rotate_z(glm::pi<double>() / 4)
+               //        .scale(1)
+               .translate({0.3, 0.3, -2.2})
+               .to_bvh(resolveFile(cow_obj_).string());
+
+    face->setMaterial(std::make_shared<LambertianMaterial>(cow_tex));
+    insert(std::move(face));
+
+    return addPig({-glm::pi<double>() / 2, 0.0, glm::pi<double>() / 4}, 1, {2, 2, -2.5}, false);
+}
+
 Scene& Scene::addAxisIndicator()
 {
     std::unique_ptr<Entity> face;
@@ -133,16 +178,17 @@ Scene& Scene::addAxisIndicator()
     return *this;
 }
 
-Scene& Scene::addPig()
+Scene& Scene::addPig(glm::dvec3 rotate, double scale, glm::dvec3 translation, bool add_box)
 {
     std::unique_ptr<Entity> face;
-    const auto load_pig_part = [](const std::string& file) {
+    const auto load_pig_part = [&rotate, &scale, &translation](const std::string& file) {
         return obj::Transform()
             .translate({1, -0.5, 2})
-            .rotate_x(-glm::pi<double>() / 2)
-            .rotate_z(-glm::pi<double>() / 3)
-            .scale(3)
-            .translate({0, 0, -1})
+            .rotate_x(rotate.x)
+            .rotate_y(rotate.y)
+            .rotate_z(rotate.z)
+            .scale(scale)
+            .translate(translation)
             .to_bvh(file);
     };
 
@@ -162,12 +208,14 @@ Scene& Scene::addPig()
     face->setMaterial(std::make_shared<DiffuseLight>(0.5 * red));
     insert(std::move(face));
 
-    face = obj::Transform()
-               .rotate_z(-glm::pi<double>() / 10)
-               .translate({0, 0, -2.75})
-               .to_bvh(obj::makeCuboid({0, 0, 0}, {4, 4, 0.5}));
-    face->setMaterial(std::make_shared<LambertianMaterial>(white));
-    insert(std::move(face));
+    if (add_box) {
+        face = obj::Transform()
+                   .rotate_z(-glm::pi<double>() / 10)
+                   .translate({0, 0, -2.75})
+                   .to_bvh(obj::makeCuboid({0, 0, 0}, {4, 4, 0.5}));
+        face->setMaterial(std::make_shared<LambertianMaterial>(white));
+        insert(std::move(face));
+    }
 
     return *this;
 }

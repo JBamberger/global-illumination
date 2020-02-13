@@ -50,10 +50,12 @@ Gui::Gui(const int width,
         SceneSetting scene;
     };
 
-    std::array<SceneMenuEntry, 5> scenes = {
+    std::array<SceneMenuEntry, 6> scenes = {
         SceneMenuEntry{"Empty Box", "Empty Cornell box.", SceneSetting::Empty},
         SceneMenuEntry{"Cornell Box", "Cornell box with one cube and two spheres.",
                        SceneSetting::Cornell},
+        SceneMenuEntry{"Exam Box", "Scene for the exam image",
+                       SceneSetting::Exam},
         SceneMenuEntry{"Pig", "Pig model consisting of multiple parts.", SceneSetting::Pig},
         SceneMenuEntry{"Spot (cow)", "Cow model with image texture.", SceneSetting::Cow},
         SceneMenuEntry{"Stanford dragon", "Stanford dragon model with many primitives.",
