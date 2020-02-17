@@ -16,15 +16,44 @@ This repository contains a pathtracer written in C++. The tracer works on a stat
 
 The following images are sampled 8, 32, 64, 128, 256, 512, 1024, 2048, 4096 and 8192 times respectively.
 
+#### Cornell box 8 samples
+
 ![Cornell box 8 samples][cornell-8]
+
+#### Cornell box 32 samples
+
 ![Cornell box 32 samples][cornell-32]
+
+#### Cornell box 64 samples
+
 ![Cornell box 64 samples][cornell-64]
+
+#### Cornell box 128 samples
+
 ![Cornell box 128 samples][cornell-128]
+
+#### Cornell box 256 samples
+
 ![Cornell box 256 samples][cornell-256]
+
+#### Cornell box 512 samples
+
 ![Cornell box 512 samples][cornell-512]
+
+#### Cornell box 1024 samples
+
 ![Cornell box 1024 samples][cornell-1024]
+
+#### Cornell box 2048 samples
+
 ![Cornell box 2048 samples][cornell-2048]
+
+#### Cornell box 4096 samples
+
 ![Cornell box 4096 samples][cornell-4096]
+
+#### Cornell box 8192 samples
+
 ![Cornell box 8192 samples][cornell-8192]
 
 ### Texture mapping
@@ -55,13 +84,12 @@ In comparison, this model of a pig consists of roughly 11400 triangles and was r
 | Dragon (diffuse)  | 47800         | 550           |
 | Dragon (glass)    | 47800         | 755           |
 
-
 ## Dependencies and prerequisites
 
-- [``cmake``][cmake]
-- [``qt5``][qt]
-- ``glm``
-- ``gtest``
+- [`cmake`][cmake]
+- [`qt5`][qt]
+- `glm`
+- `gtest`
 
 ### vcpkg
 
@@ -74,31 +102,34 @@ vcpkg install gtest
 ```
 
 ### Windows
+
 On Windows you can install the open-source version of the Qt library using the binaries provided by [www.qt.io][qt]. CMake can also be installed via binary packages from [www.cmake.org][cmake]. It is recommended to install the dependencies into the proposed directories; CMake will then find the libraries automatically.
 
 ### Linux
+
 Linux users can use their favorite package manager to install the dependencies:
 
-* Ubuntu: ``sudo apt-get install qt5 cmake``
-* Arch: ``sudo pacman -S qt5 cmake``
-* Fedora: ``sudo yum install qt5 cmake``
+- Ubuntu: `sudo apt-get install qt5 cmake`
+- Arch: `sudo pacman -S qt5 cmake`
+- Fedora: `sudo yum install qt5 cmake`
 
 ### macOS
-The easiest way to install the dependencies for macOS is to first install [Homebrew][brew]. You can then install the dependencies by typing ``brew install qt5 cmake`` into the command line.:w
+
+The easiest way to install the dependencies for macOS is to first install [Homebrew][brew]. You can then install the dependencies by typing `brew install qt5 cmake` into the command line.:w
 
 ### Building
 
 Most modern IDEs come with CMake support (e.g. CLion, Visual Studio 2019, VS Code). For a build from the command line use the following commands:
 
-~~~Bash
+```Bash
   cd <project-root>
   mkdir build; cd build
   cmake ..
   cmake --build . --config Release
   ./app/global-illu <project-root>/share
-~~~
+```
 
-For dependencies installed with vcpkg add ``-DCMAKE_TOOLCHAIN_FILE="<vcpkg-root>/scripts/buildsystems/vcpkg.cmake"`` to the ``cmake ..`` command.
+For dependencies installed with vcpkg add `-DCMAKE_TOOLCHAIN_FILE="<vcpkg-root>/scripts/buildsystems/vcpkg.cmake"` to the `cmake ..` command.
 
 On Windows you can use the graphical UI of CMake to first configure your project and then generate project files for your IDE (for example Visual Studio).
 
