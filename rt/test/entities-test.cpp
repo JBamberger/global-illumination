@@ -82,7 +82,7 @@ TEST_P(TriangleIntersectionTest, testIntersect)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    triangle.intersect(ray, hit);
+    static_cast<void>(triangle.intersect(ray, hit));
 
     if (params.success) {
         EXPECT_NEAR(hit.pos.x, params.expected_intersect.x, eps);
@@ -95,7 +95,7 @@ TEST_P(TriangleIntersectionTest, testNormal)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    triangle.intersect(ray, hit);
+    static_cast<void>(triangle.intersect(ray, hit));
 
     if (params.success) {
         EXPECT_NEAR(hit.normal.x, params.expected_normal.x, eps);
@@ -141,7 +141,7 @@ TEST_P(ImplicitSphereIntersectionTest, testIntersect)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    sphere.intersect(ray, hit);
+    static_cast<void>(sphere.intersect(ray, hit));
 
     if (params.success) {
         EXPECT_NEAR(hit.pos.x, params.expected_intersect.x, eps);
@@ -154,7 +154,7 @@ TEST_P(ImplicitSphereIntersectionTest, testNormal)
 {
     const auto params = GetParam();
     const Ray ray{{10, 0, 0}, params.direction};
-    sphere.intersect(ray, hit);
+    static_cast<void>(sphere.intersect(ray, hit));
 
     if (params.success) {
         EXPECT_NEAR(hit.normal.x, params.expected_normal.x, eps);
