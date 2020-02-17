@@ -14,18 +14,25 @@
 #include "Scene.h"
 #include "Viewer.h"
 
+/**
+ * Host window of the ray tracing application.
+ */
 class Gui : public QMainWindow {
-
-    QLabel* duration_text_;
+    /**
+     * Viewer widget that hosts the ray tracer.
+     */
     Viewer* viewer_;
-    QMenu* fileMenu_;
-    QMenu* samplesMenu_;
-    QMenu* sceneMenu_;
-    QAction* saveAction_;
 
   public:
     Gui() = delete;
 
+    /**
+     * Creates a new instance of the main window.
+     * @param width window width
+     * @param height window height
+     * @param raytracer raytracer object
+     * @param scene scene object
+     */
     Gui(int width,
         int height,
         std::shared_ptr<PathTracer> raytracer,

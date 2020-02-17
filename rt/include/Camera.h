@@ -32,9 +32,26 @@ class Camera {
   public:
     explicit Camera(glm::dvec3 pos);
 
+    /**
+     * Instantiates a new camera object with the given position and viewing direction
+     * @param pos camera focal point position
+     * @param look_at point of interest, center of the camera sensor
+     * @param v_up z-axis of the camera
+     */
     Camera(glm::dvec3 pos, glm::dvec3 look_at, glm::dvec3 v_up = {0, 0, 1});
 
+    /**
+     * Creates a ray that passes through the given pixel position.
+     * @param x x-position
+     * @param y y-position
+     * @return randomized ray through this pixel
+     */
     [[nodiscard]] Ray getRay(double x, double y) const;
 
+    /**
+     * Sets the cameras sensor resolution.
+     * @param w resolution in x direction
+     * @param h resolution in y direction
+     */
     void setWindowSize(double w, double h);
 };
