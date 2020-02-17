@@ -16,7 +16,7 @@ find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Threads)
 find_package(glm CONFIG REQUIRED)
 
-
+add_subdirectory("rt-cl")
 add_subdirectory("rt")
 add_subdirectory("app")
 
