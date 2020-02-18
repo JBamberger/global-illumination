@@ -22,7 +22,7 @@ class BVH::Node : public Entity {
   public:
     explicit Node(BoundingBox bbox) : bbox_(bbox) {}
     ~Node() override = default;
-    BoundingBox boundingBox() const override { return bbox_; }
+    [[nodiscard]] BoundingBox boundingBox() const override { return bbox_; }
 };
 
 class BVH::LeafNode : public BVH::Node {

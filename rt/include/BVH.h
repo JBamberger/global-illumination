@@ -38,6 +38,7 @@ class BVH : public Entity {
   public:
     /**
      * Creates a new bounding volume hierarchy from the given vector of triangles
+     *
      * @param faces vector of faces for contained in the volume
      * @param cutoffSize maximum number of elements per node
      */
@@ -52,6 +53,7 @@ class BVH : public Entity {
   private:
     /**
      * Creates a hierarchy from the given triangle list and returns the root node
+     *
      * @param depth the entry depth of the subtree
      * @param faces triangles in the subtree
      * @return root node of the subtree

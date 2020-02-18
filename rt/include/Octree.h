@@ -31,6 +31,7 @@ class Octree : public Hittable {
   public:
     /**
      * Constructs a new octree with the given min and max for the bbox of the tree.
+     *
      * @param min minimum position of entities in the tree
      * @param max maximum position of elements in the tree
      */
@@ -66,7 +67,7 @@ class Octree : public Hittable {
     void clear();
 
     /**
-     * Prints the tree in a lisp-like bracked style.
+     * Prints the tree in a lisp-like parenthesis-grouped style.
      *
      * @param o output stream
      * @param t tree object

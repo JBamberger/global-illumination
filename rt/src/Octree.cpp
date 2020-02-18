@@ -90,7 +90,7 @@ class Octree::Node : public Hittable {
         entities_.shrink_to_fit();
     }
 
-    bool isLeaf() const { return children_[0] == nullptr; }
+    [[nodiscard]] bool isLeaf() const { return children_[0] == nullptr; }
 
     void insert(Hittable* e, const size_t depth)
     {
@@ -135,7 +135,7 @@ class Octree::Node : public Hittable {
         }
     }
 
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         assert(isLeaf());
 
@@ -180,7 +180,7 @@ class Octree::Node : public Hittable {
         return min_dist < std::numeric_limits<double>::max();
     }
 
-    BoundingBox boundingBox() const override { return bbox_; }
+    [[nodiscard]] BoundingBox boundingBox() const override { return bbox_; }
 
     friend std::ostream& operator<<(std::ostream& o, const Node& n)
     {
