@@ -12,6 +12,8 @@ This repository contains a pathtracer written in C++. The tracer works on a stat
 
 ## Results
 
+![Exam scene][exam-scene]
+
 ### Number of samples
 
 The following images are sampled 8, 32, 64, 128, 256, 512, 1024, 2048, 4096 and 8192 times respectively.
@@ -138,6 +140,7 @@ On Windows you can use the graphical UI of CMake to first configure your project
 [brew]: www.brew.sh
 [vcpkg]: https://github.com/Microsoft/vcpkg
 
+[exam-scene]: ./results/exam-scene.jpg "Exam scene"
 [cornell-8]: ./results/cornell-8.png "Cornell box 8 samples"
 [cornell-32]: ./results/cornell-32.png "Cornell box 32 samples"
 [cornell-64]: ./results/cornell-64.png "Cornell box 64 samples"
