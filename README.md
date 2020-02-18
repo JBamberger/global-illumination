@@ -1,7 +1,7 @@
 
-# Global Illumination Methods: PathTracer WS1920
+# Global Illumination Methods: Path tracing
 
-This repository contains a pathtracer written in C++. The tracer works on a static scene and only uses the CPU. The tracing process is parallelized with OpenMP. Some features of the application include:
+This repository contains a path tracer written in C++. The tracer works on a static scene and only uses the CPU. The tracing process is parallelized with OpenMP. Some features of the application include:
 
 - Bounding-box-based hit-tests
 - An Octree for the scene
@@ -88,14 +88,10 @@ In comparison, this model of a pig consists of roughly 11400 triangles and was r
 
 ## Dependencies and prerequisites
 
-- [`cmake`][cmake]
-- [`qt5`][qt]
-- `glm`
-- `gtest`
+[`cmake`][cmake], [`qt5`][qt], [`glm`][glm], [`gtest`][gtest]
 
 ### vcpkg
-
-[Vcpkg][vcpkg] is a cross-platform package manager for C and C++ libraries.
+The easiest way to build the project is to install the dependencies with vcpkg. [Vcpkg][vcpkg] is a cross-platform package manager for C and C++ libraries.
 
 ```bash
 vcpkg install qt5
@@ -105,11 +101,11 @@ vcpkg install gtest
 
 ### Windows
 
-On Windows you can install the open-source version of the Qt library using the binaries provided by [www.qt.io][qt]. CMake can also be installed via binary packages from [www.cmake.org][cmake]. It is recommended to install the dependencies into the proposed directories; CMake will then find the libraries automatically.
+CMake can also be installed from [cmake.org][cmake]. The libraries can be downloaded and installed separately. To make them available to CMake create environment variables with `<libname>_ROOT` and the path to the library as value.
 
 ### Linux
 
-Linux users can use their favorite package manager to install the dependencies:
+Cmake and qt can be installed with most package managers. The other libraries must be downloaded separately.
 
 - Ubuntu: `sudo apt-get install qt5 cmake`
 - Arch: `sudo pacman -S qt5 cmake`
@@ -117,11 +113,13 @@ Linux users can use their favorite package manager to install the dependencies:
 
 ### macOS
 
-The easiest way to install the dependencies for macOS is to first install [Homebrew][brew]. You can then install the dependencies by typing `brew install qt5 cmake` into the command line.:w
+If [Homebrew][brew] is available install Qt and CMake with it `brew install qt5 cmake`. Otherwise install the dependencies manually.
 
-### Building
+## Building
 
-Most modern IDEs come with CMake support (e.g. CLion, Visual Studio 2019, VS Code). For a build from the command line use the following commands:
+Most modern IDEs come with CMake support (e.g. CLion, Visual Studio 2019, VS Code) or have plugins to enable such support. Then it is sufficient to open the project folder and build one of the targets.
+
+For a build from the command line use the following commands:
 
 ```Bash
   cd <project-root>
@@ -136,6 +134,8 @@ For dependencies installed with vcpkg add `-DCMAKE_TOOLCHAIN_FILE="<vcpkg-root>/
 On Windows you can use the graphical UI of CMake to first configure your project and then generate project files for your IDE (for example Visual Studio).
 
 [qt]: https://www.qt.io/download-open-source/
+[glm]: https://github.com/g-truc/glm
+[gtest]: https://github.com/google/googletest
 [cmake]: https://cmake.org/download/
 [brew]: www.brew.sh
 [vcpkg]: https://github.com/Microsoft/vcpkg
